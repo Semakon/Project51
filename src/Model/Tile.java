@@ -40,7 +40,7 @@ public class Tile {
      * Divides the id of this tile by DIVISION and uses the outcome to give the color of this tile in a String presentation.
      * @return String presentation of this tile's color.
      */
-    public String IdToColor() {
+    private String IdToColor() {
         String color;
         int colorId = id / DIVISION;
         switch (colorId) {
@@ -66,7 +66,7 @@ public class Tile {
      * Divides the id of this tile by DIVISION and uses the outcome to give the shape of this tile in a String presentation.
      * @return String presentation of this tile's shape.
      */
-    public String IdToShape() {
+    private String IdToShape() {
         String shape;
         int colorId = id % DIVISION;
         switch (colorId) {
