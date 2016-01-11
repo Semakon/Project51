@@ -1,9 +1,11 @@
-import Model.Tile;
+package Tests;
+
+import Model.Game.Tile;
 
 /**
  * Created by martijn on 11-1-16.
  */
-public class test {
+public class TileTest {
 
     public static void main(String args[]) {
         Tile tile1 = new Tile(0);

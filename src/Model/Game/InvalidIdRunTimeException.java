@@ -1,4 +1,4 @@
-package Model;
+package Model.Game;
 
 /**
  * Created by martijn on 11-1-16.

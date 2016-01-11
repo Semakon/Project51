@@ -1,11 +1,9 @@
-package Model;
+package Model.Game;
 
 /**
  * Created by martijn on 11-1-16.
  */
 public class Tile {
-
-    private static final int DIVISION = 6;  //name subject to change.
 
     private int id;
     private String color;
@@ -42,7 +40,7 @@ public class Tile {
      */
     private String IdToColor() {
         String color;
-        int colorId = id / DIVISION;
+        int colorId = id / Configuration.DIVISION;
         switch (colorId) {
             case 0 : color = "Green";
                 break;
@@ -68,7 +66,7 @@ public class Tile {
      */
     private String IdToShape() {
         String shape;
-        int colorId = id % DIVISION;
+        int colorId = id % Configuration.DIVISION;
         switch (colorId) {
             case 0 : shape = "Cross";
                 break;
