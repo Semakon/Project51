@@ -1,7 +1,7 @@
 package Model.Game;
 
 import Model.Game.Exceptions.InsufficientTilesInPoolException;
-import Model.Game.Exceptions.InvalidAmountRunTimeExceptiontest;
+import Model.Game.Exceptions.InvalidAmountRuntimeException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ public class Pool {
      */
     public List<Tile> takeTiles(int amount) throws InsufficientTilesInPoolException {
         if (amount <= 0 || amount > Configuration.MAXIMUM_HAND) {
-            throw new InvalidAmountRunTimeExceptiontest("Amount must be between 0 (exclusive) and " + Configuration.MAXIMUM_HAND + " (inclusive).");
+            throw new InvalidAmountRuntimeException("Amount must be between 0 (exclusive) and " + Configuration.MAXIMUM_HAND + " (inclusive).");
         }
         if (pool.size() < amount) {
             throw new InsufficientTilesInPoolException("Pool doesn't contain enough tiles.");

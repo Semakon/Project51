@@ -1,6 +1,6 @@
 package Model.Game;
 
-import Model.Game.Exceptions.InvalidIdRunTimeExceptiontest;
+import Model.Game.Exceptions.InvalidIdRuntimeException;
 
 /**
  * Created by martijn on 11-1-16.
@@ -17,7 +17,7 @@ public class Tile {
      */
     public Tile(int id) {
         if (id < 0 || id > 35) {
-            throw new InvalidIdRunTimeExceptiontest("ID must be between 0 (inclusive) and " + (Configuration.DIVISION * Configuration.DIVISION) + ".");
+            throw new InvalidIdRuntimeException("ID must be between 0 (inclusive) and " + (Configuration.DIVISION * Configuration.DIVISION) + ".");
         }
         this.id = id;
         this.color = IdToColor();
