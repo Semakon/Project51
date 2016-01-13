@@ -10,15 +10,23 @@ import java.util.Map;
  */
 public class PutMove extends Move {
 
-    private Criteria criteria = Criteria.invalid;
+    private Criteria criteria = Criteria.unspecified;
     private Positioning positioning = Positioning.unspecified;
 
-    public Map<Location, Tile> Move() {
+    public Map<Location, Tile> move() {
         Map<Location, Tile> move = null;
 
         //TODO: implement (with exceptions)
 
         return move;
+    }
+
+    public Criteria getCriteria() {
+        return criteria;
+    }
+
+    public Positioning getPositioning() {
+        return positioning;
     }
 
     /**
@@ -51,7 +59,7 @@ public class PutMove extends Move {
         boolean duplicate = false;
         for (Location loc : m.keySet()) {
             for (Location loc2 : m.keySet()) {
-                if (loc != loc2 && loc.isDuplicate(loc2)) {
+                if (loc != loc2 && loc.equalsPos(loc2)) {
                     duplicate = true;
                 }
             }

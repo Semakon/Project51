@@ -26,7 +26,7 @@ public class Location {
      * @param loc the other Location
      * @return true if loc points to the same location as this Location
      */
-    public boolean isDuplicate(Location loc) {
+    public boolean equalsPos(Location loc) {
         return this.x == loc.getX() && this.y == loc.getY();
     }
 

@@ -1,5 +1,7 @@
 package Model.Game;
 
+import Model.Game.Enumerations.Positioning;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,8 +34,13 @@ public class Board {
     }
 
     private boolean validPut(PutMove move) { //TODO: add exceptions
-        Map<Location, Tile> m = move.Move();
+        Map<Location, Tile> m = move.move();
 
+        if (move.getPositioning() == Positioning.vertical) {
+            for (Location loc : m.keySet()) {
+                //TODO: implement
+            }
+        }
         return false;
     }
 
