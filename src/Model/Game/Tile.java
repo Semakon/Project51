@@ -1,5 +1,7 @@
 package Model.Game;
 
+import Model.Game.Enumerations.Color;
+import Model.Game.Enumerations.Shape;
 import Model.Game.Exceptions.InvalidIdRuntimeException;
 
 /**
@@ -8,8 +10,8 @@ import Model.Game.Exceptions.InvalidIdRuntimeException;
 public class Tile {
 
     private int id;
-    private String color;
-    private String shape;
+    private Color color;
+    private Shape shape;
 
     /**
      * Creates a new Tile with an id, color and shape.
@@ -17,22 +19,22 @@ public class Tile {
      */
     public Tile(int id) {
         if (id < 0 || id > 35) {
-            throw new InvalidIdRuntimeException("ID must be between 0 (inclusive) and " + (Configuration.RANGE * Configuration.RANGE) + ".");
+            throw new InvalidIdRuntimeException("ID must be between 0 (inclusive) and " + (Configuration.RANGE * Configuration.RANGE) + " (exclusive).");
         }
         this.id = id;
-        this.color = IdToColor();
-        this.shape = IdToShape();
+        this.color = idToColor(id);
+        this.shape = idToShape(id);
     }
 
     public int getId() {
         return id;
     }
 
-    public String getColor() {
+    public Color getColor() {
         return color;
     }
 
-    public String getShape() {
+    public Shape getShape() {
         return shape;
     }
 
@@ -40,52 +42,34 @@ public class Tile {
      * Divides the id of this tile by RANGE and uses the outcome to give the color of this tile in a String presentation.
      * @return String presentation of this tile's color.
      */
-    private String IdToColor() {
-        String color;
-        int colorId = id / Configuration.RANGE;
-        switch (colorId) {
-            case 0 : color = "Green";
-                break;
-            case 1 : color = "Yellow";
-                break;
-            case 2 : color = "Red";
-                break;
-            case 3 : color = "Blue";
-                break;
-            case 4 : color = "Purple";
-                break;
-            case 5 : color = "Orange";
-                break;
-            default : color = null;
-                break;
+    private Color idToColor(int id) {
+        id = id / Configuration.RANGE;
+        switch (id) {
+            case 0 : return Color.Green;
+            case 1 : return Color.Yellow;
+            case 2 : return Color.Red;
+            case 3 : return Color.Blue;
+            case 4 : return Color.Purple;
+            case 5 : return Color.Orange;
+            default : return null;
         }
-        return color;
     }
 
     /**
      * Divides the id of this tile by RANGE and uses the outcome to give the shape of this tile in a String presentation.
      * @return String presentation of this tile's shape.
      */
-    private String IdToShape() {
-        String shape;
-        int colorId = id % Configuration.RANGE;
-        switch (colorId) {
-            case 0 : shape = "Cross";
-                break;
-            case 1 : shape = "Plus";
-                break;
-            case 2 : shape = "Square";
-                break;
-            case 3 : shape = "Star";
-                break;
-            case 4 : shape = "Circle";
-                break;
-            case 5 : shape = "Diamond";
-                break;
-            default : shape = null;
-                break;
+    private Shape idToShape(int id) {
+        id = id % Configuration.RANGE;
+        switch (id) {
+            case 0 : return Shape.Cross;
+            case 1 : return Shape.Plus;
+            case 2 : return Shape.Square;
+            case 3 : return Shape.Star;
+            case 4 : return Shape.Circle;
+            case 5 : return Shape.Diamond;
+            default : return null;
         }
-        return shape;
     }
 
 }

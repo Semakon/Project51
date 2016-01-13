@@ -1,8 +1,6 @@
 package Tests;
 
-import Model.Game.Board;
-import Model.Game.Location;
-import Model.Game.Tile;
+import Model.Game.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,8 +24,8 @@ public class ValidLocationTest {
         move.put(loc3, tile);
         move.put(loc4, tile);
 
-        Board b = new Board();
-//        System.out.println(b.validLocation(move)); //change Board.validLocation(Map<Location, Tile> m) to public to test
+        Move m = new PutMove();
+//        System.out.println(m.validMovePositioning(move));
     }
 
 }

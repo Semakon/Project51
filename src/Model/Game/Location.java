@@ -22,6 +22,15 @@ public class Location {
     }
 
     /**
+     * Determines whether another location has the same x and y
+     * @param loc the other Location
+     * @return true if loc points to the same location as this Location
+     */
+    public boolean isDuplicate(Location loc) {
+        return this.x == loc.getX() && this.y == loc.getY();
+    }
+
+    /**
      * Gives a String representation of Location for the IProtocol.
      * @return x,y
      */
