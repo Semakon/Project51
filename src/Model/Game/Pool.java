@@ -15,12 +15,13 @@ public class Pool {
     private List<Tile> pool;
 
     /**
-     * Creates a new instance of Pool. TO BE CONTINUED!
+     * Creates a new instance of Pool with Configuration.RANGE * Configuration.RANGE unique tiles. Every unique tile appears
+     * Configuration.TILE_DUPLICATES times in the pool.
      */
     public Pool() {
         pool = new ArrayList<>();
         for (int i = 0; i < Configuration.TILE_DUPLICATES; i++) {
-            for (int j = 0; j < Configuration.DIVISION * Configuration.DIVISION; j++) {
+            for (int j = 0; j < Configuration.RANGE * Configuration.RANGE; j++) {
                 pool.add(new Tile(j));
             }
         }

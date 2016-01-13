@@ -17,7 +17,7 @@ public class Tile {
      */
     public Tile(int id) {
         if (id < 0 || id > 35) {
-            throw new InvalidIdRuntimeException("ID must be between 0 (inclusive) and " + (Configuration.DIVISION * Configuration.DIVISION) + ".");
+            throw new InvalidIdRuntimeException("ID must be between 0 (inclusive) and " + (Configuration.RANGE * Configuration.RANGE) + ".");
         }
         this.id = id;
         this.color = IdToColor();
@@ -37,12 +37,12 @@ public class Tile {
     }
 
     /**
-     * Divides the id of this tile by DIVISION and uses the outcome to give the color of this tile in a String presentation.
+     * Divides the id of this tile by RANGE and uses the outcome to give the color of this tile in a String presentation.
      * @return String presentation of this tile's color.
      */
     private String IdToColor() {
         String color;
-        int colorId = id / Configuration.DIVISION;
+        int colorId = id / Configuration.RANGE;
         switch (colorId) {
             case 0 : color = "Green";
                 break;
@@ -63,12 +63,12 @@ public class Tile {
     }
 
     /**
-     * Divides the id of this tile by DIVISION and uses the outcome to give the shape of this tile in a String presentation.
+     * Divides the id of this tile by RANGE and uses the outcome to give the shape of this tile in a String presentation.
      * @return String presentation of this tile's shape.
      */
     private String IdToShape() {
         String shape;
-        int colorId = id % Configuration.DIVISION;
+        int colorId = id % Configuration.RANGE;
         switch (colorId) {
             case 0 : shape = "Cross";
                 break;

@@ -6,7 +6,7 @@ package Model.Game;
 public class Configuration {
 
     //Amount of unique colors and shapes (not combinations)
-    public static final int DIVISION = 6;  //name subject to change.
+    public static final int RANGE = 6;  //name subject to change.
 
     //Amount of duplicates of a unique tile
     public static final int TILE_DUPLICATES = 3;
