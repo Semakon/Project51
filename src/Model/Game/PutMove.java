@@ -1,6 +1,6 @@
 package Model.Game;
 
-import Model.Game.Enumerations.Criteria;
+import Model.Game.Enumerations.Identity;
 import Model.Game.Enumerations.Positioning;
 
 import java.util.Map;
@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public class PutMove extends Move {
 
-    private Criteria criteria = Criteria.unspecified;
+    private Identity identity = Identity.unspecified;
     private Positioning positioning = Positioning.unspecified;
 
     public Map<Location, Tile> move() {
@@ -21,8 +21,8 @@ public class PutMove extends Move {
         return move;
     }
 
-    public Criteria getCriteria() {
-        return criteria;
+    public Identity getIdentity() {
+        return identity;
     }
 
     public Positioning getPositioning() {
@@ -35,7 +35,7 @@ public class PutMove extends Move {
      * @param m Map with Location and Tile from the move
      * @return True if the Location of the move is valid
      */
-    public boolean validMovePositioning(Map<Location, Tile> m) {
+    public boolean validPositioning(Map<Location, Tile> m) {
         boolean validX = true;
         outerLoop:
         for (Location loc : m.keySet()) {
@@ -59,7 +59,7 @@ public class PutMove extends Move {
         boolean duplicate = false;
         for (Location loc : m.keySet()) {
             for (Location loc2 : m.keySet()) {
-                if (loc != loc2 && loc.equalsPos(loc2)) {
+                if (loc != loc2 && loc.isEqualTo(loc2)) {
                     duplicate = true;
                 }
             }
@@ -81,7 +81,7 @@ public class PutMove extends Move {
      * @param m Map with Location and Tile from the move
      * @return True if the Tiles have valid shapes/colors
      */
-    public boolean validMoveCriteria(Map<Location, Tile> m) {
+    public boolean validIdentity(Map<Location, Tile> m) {
         boolean validColor = true;
         outerLoop:
         for (Tile tile : m.values()) {
@@ -103,13 +103,13 @@ public class PutMove extends Move {
             }
         }
         if (validColor && validShape) {
-            criteria = Criteria.unspecified;
+            identity = Identity.unspecified;
         } else if (validColor) {
-            criteria = Criteria.color;
+            identity = Identity.color;
         } else if (validShape) {
-            criteria = Criteria.shape;
+            identity = Identity.shape;
         } else {
-            criteria = Criteria.invalid;
+            identity = Identity.invalid;
         }
         return validColor || validShape;
     }

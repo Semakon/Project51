@@ -24,8 +24,8 @@ public class ValidLocationTest {
         move.put(loc3, tile);
         move.put(loc4, tile);
 
-        Move m = new PutMove();
-//        System.out.println(m.validMovePositioning(move));
+        PutMove m = new PutMove();
+        System.out.println(m.validPositioning(move));
     }
 
 }

@@ -1,5 +1,6 @@
 package Model.Game;
 
+import Model.Game.Enumerations.Identity;
 import Model.Game.Enumerations.Positioning;
 
 import java.util.HashMap;
@@ -29,19 +30,82 @@ public class Board {
         if (move instanceof PutMove) {
             valid = validPut((PutMove) move);
         } else
-            valid = move instanceof TradeMove && validTrade((TradeMove) move); //subject to change
+            valid = move instanceof TradeMove && validTrade((TradeMove) move);
         return valid;
     }
 
     private boolean validPut(PutMove move) { //TODO: add exceptions
         Map<Location, Tile> m = move.move();
 
+        boolean valid = false;
+
         if (move.getPositioning() == Positioning.vertical) {
+            int testedBlocks = 0;
+            int validatedBlocks = 0;
             for (Location loc : m.keySet()) {
-                //TODO: implement
+                Tile tileBelow = null;
+                Tile tileAbove = null;
+                boolean inMove = false;
+                for (Location loc2 : m.keySet()) {
+                    if (loc2.isEqualTo(loc.getX(), loc.getY() - 1)) {
+                        // (loc.x, loc.y - 1) is not empty.
+                        inMove = true;
+                        break;
+                    }
+                }
+                if (inMove) {
+                    inMove = false;
+                } else {
+                    for (Location fieldLoc : field.keySet()) {
+                        if (fieldLoc.isEqualTo(loc.getX(), loc.getY() - 1)) {
+                            // (loc.x, loc.y - 1) is present on the board.
+                            tileBelow = field.get(fieldLoc);
+                            testedBlocks++;
+                            break;
+                        }
+                    }
+                }
+                for (Location loc2 : m.keySet()) {
+                    if (loc2.isEqualTo(loc.getX(), loc.getY() + 1)) {
+                        // (loc.x, loc.y + 1) is not empty.
+                        inMove = true;
+                        break;
+                    }
+                }
+                if (!inMove) {
+                    for (Location fieldLoc : field.keySet()) {
+                        if (fieldLoc.isEqualTo(loc.getX(), loc.getY() + 1)) {
+                            // (loc.x, loc.y + 1) is present on the board.
+                            tileAbove = field.get(fieldLoc);
+                            testedBlocks++;
+                            break;
+                        }
+                    }
+                }
+                if (move.getIdentity() == Identity.color) {
+                    if (tileBelow != null && tileBelow.getColor() == m.get(loc).getColor()) {
+                        validatedBlocks++;
+                    }
+                    if (tileAbove != null && tileAbove.getColor() == m.get(loc).getColor()) {
+                        validatedBlocks++;
+                    }
+                } else if (move.getIdentity() == Identity.shape) {
+                    if (tileBelow != null && tileBelow.getShape() == m.get(loc).getShape()) {
+                        validatedBlocks++;
+                    }
+                    if (tileAbove != null && tileAbove.getShape() == m.get(loc).getShape()) {
+                        validatedBlocks++;
+                    }
+                } else {
+                    //TODO: throw  runtimeException: invalid or unspecified identity.
+                }
             }
+            if (testedBlocks - validatedBlocks == 0) {
+                valid = true;
+            }
+
         }
-        return false;
+        return valid;
     }
 
     private boolean validTrade(TradeMove move) {
