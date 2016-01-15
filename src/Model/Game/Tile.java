@@ -39,6 +39,15 @@ public class Tile {
     }
 
     /**
+     * Checks whether a Tile is equal to this Tile.
+     * @param tile Tile to be checked
+     * @return True if this Tile and tile have the same shape and color
+     */
+    public boolean isEqualTo(Tile tile) {
+        return tile.getColor() == color && tile.getShape() == shape;
+    }
+
+    /**
      * Divides the id of this tile by RANGE and uses the outcome to give the color of this tile in a String presentation.
      * @return String presentation of this tile's color.
      */

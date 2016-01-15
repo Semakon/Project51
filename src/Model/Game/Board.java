@@ -38,7 +38,7 @@ public class Board {
         Map<Location, Tile> m = move.move();
 
         boolean valid = false;
-
+        outerLoop:
         if (move.getPositioning() == Positioning.vertical) {
             int testedBlocks = 0;
             int validatedBlocks = 0;
@@ -57,6 +57,10 @@ public class Board {
                     inMove = false;
                 } else {
                     for (Location fieldLoc : field.keySet()) {
+                        if (field.get(fieldLoc).isEqualTo(m.get(loc))) {
+                            valid = false;
+                            break outerLoop;
+                        }
                         if (fieldLoc.isEqualTo(loc.getX(), loc.getY() - 1)) {
                             // (loc.x, loc.y - 1) is present on the board.
                             tileBelow = field.get(fieldLoc);
@@ -74,6 +78,10 @@ public class Board {
                 }
                 if (!inMove) {
                     for (Location fieldLoc : field.keySet()) {
+                        if (field.get(fieldLoc).isEqualTo(m.get(loc))) {
+                            valid = false;
+                            break outerLoop;
+                        }
                         if (fieldLoc.isEqualTo(loc.getX(), loc.getY() + 1)) {
                             // (loc.x, loc.y + 1) is present on the board.
                             tileAbove = field.get(fieldLoc);
@@ -101,7 +109,7 @@ public class Board {
                 }
             }
             if (testedBlocks - validatedBlocks == 0) {
-                valid = true;
+                //vertical axis is valid
             }
 
         }
