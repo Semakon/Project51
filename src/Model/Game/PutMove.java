@@ -41,6 +41,7 @@ public class PutMove extends Move {
         boolean verticalLine = true;
         boolean horizontalLine = true;
         boolean duplicate = false;
+        boolean valid = true;
 
         outerLoop:
         for (Location loc : move.keySet()) {
@@ -67,16 +68,18 @@ public class PutMove extends Move {
                 }
             }
         }
-        if (verticalLine && horizontalLine) {                                             //this means m only contains one block.
+        if (move.size() == 1) {
             positioning = Positioning.unspecified;
-        } else if (horizontalLine) {
+        } else if (horizontalLine && !verticalLine) {
             positioning = Positioning.horizontal;
-        } else if (verticalLine) {
+        } else if (!horizontalLine && verticalLine) {
             positioning = Positioning.vertical;
         } else {
+            valid = false;
             positioning = Positioning.invalid;
         }
-        return (verticalLine || horizontalLine) && !duplicate;
+
+        return valid && !duplicate;
     }
 
     /**
@@ -131,10 +134,8 @@ public class PutMove extends Move {
                     }
                 }
             }
-        } else if (identity == Identity.unspecified) {
-            valid = true;
         } else {
-            valid = false;
+            valid = identity == Identity.unspecified;
         }
 
         return valid;
