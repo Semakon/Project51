@@ -3,6 +3,7 @@ package Model.Game;
 import Model.Game.Enumerations.Identity;
 import Model.Game.Enumerations.Positioning;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -12,12 +13,14 @@ public class PutMove extends Move {
 
     private Identity identity = Identity.unspecified;
     private Positioning positioning = Positioning.unspecified;
+    private Map<Location, Tile> move;
 
-    public Map<Location, Tile> move() {
-        Map<Location, Tile> move = null;
+    public PutMove() {
+        move = new HashMap<>();
+        //TODO: implement generating move
+    }
 
-        //TODO: implement (with exceptions)
-
+    public Map<Location, Tile> getMove() {
         return move;
     }
 
@@ -32,86 +35,109 @@ public class PutMove extends Move {
     /**
      * Checks whether a move is either all on one horizontal line or all on one vertical line and within Configuration.RANGE
      * distance from one another. Also checks whether the move set has duplicates.
-     * @param m Map with Location and Tile from the move
      * @return True if the Location of the move is valid
      */
-    public boolean validPositioning(Map<Location, Tile> m) {
-        boolean validX = true;
+    public boolean validPositioning() {
+        boolean verticalLine = true;
+        boolean horizontalLine = true;
+        boolean duplicate = false;
+
         outerLoop:
-        for (Location loc : m.keySet()) {
-            for (Location loc2 : m.keySet()) {
-                if (loc.getX() != loc2.getX() || Math.abs(loc.getY() - loc2.getY()) > Configuration.RANGE) {
-                    validX = false;
+        for (Location loc : move.keySet()) {
+            for (Location loc2 : move.keySet()) {
+                if (loc.getX() != loc2.getX() || Math.abs(loc.getY() - loc2.getY()) > Configuration.RANGE - 1) {
+                    verticalLine = false;
                     break outerLoop;
                 }
             }
         }
-        boolean validY = true;
-        outerLoop2:
-        for (Location loc : m.keySet()) {
-            for (Location loc2 : m.keySet()) {
-                if (loc.getY() != loc2.getY() || Math.abs(loc.getX() - loc2.getX()) > Configuration.RANGE) {
-                    validY = false;
-                    break outerLoop2;
+        outerLoop:
+        for (Location loc : move.keySet()) {
+            for (Location loc2 : move.keySet()) {
+                if (loc.getY() != loc2.getY() || Math.abs(loc.getX() - loc2.getX()) > Configuration.RANGE - 1) {
+                    horizontalLine = false;
+                    break outerLoop;
                 }
             }
         }
-        boolean duplicate = false;
-        for (Location loc : m.keySet()) {
-            for (Location loc2 : m.keySet()) {
+        for (Location loc : move.keySet()) {
+            for (Location loc2 : move.keySet()) {
                 if (loc != loc2 && loc.isEqualTo(loc2)) {
                     duplicate = true;
                 }
             }
         }
-        if (validX && validY) {
+        if (verticalLine && horizontalLine) {                                             //this means m only contains one block.
             positioning = Positioning.unspecified;
-        } else if (validY) {
+        } else if (horizontalLine) {
             positioning = Positioning.horizontal;
-        } else if (validX) {
+        } else if (verticalLine) {
             positioning = Positioning.vertical;
         } else {
             positioning = Positioning.invalid;
         }
-        return (validX || validY) && !duplicate;
+        return (verticalLine || horizontalLine) && !duplicate;
     }
 
     /**
-     * Checks whether a move is either all different colors or all different shapes.
-     * @param m Map with Location and Tile from the move
+     * Checks whether a move has all Tiles with the same color and different shape or same shape and different color.
      * @return True if the Tiles have valid shapes/colors
      */
-    public boolean validIdentity(Map<Location, Tile> m) {
-        boolean validColor = true;
-        outerLoop:
-        for (Tile tile : m.values()) {
-            for (Tile tile2 : m.values()) {
-                if (tile != tile2 && tile.getColor() == tile2.getColor()) {
-                    validColor = false;
-                    break outerLoop;
+    public boolean validIdentity() {
+        boolean valid = true;
+        boolean sameColor = true;
+        boolean sameShape = true;
+
+        for (Tile tile : move.values()) {
+            for (Tile tile2 : move.values()) {
+                if (tile != tile2 && tile.getColor() != tile2.getColor()) {
+                    sameColor = false;
+                }
+                if (tile != tile2 && tile.getShape() != tile2.getShape()) {
+                    sameShape = false;
                 }
             }
         }
-        boolean validShape = true;
-        outerLoop2:
-        for (Tile tile : m.values()) {
-            for (Tile tile2 : m.values()) {
-                if (tile != tile2 && tile.getShape() == tile2.getShape()) {
-                    validShape = false;
-                    break outerLoop2;
-                }
-            }
-        }
-        if (validColor && validShape) {
+
+        if (move.size() == 1) {
             identity = Identity.unspecified;
-        } else if (validColor) {
+        } else if (sameColor && !sameShape) {
             identity = Identity.color;
-        } else if (validShape) {
+        } else if (!sameColor && sameShape) {
             identity = Identity.shape;
         } else {
             identity = Identity.invalid;
         }
-        return validColor || validShape;
+
+        if (identity == Identity.color) {
+            outerLoop:
+            for (Tile tile : move.values()) {
+                for (Tile tile2 : move.values()) {
+                    if (tile != tile2 && tile.getShape() == tile2.getShape()) {
+                        //m contains one or more doubles.
+                        valid = false;
+                        break outerLoop;
+                    }
+                }
+            }
+        } else if (identity == Identity.shape) {
+            outerLoop:
+            for (Tile tile : move.values()) {
+                for (Tile tile2 : move.values()) {
+                    if (tile != tile2 && tile.getColor() == tile2.getColor()) {
+                        //m contains one or more doubles.
+                        valid = false;
+                        break outerLoop;
+                    }
+                }
+            }
+        } else if (identity == Identity.unspecified) {
+            valid = true;
+        } else {
+            valid = false;
+        }
+
+        return valid;
     }
 
 }

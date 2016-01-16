@@ -35,9 +35,22 @@ public class Board {
     }
 
     private boolean validPut(PutMove move) { //TODO: add exceptions
-        Map<Location, Tile> m = move.move();
+        Map<Location, Tile> m = move.getMove();
 
         boolean valid = false;
+        boolean verticalValid = false;
+        boolean horizontalValid = false;
+
+        for (Location loc : move.getMove().keySet()) {
+            for (Location loc2 : field.keySet()) {
+                if (loc.isEqualTo(loc2)) {
+                    //TODO: throw exception: location already in use
+                    return false;
+                }
+            }
+        }
+
+        // vertical
         outerLoop:
         if (move.getPositioning() == Positioning.vertical) {
             int testedBlocks = 0;
@@ -104,14 +117,83 @@ public class Board {
                     if (tileAbove != null && tileAbove.getShape() == m.get(loc).getShape()) {
                         validatedBlocks++;
                     }
+                } else if (move.getIdentity() == Identity.unspecified) {
+                    if (tileBelow != null && (tileBelow.getColor() == m.get(loc).getColor() || tileBelow.getShape() == m.get(loc).getShape())) {
+                        validatedBlocks++;
+                    }
+                    if (tileAbove != null && (tileAbove.getColor() == m.get(loc).getColor() || tileAbove.getShape() == m.get(loc).getShape())) {
+                        validatedBlocks++;
+                    }
                 } else {
-                    //TODO: throw  runtimeException: invalid or unspecified identity.
+                    //TODO: throw runtimeException: invalid identity.
                 }
             }
             if (testedBlocks - validatedBlocks == 0) {
-                //vertical axis is valid
+                verticalValid = true;
             }
 
+        } else if (move.getPositioning() == Positioning.horizontal) {
+            //TODO: implement
+        } else if (move.getPositioning() == Positioning.unspecified) {
+            //TODO: implement
+        } else {
+            //TODO: throw runtimeException: invalid positioning
+        }
+
+
+        return valid;
+    }
+
+    public boolean validLine(PutMove move, Location location, int step) { //TODO: add choice for X or Y
+
+        //TODO: FIX EVERYTHING BECAUSE I FAILED TO UNDERSTAND THE SIMPLEST OF RULES... FUCK THIS GAME
+        boolean valid = false;
+        boolean inMove = false;
+        for (Location loc : move.getMove().keySet()) {
+            if (loc.isEqualTo(location)) {
+                valid = validLine(move, new Location(loc.getX(), loc.getY() + step), step);             // recursive
+                inMove = true;
+                break;
+            }
+        }
+        if (!inMove) {
+            for (Location loc : field.keySet()) {
+                if (loc.isEqualTo(location)) {
+
+                    if (move.getIdentity() == Identity.color) {
+                        for (Location loc2 : move.getMove().keySet()) {
+                            if (field.get(loc).getColor() == move.getMove().get(loc2).getColor()) {
+                                //TODO: throw exception: color already in row/column
+                                return false;
+                            }
+                        }
+                        valid = validLine(move, new Location(loc.getX(), loc.getY() + step), step);     // recursive
+
+                    } else if (move.getIdentity() == Identity.shape) {
+                        for (Location loc2 : move.getMove().keySet()) {
+                            if (field.get(loc).getShape() == move.getMove().get(loc2).getShape()) {
+                                //TODO: throw exception: shape already in row/column
+                                return false;
+                            }
+                        }
+                        valid = validLine(move, new Location(loc.getX(), loc.getY() + step), step);     // recursive
+
+                    } else if (move.getIdentity() == Identity.unspecified) {
+                        for (Location loc2 : move.getMove().keySet()) {
+                            if (field.get(loc).getColor() == move.getMove().get(loc2).getColor() ||
+                                    field.get(loc).getShape() == move.getMove().get(loc2).getShape()) {
+                                //TODO: throw exception: shape/color already in row/column
+                                return false;
+                            }
+                        }
+                    } else {
+                        //TODO: throw runtimeException: invalid identity
+                    }
+
+                    break; // right location is found, no need to continue loop
+
+                }
+            }
         }
         return valid;
     }
