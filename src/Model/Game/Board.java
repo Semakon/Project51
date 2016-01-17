@@ -65,7 +65,60 @@ public class Board {
         return validLine && validOrthogonalLines;
     }
 
+    public boolean validOrthogonalLines(PutMove move, Direction direction, Location location, Location startPoint, int step, Identity identity) { // step is either +1 or -1
+        for (Location loc : move.getMove().keySet()) {
+            if (loc.isEqualTo(location)) {
+                if (direction == Direction.X) {
+                    return validOrthogonalLines(move, direction, new Location(loc.getX(), loc.getY() + step), startPoint, step, identity);
+                } else {
+                    return validOrthogonalLines(move, direction, new Location(loc.getX() + step, loc.getY()), startPoint, step, identity);
+                }
+            }
+        }
+
+        for (Location loc : field.keySet()) {
+            if (loc.isEqualTo(location)) {
+
+                if (field.get(loc).getColor() == move.getMove().get(startPoint).getColor() &&
+                        field.get(loc).getShape() == move.getMove().get(startPoint).getShape()) {
+                    // same block (exception?)
+                    return false;
+                }
+                if (field.get(loc).getColor() != move.getMove().get(startPoint).getColor() &&
+                        field.get(loc).getShape() != move.getMove().get(startPoint).getShape()) {
+                    // no common identity (exception?)
+                    return false;
+                }
+                if (identity == Identity.unspecified) {
+                    // no identity in common and both identities in common have already been filtered out at this point
+                    if (field.get(loc).getShape() == move.getMove().get(startPoint).getShape()) {
+                        identity = Identity.shape;
+                    } else {
+                        // matching colors is the only option left
+                        identity = Identity.color;
+                    }
+
+                } else if (identity == Identity.color) {
+                    if (field.get(loc).getColor() != move.getMove().get(startPoint).getColor()) {
+
+                        return false;
+                    }
+                } else if (identity == Identity.shape) {
+
+                } else {
+                    // should not occur
+                    //TODO: throw runtimeException: invalid identity
+                }
+
+            }
+        }
+        return true;
+    }
+
     public boolean validLine(PutMove move, Direction direction, Location location, int step) { // step is either +1 or -1
+
+        //TODO: FIX BECAUSE IT'S BAD...
+
         for (Location loc : move.getMove().keySet()) {
             if (loc.isEqualTo(location)) {
                 if (direction == Direction.X) {
