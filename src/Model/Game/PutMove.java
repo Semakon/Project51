@@ -1,6 +1,6 @@
 package Model.Game;
 
-import Model.Game.Enumerations.Direction;
+import Model.Game.Enumerations.Axis;
 import Model.Game.Enumerations.Identity;
 import Model.Game.Enumerations.Positioning;
 
@@ -35,20 +35,25 @@ public class PutMove extends Move {
         return positioning;
     }
 
-    public Location lowerBound(Direction direction) {
+    /**
+     * Gives the Location of the with the lowest X or Y depending on axis.
+     * @param axis Determines whether the Location with the lowest X or Y is returned.
+     * @return Location with lowest X/Y
+     */
+    public Location lowerBound(Axis axis) {
         List<Location> list = new ArrayList<>();
         for (Location loc : move.keySet()) {
             list.add(loc);
         }
         if (list.size() > 1) {
             for (int i = 0; i < list.size() - 1; i++) {
-                if (direction == Direction.X) {
+                if (axis == Axis.X) {
                     if (list.get(i).getX() < list.get(i + 1).getX()) {
                         Location temp = list.get(i);
                         list.set(i, list.get(i + 1));
                         list.set(i + 1, temp);
                     }
-                } else if (direction == Direction.Y) {
+                } else if (axis == Axis.Y) {
                     if (list.get(i).getY() < list.get(i + 1).getY()) {
                         Location temp = list.get(i);
                         list.set(i, list.get(i + 1));
@@ -60,20 +65,25 @@ public class PutMove extends Move {
         return list.get(list.size() - 1);
     }
 
-    public Location higherBound(Direction direction) {
+    /**
+     * Gives the Location of the with the highest X or Y depending on axis.
+     * @param axis Determines whether the Location with the highest X or Y is returned.
+     * @return Location with highest X/Y
+     */
+    public Location higherBound(Axis axis) {
         List<Location> list = new ArrayList<>();
         for (Location loc : move.keySet()) {
             list.add(loc);
         }
         if (list.size() > 1) {
             for (int i = 0; i < list.size() - 1; i++) {
-                if (direction == Direction.X) {
+                if (axis == Axis.X) {
                     if (list.get(i).getX() > list.get(i + 1).getX()) {
                         Location temp = list.get(i);
                         list.set(i, list.get(i + 1));
                         list.set(i + 1, temp);
                     }
-                } else if (direction == Direction.Y) {
+                } else if (axis == Axis.Y) {
                     if (list.get(i).getY() > list.get(i + 1).getY()) {
                         Location temp = list.get(i);
                         list.set(i, list.get(i + 1));

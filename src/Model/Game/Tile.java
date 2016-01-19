@@ -81,4 +81,12 @@ public class Tile {
         }
     }
 
+    /**
+     * Gives a representation of a Tile.
+     * @return ([color], [shape])
+     */
+    public String toString() {
+        return "(" + this.color + ", " + this.shape + ")";
+    }
+
 }
