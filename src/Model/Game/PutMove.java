@@ -1,9 +1,12 @@
 package Model.Game;
 
+import Model.Game.Enumerations.Direction;
 import Model.Game.Enumerations.Identity;
 import Model.Game.Enumerations.Positioning;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,6 +33,56 @@ public class PutMove extends Move {
 
     public Positioning getPositioning() {
         return positioning;
+    }
+
+    public Location lowerBound(Direction direction) {
+        List<Location> list = new ArrayList<>();
+        for (Location loc : move.keySet()) {
+            list.add(loc);
+        }
+        if (list.size() > 1) {
+            for (int i = 0; i < list.size() - 1; i++) {
+                if (direction == Direction.X) {
+                    if (list.get(i).getX() < list.get(i + 1).getX()) {
+                        Location temp = list.get(i);
+                        list.set(i, list.get(i + 1));
+                        list.set(i + 1, temp);
+                    }
+                } else if (direction == Direction.Y) {
+                    if (list.get(i).getY() < list.get(i + 1).getY()) {
+                        Location temp = list.get(i);
+                        list.set(i, list.get(i + 1));
+                        list.set(i + 1, temp);
+                    }
+                }
+            }
+        }
+        return list.get(list.size() - 1);
+    }
+
+    public Location higherBound(Direction direction) {
+        List<Location> list = new ArrayList<>();
+        for (Location loc : move.keySet()) {
+            list.add(loc);
+        }
+        if (list.size() > 1) {
+            for (int i = 0; i < list.size() - 1; i++) {
+                if (direction == Direction.X) {
+                    if (list.get(i).getX() > list.get(i + 1).getX()) {
+                        Location temp = list.get(i);
+                        list.set(i, list.get(i + 1));
+                        list.set(i + 1, temp);
+                    }
+                } else if (direction == Direction.Y) {
+                    if (list.get(i).getY() > list.get(i + 1).getY()) {
+                        Location temp = list.get(i);
+                        list.set(i, list.get(i + 1));
+                        list.set(i + 1, temp);
+                    }
+                }
+            }
+        }
+        return list.get(list.size() - 1);
     }
 
     /**

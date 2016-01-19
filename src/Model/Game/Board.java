@@ -40,6 +40,15 @@ public class Board {
         boolean validLine = false;
         boolean validOrthogonalLines = false;
 
+        for (Location loc : move.getMove().keySet()) {
+            for (Location loc2 : field.keySet()) {
+                if (loc.isEqualTo(loc2)) {
+                    //TODO: throw exception: location already in use
+                    return false;
+                }
+            }
+        }
+
         Location startPoint = new ArrayList<>(move.getMove().keySet()).get(0);
 
         if (move.getPositioning() == Positioning.vertical) {
@@ -66,6 +75,9 @@ public class Board {
     }
 
     public boolean validOrthogonalLines(PutMove move, Direction direction, Location location, Location startPoint, int step, Identity identity) { // step is either +1 or -1
+
+        //TODO: fix cuz bad
+
         for (Location loc : move.getMove().keySet()) {
             if (loc.isEqualTo(location)) {
                 if (direction == Direction.X) {
@@ -116,9 +128,7 @@ public class Board {
     }
 
     public boolean validLine(PutMove move, Direction direction, Location location, int step) { // step is either +1 or -1
-
-        //TODO: FIX BECAUSE IT'S BAD...
-
+        System.out.println("Checking: (" + location.getX() + ", " + location.getY() + ")");
         for (Location loc : move.getMove().keySet()) {
             if (loc.isEqualTo(location)) {
                 if (direction == Direction.X) {
@@ -131,9 +141,11 @@ public class Board {
 
         for (Location loc : field.keySet()) {
             if (loc.isEqualTo(location)) {
+                System.out.println("Test: Matching location found");
 
                 //same color, different shapes
                 if (move.getIdentity() == Identity.color) {
+                    System.out.println("Identity = color");
                     for (Location loc2 : move.getMove().keySet()) {
                         if (field.get(loc).getColor() != move.getMove().get(loc2).getColor()) {
                             //TODO: throw exception: color differs from move set
@@ -152,6 +164,7 @@ public class Board {
 
                 //same shape, different colors
                 } else if (move.getIdentity() == Identity.shape) {
+                    System.out.println("Identity = shape");
                     for (Location loc2 : move.getMove().keySet()) {
                         if (field.get(loc).getShape() != move.getMove().get(loc2).getShape()) {
                             //TODO: throw exception: shape differs from move set
@@ -170,6 +183,7 @@ public class Board {
 
                 //one block in move set
                 } else if (move.getIdentity() == Identity.unspecified) {
+                    System.out.println("Identity = unspecified");
                     for (Location loc2 : move.getMove().keySet()) {
                         if (field.get(loc).getColor() == move.getMove().get(loc2).getColor() &&
                                 field.get(loc).getShape() == move.getMove().get(loc2).getShape()) {
@@ -190,6 +204,17 @@ public class Board {
                 break; // right location is found on the field, no need to continue loop
             }
         }
+
+        if (direction == Direction.X) {
+            if (location.getX() < move.higherBound(direction).getX() && location.getX() > move.lowerBound(direction).getX()) {
+                return false;
+            }
+        } else {
+            if (location.getY() < move.higherBound(direction).getY() && location.getY() > move.lowerBound(direction).getY()) {
+                return false;
+            }
+        }
+
         return true;
     }
 
