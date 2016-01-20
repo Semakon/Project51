@@ -1,6 +1,7 @@
 package Tests;
 
 import Model.Game.*;
+import Model.Game.Exceptions.InvalidMoveException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,8 +60,12 @@ public class ValidLineTest {
         System.out.println("validPositioning: " + move.validPositioning());
         System.out.println("validIdentity: " + move.validIdentity());
 
-        if (move.validPositioning() && move.validIdentity()) {
-            System.out.println("\nvalidMove: " + b.validMove(move));
+        try {
+            if (move.validPositioning() && move.validIdentity()) {
+                System.out.println("\nvalidMove: " + b.validMove(move));
+            }
+        } catch (InvalidMoveException e) {
+            System.out.println("\nvalidMove: " + false);
         }
 
     }

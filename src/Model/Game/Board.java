@@ -3,6 +3,7 @@ package Model.Game;
 import Model.Game.Enumerations.Axis;
 import Model.Game.Enumerations.Identity;
 import Model.Game.Enumerations.Positioning;
+import Model.Game.Exceptions.InvalidMoveException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,7 +29,7 @@ public class Board {
         return field.isEmpty();
     }
 
-    public boolean validMove(Move move) {
+    public boolean validMove(Move move) throws InvalidMoveException {
         boolean valid;
         if (move instanceof PutMove) {
             valid = validPut((PutMove) move);
@@ -37,16 +38,14 @@ public class Board {
         return valid;
     }
 
-    private boolean validPut(PutMove move) { //TODO: add exceptions
+    private boolean validPut(PutMove move) throws InvalidMoveException {
         boolean validLine = false;
         boolean validOrthogonalLines = true;
 
         for (Location loc : move.getMove().keySet()) {
             for (Location loc2 : field.keySet()) {
                 if (loc.isEqualTo(loc2)) {
-                    //TODO: throw exception: location already in use
-                    System.out.println("\nLocation already in use.");
-                    return false;
+                    throw new InvalidMoveException("Location already in use."); //return false;
                 }
                 //TODO: check if move is attached to anything in the field
             }
@@ -56,7 +55,7 @@ public class Board {
 
         if (move.getPositioning() == Positioning.vertical) {
             validLine = validLine(move, Axis.Y, startPoint, 1) &&
-                    validLine(move, Axis.Y, startPoint, - 1);
+                    validLine(move, Axis.Y, startPoint, -1);
 
             for (Location loc : move.getMove().keySet()) {
                 List<Tile> orthogonalLine = new ArrayList<>();
@@ -69,7 +68,7 @@ public class Board {
             }
         } else if (move.getPositioning() == Positioning.horizontal) {
             validLine = validLine(move, Axis.X, startPoint, 1) &&
-                    validLine(move, Axis.X, startPoint, - 1);
+                    validLine(move, Axis.X, startPoint, -1);
 
             for (Location loc : move.getMove().keySet()) {
                 List<Tile> orthogonalLine = new ArrayList<>();
@@ -82,15 +81,14 @@ public class Board {
             }
         } else if (move.getPositioning() == Positioning.unspecified) {  //TODO: figure out if this is the best solution
             validLine = validLine(move, Axis.X, startPoint, 1) &&
-                    validLine(move, Axis.X, startPoint, - 1);
+                    validLine(move, Axis.X, startPoint, -1);
             validOrthogonalLines = validLine(move, Axis.Y, startPoint, 1) &&
-                    validLine(move, Axis.Y, startPoint, - 1);
+                    validLine(move, Axis.Y, startPoint, -1);
 
         } else {
             //should not occur
             //TODO: throw runtimeException: invalid positioning
         }
-
         return validLine && validOrthogonalLines;
     }
 
@@ -131,7 +129,7 @@ public class Board {
      * @param line Line to be checked.
      * @return True if the line is valid.
      */
-    public boolean validOrthogonalLine(List<Tile> line) {
+    public boolean validOrthogonalLine(List<Tile> line) throws InvalidMoveException {
         boolean valid = true;
         boolean sameColor = true;
         boolean sameShape = true;
@@ -146,24 +144,18 @@ public class Board {
             }
         }
         if (sameColor && !sameShape) {
-            outerLoop:
             for (Tile tile :line) {
                 for (Tile tile2 : line) {
                     if (tile != tile2 && tile.getShape() == tile2.getShape()) {
-                        //line contains double(s)
-                        valid = false;
-                        break outerLoop;
+                        throw new InvalidMoveException("Line contains double(s).");
                     }
                 }
             }
         } else if (!sameColor && sameShape) {
-            outerLoop:
             for (Tile tile : line) {
                 for (Tile tile2 : line) {
                     if (tile != tile2 && tile.getColor() == tile2.getColor()) {
-                        //line contains double(s)
-                        valid = false;
-                        break outerLoop;
+                        throw new InvalidMoveException("Line contains double(s).");
                     }
                 }
             }
@@ -183,7 +175,7 @@ public class Board {
      * @param step Step the X or Y takes (1 or -1).
      * @return True if the move does not violate any game rules on the line.
      */
-    public boolean validLine(PutMove move, Axis axis, Location location, int step) { // step is either +1 or -1
+    public boolean validLine(PutMove move, Axis axis, Location location, int step) throws InvalidMoveException { // step is either +1 or -1
         System.out.println("\nChecking: (" + location.getX() + ", " + location.getY() + ")");
         for (Location loc : move.getMove().keySet()) {
             if (loc.isEqualTo(location)) {
@@ -204,12 +196,10 @@ public class Board {
                 if (move.getIdentity() == Identity.color) {
                     for (Location loc2 : move.getMove().keySet()) {
                         if (field.get(loc).getColor() != move.getMove().get(loc2).getColor()) {
-                            //TODO: throw exception: color differs from move set
-                            return false;
+                            throw new InvalidMoveException("Color doesn't fit in row/column.");
                         }
                         if (field.get(loc).getShape() == move.getMove().get(loc2).getShape()) {
-                            //TODO: throw exception: shape is already in row/column
-                            return false;
+                            throw new InvalidMoveException("Shape is already in row/column.");
                         }
                     }
                     if (axis == Axis.X) {
@@ -222,12 +212,10 @@ public class Board {
                 } else if (move.getIdentity() == Identity.shape) {
                     for (Location loc2 : move.getMove().keySet()) {
                         if (field.get(loc).getShape() != move.getMove().get(loc2).getShape()) {
-                            //TODO: throw exception: shape differs from move set
-                            return false;
+                            throw new InvalidMoveException("Shape doesn't fit in row/column.");
                         }
                         if (field.get(loc).getColor() == move.getMove().get(loc2).getColor()) {
-                            //TODO: throw exception: color already in row/column
-                            return false;
+                            throw new InvalidMoveException("Color is already in row/column.");
                         }
                     }
                     if (axis == Axis.X) {
@@ -241,13 +229,11 @@ public class Board {
                     for (Location loc2 : move.getMove().keySet()) {
                         if (field.get(loc).getColor() == move.getMove().get(loc2).getColor() &&
                                 field.get(loc).getShape() == move.getMove().get(loc2).getShape()) {
-                            //TODO: throw exception: same tile
-                            return false;
+                            throw new InvalidMoveException("Same tile in row/column.");
                         }
                         if (field.get(loc).getColor() != move.getMove().get(loc2).getColor() &&
                                 field.get(loc).getShape() != move.getMove().get(loc2).getShape()) {
-                            //TODO: throw exception: tile shares no identity with surrounding tiles
-                            return false;
+                            throw new InvalidMoveException("Tile shares no identity with surrounding tiles.");
                         }
                     }
                 } else {

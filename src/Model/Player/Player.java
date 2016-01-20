@@ -1,8 +1,11 @@
 package Model.Player;
 
 import Model.Game.Board;
+import Model.Game.Exceptions.InvalidMoveException;
 import Model.Game.Move;
-import View.View;
+import Model.Game.Tile;
+
+import java.util.List;
 
 /**
  * Created by Martijn on 11-1-2016.
@@ -10,16 +13,15 @@ import View.View;
 public abstract class Player {
 
     private String name;
-    private View UI;
+    private List<Tile> hand;
 
     /**
      * Creates a new instance of Player with a name and a UI.
      * @param name the player's name.
-     * @param UI the UI.
      */
-    public Player(String name, View UI) {
+    public Player(String name, List<Tile> hand) {
         this.name = name;
-        this.UI = UI;
+        this.hand = hand;
     }
 
     /**
@@ -29,11 +31,8 @@ public abstract class Player {
         return name;
     }
 
-    /**
-     * returns the View.
-     */
-    public View getUI() {
-        return UI;
+    public List<Tile> getHand() {
+        return hand;
     }
 
     /**
@@ -52,10 +51,15 @@ public abstract class Player {
         boolean valid = false;
         while (!valid) {
             move = determineMove(board);
-            if (board.validMove(move)) {
-                valid = true;
-            } else {
-                UI.showError("That move is invalid.");
+            try {
+                if (board.validMove(move)) {
+                    valid = true;
+                } else {
+                    //TODO: show error: move is invalid
+                }
+            } catch (InvalidMoveException e) {
+                //TODO: show error: move is invalid
+                e.getStackTrace();
             }
         }
         return move;
