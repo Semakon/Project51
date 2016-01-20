@@ -1,10 +1,6 @@
 package Tests;
 
 import Model.Game.*;
-import Model.Game.Enumerations.Axis;
-import Model.Game.Enumerations.Positioning;
-
-import java.util.ArrayList;
 
 /**
  * Created by Martijn on 19-1-2016.
@@ -59,33 +55,7 @@ public class ValidLineTest {
         System.out.println("validIdentity: " + m.validIdentity());
 
         if (m.validPositioning() && m.validIdentity()) {
-
             System.out.println("\nvalidMove: " + b.validMove(m));
-
-//            boolean validLine = false;
-//            Location startPoint = new ArrayList<>(m.getMove().keySet()).get(0);
-//
-//            if (m.getPositioning() == Positioning.vertical) {
-//                validLine = b.validLine(m, Axis.Y, startPoint, 1) &&
-//                        b.validLine(m, Axis.Y, startPoint, - 1);
-//            } else if (m.getPositioning() == Positioning.horizontal) {
-//                validLine = b.validLine(m, Axis.X, startPoint, 1) &&
-//                        b.validLine(m, Axis.X, startPoint, - 1);
-//            } else if (m.getPositioning() == Positioning.unspecified) {
-//                validLine = b.validLine(m, Axis.X, startPoint, 1) &&
-//                        b.validLine(m, Axis.X, startPoint, - 1);
-//            } else {
-//                //should not occur
-//                System.out.println("invalid Positioning");
-//            }
-
-//            System.out.println("validLine: " + validLine);
-//
-//            for (Location location : m.getMove().keySet()) {
-//                System.out.println("\nOrthogonal line 1: " + b.orthogonalLine(m, Axis.Y, location, location, 1));
-//                System.out.println("Orthogonal line 2: " + b.orthogonalLine(m, Axis.Y, location, location, -1));
-//            }
-
         }
 
     }
