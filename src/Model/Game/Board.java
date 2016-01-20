@@ -279,4 +279,11 @@ public class Board {
         return false;
     }
 
+    /**
+     * Clears the field of all Tiles.
+     */
+    public void reset() {
+        field.clear();
+    }
+
 }

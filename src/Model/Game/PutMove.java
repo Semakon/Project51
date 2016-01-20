@@ -5,7 +5,6 @@ import Model.Game.Enumerations.Identity;
 import Model.Game.Enumerations.Positioning;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,9 +17,15 @@ public class PutMove extends Move {
     private Positioning positioning = Positioning.unspecified;
     private Map<Location, Tile> move;
 
-    public PutMove() {
-        move = new HashMap<>();
-        //TODO: implement generating move
+    /**
+     * Creates a new instance of PutMove(). (to be continued)
+     * @param move Move input by Player.
+     */
+    public PutMove(Map<Location, Tile> move) {
+        this.move = move;
+        if (validPositioning() && validIdentity()) {
+            //TODO: implement
+        }
     }
 
     public Map<Location, Tile> getMove() {

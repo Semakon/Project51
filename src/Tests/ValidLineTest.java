@@ -2,6 +2,9 @@ package Tests;
 
 import Model.Game.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by Martijn on 19-1-2016.
  */
@@ -10,7 +13,6 @@ public class ValidLineTest {
     public static void main(String[] args) {
 
         Board b = new Board();
-        PutMove m = new PutMove();
 
         //in move
         Location loc = new Location(5, 2);
@@ -39,10 +41,13 @@ public class ValidLineTest {
         Tile tile8 = new Tile(23);
 
         //in move
-        m.getMove().put(loc, tile);
-        m.getMove().put(loc2, tile2);
-        m.getMove().put(loc3, tile3);
-        m.getMove().put(loc4, tile4);
+        Map<Location, Tile> m = new HashMap<>();
+        m.put(loc, tile);
+        m.put(loc2, tile2);
+        m.put(loc3, tile3);
+        m.put(loc4, tile4);
+
+        PutMove move = new PutMove(m);
 
         //in field
         b.getField().put(loc5, tile5);
@@ -51,11 +56,11 @@ public class ValidLineTest {
         b.getField().put(loc7, tile7);
         b.getField().put(loc8, tile8);
 
-        System.out.println("validPositioning: " + m.validPositioning());
-        System.out.println("validIdentity: " + m.validIdentity());
+        System.out.println("validPositioning: " + move.validPositioning());
+        System.out.println("validIdentity: " + move.validIdentity());
 
-        if (m.validPositioning() && m.validIdentity()) {
-            System.out.println("\nvalidMove: " + b.validMove(m));
+        if (move.validPositioning() && move.validIdentity()) {
+            System.out.println("\nvalidMove: " + b.validMove(move));
         }
 
     }
