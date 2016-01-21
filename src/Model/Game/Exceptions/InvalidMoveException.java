@@ -5,6 +5,10 @@ package Model.Game.Exceptions;
  */
 public class InvalidMoveException extends Exception {
 
+    public InvalidMoveException() {
+        super("Move is invalid.");
+    }
+
     public InvalidMoveException(String message) {
         super(message);
     }

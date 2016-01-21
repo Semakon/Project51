@@ -14,4 +14,16 @@ public class Configuration {
     //Maximum amount of tiles in a hand
     public static final int MAXIMUM_HAND = 6;
 
+    //Strings used to create a String presentation of board.
+    public static final String EMPTY_SPACE = "        |";
+    public static final String MID_ROW = "--------+";
+    public static final String END_ROW = "--------|";
+    public static final String EMPTY_FIELD = "|" + MID_ROW + MID_ROW + END_ROW + "\n"
+            + "|" + EMPTY_SPACE + EMPTY_SPACE + EMPTY_SPACE + "\n"
+            + "|" + MID_ROW + MID_ROW + END_ROW + "\n"
+            + "|" + EMPTY_SPACE + EMPTY_SPACE + EMPTY_SPACE + "\n"
+            + "|" + MID_ROW + MID_ROW + END_ROW + "\n"
+            + "|" + EMPTY_SPACE + EMPTY_SPACE + EMPTY_SPACE + "\n"
+            + "|" + MID_ROW + MID_ROW + END_ROW + "\n";
+
 }

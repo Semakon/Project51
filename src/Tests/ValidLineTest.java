@@ -62,7 +62,8 @@ public class ValidLineTest {
 
         try {
             if (move.validPositioning() && move.validIdentity()) {
-                System.out.println("\nvalidMove: " + b.validMove(move));
+                b.makePutMove(move);
+                System.out.println("\nvalidMove: True");
             }
         } catch (InvalidMoveException e) {
             System.out.println("\nvalidMove: " + false);

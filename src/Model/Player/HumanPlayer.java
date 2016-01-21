@@ -1,6 +1,7 @@
 package Model.Player;
 
 import Model.Game.Board;
+import Model.Game.Exceptions.InvalidMoveException;
 import Model.Game.Move;
 import Model.Game.Tile;
 
@@ -22,6 +23,8 @@ public class HumanPlayer extends Player {
     @Override
     public Move determineMove(Board board) {
         //TODO: implement
+        //trade or put?
+        //catch InvalidMoveException and InsufficientTilesInPoolException
         return null;
     }
 

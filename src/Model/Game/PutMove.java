@@ -1,11 +1,9 @@
 package Model.Game;
 
-import Model.Game.Enumerations.Axis;
 import Model.Game.Enumerations.Identity;
 import Model.Game.Enumerations.Positioning;
+import Model.Game.Exceptions.InvalidMoveException;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,9 +21,6 @@ public class PutMove extends Move {
      */
     public PutMove(Map<Location, Tile> move) {
         this.move = move;
-        if (validPositioning() && validIdentity()) {
-            //TODO: implement
-        }
     }
 
     public Map<Location, Tile> getMove() {
@@ -40,64 +35,12 @@ public class PutMove extends Move {
         return positioning;
     }
 
-    /**
-     * Gives the Location of the with the lowest X or Y depending on axis.
-     * @param axis Determines whether the Location with the lowest X or Y is returned.
-     * @return Location with lowest X/Y
-     */
-    public Location lowerBound(Axis axis) {
-        List<Location> list = new ArrayList<>();
-        for (Location loc : move.keySet()) {
-            list.add(loc);
+    public boolean validMove() throws InvalidMoveException {
+        if (validPositioning() && validIdentity()) {
+            return true;
+        } else {
+            throw new InvalidMoveException("Move is invalid regardless of field.");
         }
-        if (list.size() > 1) {
-            for (int i = 0; i < list.size() - 1; i++) {
-                if (axis == Axis.X) {
-                    if (list.get(i).getX() < list.get(i + 1).getX()) {
-                        Location temp = list.get(i);
-                        list.set(i, list.get(i + 1));
-                        list.set(i + 1, temp);
-                    }
-                } else if (axis == Axis.Y) {
-                    if (list.get(i).getY() < list.get(i + 1).getY()) {
-                        Location temp = list.get(i);
-                        list.set(i, list.get(i + 1));
-                        list.set(i + 1, temp);
-                    }
-                }
-            }
-        }
-        return list.get(list.size() - 1);
-    }
-
-    /**
-     * Gives the Location of the with the highest X or Y depending on axis.
-     * @param axis Determines whether the Location with the highest X or Y is returned.
-     * @return Location with highest X/Y
-     */
-    public Location higherBound(Axis axis) {
-        List<Location> list = new ArrayList<>();
-        for (Location loc : move.keySet()) {
-            list.add(loc);
-        }
-        if (list.size() > 1) {
-            for (int i = 0; i < list.size() - 1; i++) {
-                if (axis == Axis.X) {
-                    if (list.get(i).getX() > list.get(i + 1).getX()) {
-                        Location temp = list.get(i);
-                        list.set(i, list.get(i + 1));
-                        list.set(i + 1, temp);
-                    }
-                } else if (axis == Axis.Y) {
-                    if (list.get(i).getY() > list.get(i + 1).getY()) {
-                        Location temp = list.get(i);
-                        list.set(i, list.get(i + 1));
-                        list.set(i + 1, temp);
-                    }
-                }
-            }
-        }
-        return list.get(list.size() - 1);
     }
 
     /**

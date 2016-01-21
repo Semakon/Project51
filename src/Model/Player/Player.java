@@ -47,22 +47,7 @@ public abstract class Player {
      * @param board the current board.
      */
     public Move makeMove(Board board) {
-        Move move = null;
-        boolean valid = false;
-        while (!valid) {
-            move = determineMove(board);
-            try {
-                if (board.validMove(move)) {
-                    valid = true;
-                } else {
-                    //TODO: show error: move is invalid
-                }
-            } catch (InvalidMoveException e) {
-                //TODO: show error: move is invalid
-                e.getStackTrace();
-            }
-        }
-        return move;
+        return determineMove(board); //TODO: merge with determineMove (?)
     }
 
 }

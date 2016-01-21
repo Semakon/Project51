@@ -3,7 +3,10 @@ package Model.Game;
 import Model.Game.Enumerations.Axis;
 import Model.Game.Enumerations.Identity;
 import Model.Game.Enumerations.Positioning;
+import Model.Game.Exceptions.InsufficientTilesInPoolException;
 import Model.Game.Exceptions.InvalidMoveException;
+import Model.Game.Exceptions.TilesNotInHandException;
+import jdk.nashorn.internal.runtime.regexp.joni.Config;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,26 +19,31 @@ import java.util.Map;
 public class Board {
 
     private Map<Location, Tile> field;
+    private Pool pool;
 
     public Board() {
         field = new HashMap<>();
+        pool = new Pool();
     }
 
     public Map<Location, Tile> getField() {
         return field;
     }
 
-    public boolean fieldIsEmpty() {
-        return field.isEmpty();
+    public Pool getPool() {
+        return pool;
     }
 
-    public boolean validMove(Move move) throws InvalidMoveException {
-        boolean valid;
-        if (move instanceof PutMove) {
-            valid = validPut((PutMove) move);
-        } else
-            valid = move instanceof TradeMove && validTrade((TradeMove) move);
-        return valid;
+    public void makePutMove(PutMove move) throws InvalidMoveException {
+        if (move.validMove() && validPut(move)) {
+            field.putAll(move.getMove());
+        }
+    }
+
+    public void makeTradeMove(TradeMove move, List<Tile> hand) throws InvalidMoveException {
+        if (validTrade(move, hand)) {
+            pool.tradeTiles(move.getMove());
+        }
     }
 
     private boolean validPut(PutMove move) throws InvalidMoveException {
@@ -246,12 +254,12 @@ public class Board {
         }
         System.out.println("Empty space");
         if (axis == Axis.X) {
-            if (location.getX() < move.higherBound(axis).getX() && location.getX() > move.lowerBound(axis).getX()) {
+            if (location.getX() < higherBound(axis, move.getMove()).getX() && location.getX() > lowerBound(axis, move.getMove()).getX()) {
                 System.out.println("Gap in move");
                 return validLine(move, axis, new Location(location.getX() + step, location.getY()), step);                // recursive
             }
         } else {
-            if (location.getY() < move.higherBound(axis).getY() && location.getY() > move.lowerBound(axis).getY()) {
+            if (location.getY() < higherBound(axis, move.getMove()).getY() && location.getY() > lowerBound(axis, move.getMove()).getY()) {
                 System.out.println("Gap in move");
                 return validLine(move, axis, new Location(location.getX(), location.getY() + step), step);                // recursive
             }
@@ -260,9 +268,81 @@ public class Board {
         return true;
     }
 
-    private boolean validTrade(TradeMove move) {
-        //TODO: implement
-        return false;
+    /**
+     * Checks whether the Pool has enough Tiles to trade.
+     * @param move Move with Tile amount.
+     * @return True if the amount of Tiles in the pool is larger or equal to the amount of Tiles in the Move.
+     */
+    private boolean validTrade(TradeMove move, List<Tile> hand) throws InvalidMoveException {
+        if (move.getMove().size() <= pool.getPool().size()) {
+            if (hand.containsAll(move.getMove())) {
+                return true;
+            } else {
+                throw new TilesNotInHandException("Hand doesn't contain all Tiles from move.");
+            }
+        } else {
+            throw new InsufficientTilesInPoolException("Pool contains insufficient Tiles to make this trade.");
+        }
+    }
+
+    /**
+     * Gives the Location of the with the lowest X or Y depending on axis.
+     * @param axis Determines whether the Location with the lowest X or Y is returned.
+     * @return Location with lowest X/Y
+     */
+    public Location lowerBound(Axis axis, Map<Location, Tile> map) {
+        List<Location> list = new ArrayList<>();
+        for (Location loc : map.keySet()) {
+            list.add(loc);
+        }
+        if (list.size() > 1) {
+            for (int i = 0; i < list.size() - 1; i++) {
+                if (axis == Axis.X) {
+                    if (list.get(i).getX() < list.get(i + 1).getX()) {
+                        Location temp = list.get(i);
+                        list.set(i, list.get(i + 1));
+                        list.set(i + 1, temp);
+                    }
+                } else if (axis == Axis.Y) {
+                    if (list.get(i).getY() < list.get(i + 1).getY()) {
+                        Location temp = list.get(i);
+                        list.set(i, list.get(i + 1));
+                        list.set(i + 1, temp);
+                    }
+                }
+            }
+        }
+        return list.get(list.size() - 1);
+    }
+
+    /**
+     * Gives the Location of the with the highest X or Y depending on axis.
+     * @param axis Determines whether the Location with the highest X or Y is returned.
+     * @return Location with highest X/Y
+     */
+    public Location higherBound(Axis axis, Map<Location, Tile> map) {
+        List<Location> list = new ArrayList<>();
+        for (Location loc : map.keySet()) {
+            list.add(loc);
+        }
+        if (list.size() > 1) {
+            for (int i = 0; i < list.size() - 1; i++) {
+                if (axis == Axis.X) {
+                    if (list.get(i).getX() > list.get(i + 1).getX()) {
+                        Location temp = list.get(i);
+                        list.set(i, list.get(i + 1));
+                        list.set(i + 1, temp);
+                    }
+                } else if (axis == Axis.Y) {
+                    if (list.get(i).getY() > list.get(i + 1).getY()) {
+                        Location temp = list.get(i);
+                        list.set(i, list.get(i + 1));
+                        list.set(i + 1, temp);
+                    }
+                }
+            }
+        }
+        return list.get(list.size() - 1);
     }
 
     /**
@@ -270,6 +350,58 @@ public class Board {
      */
     public void reset() {
         field.clear();
+    }
+
+    public String toString() {
+        String fieldString = "";
+
+        if (field.isEmpty()) {
+            return Configuration.EMPTY_FIELD;
+        }
+
+        int lowX = lowerBound(Axis.X, field).getX();
+        int highX = higherBound(Axis.X, field).getX();
+        int lowY = lowerBound(Axis.Y, field).getY();
+        int highY = higherBound(Axis.Y, field).getY();
+        int length = highX - lowX + 2;
+
+        String staticRow = "|";
+        String emptyRow = "|";
+        for (int i = 0; i < length; i++) {
+            staticRow += Configuration.MID_ROW;
+            emptyRow += Configuration.EMPTY_SPACE;
+        }
+        staticRow += Configuration.END_ROW + "\n";
+        emptyRow += Configuration.EMPTY_SPACE + "\n";
+
+        fieldString += staticRow + emptyRow + staticRow;
+
+        for (int j = lowY; j < highY + 1; j++) {
+            String row = "|" + Configuration.EMPTY_SPACE;
+            Map<Location, Tile> temp = new HashMap<>();
+            for (Location loc : field.keySet()) {
+                if (loc.getY() == j) {
+                    temp.put(loc, field.get(loc));
+                }
+            }
+            for (int i = lowX; i <= highX; i++) {
+                boolean placed = false;
+                for (Location loc : temp.keySet()) {
+                    if (loc.getX() == i) {
+                        row += temp.get(loc) + "|";
+                        placed = true;
+                    }
+                }
+                if (!placed) {
+                    row += Configuration.EMPTY_SPACE;
+                }
+            }
+            row += Configuration.EMPTY_SPACE + "\n";
+            fieldString += row + staticRow;
+        }
+
+        fieldString += emptyRow + staticRow;
+        return fieldString;
     }
 
 }

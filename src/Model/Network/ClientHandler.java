@@ -1,4 +1,4 @@
-package Network;
+package Model.Network;
 
 /**
  * Created by Herjan on 20-1-2016.
