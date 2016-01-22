@@ -19,6 +19,16 @@ public class ToStringTest {
         b.getField().put(new Location(1, 1), new Tile(24));
         b.getField().put(new Location(1, 3), new Tile(6));
 
+        b.getField().put(new Location(1, 4), new Tile(12));
+        b.getField().put(new Location(1, 5), new Tile(0));
+        b.getField().put(new Location(2, 5), new Tile(1));
+        b.getField().put(new Location(3, 5), new Tile(2));
+        b.getField().put(new Location(0, 5), new Tile(5));
+        b.getField().put(new Location(-1, 5), new Tile(4));
+
+        b.getField().put(new Location(0, -1), new Tile(32));
+        b.getField().put(new Location(-1, -1), new Tile(26));
+
         System.out.println(b.toString());
     }
 

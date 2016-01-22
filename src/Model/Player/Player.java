@@ -1,9 +1,7 @@
 package Model.Player;
 
-import Model.Game.Board;
+import Model.Game.*;
 import Model.Game.Exceptions.InvalidMoveException;
-import Model.Game.Move;
-import Model.Game.Tile;
 
 import java.util.List;
 
@@ -34,6 +32,10 @@ public abstract class Player {
     public List<Tile> getHand() {
         return hand;
     }
+
+    public abstract PutMove determinePutMove(Board board);
+
+    public abstract TradeMove determineTradeMove(Board board);
 
     /**
      * Determines the next move.

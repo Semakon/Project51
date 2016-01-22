@@ -352,9 +352,11 @@ public class Board {
         field.clear();
     }
 
+    /**
+     * Creates a string representation of field that can be used for a TUI.
+     * @return String representation of field.
+     */
     public String toString() {
-        String fieldString = "";
-
         if (field.isEmpty()) {
             return Configuration.EMPTY_FIELD;
         }
@@ -365,19 +367,27 @@ public class Board {
         int highY = higherBound(Axis.Y, field).getY();
         int length = highX - lowX + 2;
 
-        String staticRow = "|";
-        String emptyRow = "|";
+        String fieldString = "   |";
+        for (int i = lowX - 1; i <= highX + 1; i++) {
+            fieldString += topRow(i);
+        }
+        fieldString += "\n";
+        String emptyRow = "";
+        String staticRow = "---|";
+
         for (int i = 0; i < length; i++) {
             staticRow += Configuration.MID_ROW;
             emptyRow += Configuration.EMPTY_SPACE;
         }
+
         staticRow += Configuration.END_ROW + "\n";
         emptyRow += Configuration.EMPTY_SPACE + "\n";
 
-        fieldString += staticRow + emptyRow + staticRow;
+        fieldString += staticRow + startRow(lowY - 1) + emptyRow + staticRow;
 
         for (int j = lowY; j < highY + 1; j++) {
-            String row = "|" + Configuration.EMPTY_SPACE;
+            String row = startRow(j) + Configuration.EMPTY_SPACE;
+
             Map<Location, Tile> temp = new HashMap<>();
             for (Location loc : field.keySet()) {
                 if (loc.getY() == j) {
@@ -400,8 +410,26 @@ public class Board {
             fieldString += row + staticRow;
         }
 
-        fieldString += emptyRow + staticRow;
+        fieldString += startRow(highY + 1) + emptyRow + staticRow;
         return fieldString;
+    }
+
+    private String startRow(int i) {
+        String startRow = i < 0 ? "-" : " ";
+        if (i >= - 9 && i <= 9) {
+            startRow += "0";
+        }
+        startRow += Math.abs(i) + "|";
+        return startRow;
+    }
+
+    private String topRow(int i) {
+        String topRow = i < 0 ? "  -" : "   ";
+        if (i >= - 9 && i <= 9) {
+            topRow += "0";
+        }
+        topRow += Math.abs(i) + "   |";
+        return topRow;
     }
 
 }

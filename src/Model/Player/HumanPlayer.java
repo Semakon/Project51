@@ -1,9 +1,7 @@
 package Model.Player;
 
-import Model.Game.Board;
+import Model.Game.*;
 import Model.Game.Exceptions.InvalidMoveException;
-import Model.Game.Move;
-import Model.Game.Tile;
 
 import java.util.List;
 
@@ -20,6 +18,16 @@ public class HumanPlayer extends Player {
         super(name, hand);
     }
 
+    public PutMove determinePutMove(Board board) {
+
+        return null;
+    }
+
+    public TradeMove determineTradeMove(Board board) {
+
+        return null;
+    }
+
     @Override
     public Move determineMove(Board board) {
         //TODO: implement
@@ -27,5 +35,7 @@ public class HumanPlayer extends Player {
         //catch InvalidMoveException and InsufficientTilesInPoolException
         return null;
     }
+
+
 
 }
