@@ -1,6 +1,7 @@
 package Model.Player;
 
 import Model.Game.*;
+import Model.Game.Exceptions.InvalidAmountRuntimeException;
 import Model.Game.Exceptions.InvalidMoveException;
 
 import java.util.List;
@@ -19,21 +20,24 @@ public class HumanPlayer extends Player {
     }
 
     public PutMove determinePutMove(Board board) {
-
-        return null;
+        PutMove move = null;
+        //TODO: get user input to create new Map<Location, Tile>
+        return move;
     }
 
     public TradeMove determineTradeMove(Board board) {
-
-        return null;
+        TradeMove move = null;
+        //TODO: get user input to create a new List<Tile>
+        return move;
     }
 
     @Override
     public Move determineMove(Board board) {
-        //TODO: implement
-        //trade or put?
-        //catch InvalidMoveException and InsufficientTilesInPoolException
-        return null;
+        Move move = null;
+        //TODO: user input: trade or put?
+        // if put: move = determinePutMove(board);
+        // if trade: move = determineTradeMove(board);
+        return move;
     }
 
 

@@ -8,6 +8,9 @@ public class Configuration {
     //Amount of unique colors and shapes (not combinations)
     public static final int RANGE = 6;  //name subject to change
 
+    //Amount of Tiles each Player gets
+    public static final int HAND = 6;
+
     //Amount of duplicates of a unique tile
     public static final int TILE_DUPLICATES = 3;
 
