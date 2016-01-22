@@ -11,10 +11,10 @@ public class Game {
     private Player[] players;
     private int currentPlayer;
 
-    public Game(Player[] players, int firstMove) {
+    public Game(String[] players, String firstMove) {
         board = new Board();
-        this.players = players;
-        this.currentPlayer = firstMove;
+        this.players = new Player[players.length];
+        //TODO: create players
     }
 
     public Board getBoard() {
