@@ -3,6 +3,9 @@ package Model.Network;
 /**
  * Created by Herjan on 20-1-2016.
  */
+
+//import Model.Game.Game;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -40,10 +43,34 @@ public class ClientHandler extends Thread {
      * is participating in the chat. Notice that this method should
      * be called immediately after the ClientHandler has been constructed.
      */
-    /**public void announce() throws IOException {
+     public void announce() throws IOException {
      clientName = in.readLine();
      server.broadcast("[" + clientName + " has entered]", this);
-     System.out.println(getName());}*/
+     System.out.println(getName());}
+
+    public void setClientName(String name) {
+        this.clientName=name;
+    }
+
+    public String getClientName(){
+        return clientName;
+    }
+
+    /**
+     * This method can be used to send a message over the socket
+     * connection to the Client. If the writing of a message fails,
+     * the method concludes that the socket connection has been lost
+     * and shutdown() is called.
+     */
+    public void sendMessage(String msg) {
+        try {
+            out.write(msg);
+            out.newLine();
+            out.flush();
+        } catch (IOException e) {
+        }
+
+    }
 
     /**
      * This ClientHandler signs off from the Server and subsequently

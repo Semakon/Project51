@@ -6,7 +6,7 @@ import Model.Game.Enumerations.Positioning;
 import Model.Game.Exceptions.InsufficientTilesInPoolException;
 import Model.Game.Exceptions.InvalidMoveException;
 import Model.Game.Exceptions.TilesNotInHandException;
-import jdk.nashorn.internal.runtime.regexp.joni.Config;
+//import jdk.nashorn.internal.runtime.regexp.joni.Config;
 
 import java.util.ArrayList;
 import java.util.HashMap;
