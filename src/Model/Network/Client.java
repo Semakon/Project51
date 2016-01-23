@@ -103,11 +103,10 @@ public class Client extends Thread {
      * forwarded to the MessageUI
      */
     public void run() {
-        this.sendMessage(IDENTIFY);
+        this.sendMessage(IDENTIFY + " " + this.getClientName());
         System.out.println("Hallo"+msgSeperator+clientName);
         System.out.println("Waiting for other client...");
         try {
-            System.out.println("nope");
             String message = in.readLine();
             //System.out.println("Hallo" + message + "Doei");
             String[] blocks = message.split(msgSeperator);
@@ -115,8 +114,8 @@ public class Client extends Thread {
                 print("Command from server: " + message);
 
                 switch(blocks[0]) {
-                    case "hallo": System.out.println("Doei"); break;
-                    case "IDENTIFY": identify(blocks); break;
+                    //case "someString": doSomething; break;
+                    case "IDENTIFYOK": identify(blocks); break;
                     //case sendBoard: sendBoard(blocks); break;
                     //case startGame: startGame(blocks); break;
                     //case moveResult: moveResult(blocks); break;
@@ -137,10 +136,10 @@ public class Client extends Thread {
         return clientName;
     }
 
-    List<String> features = new ArrayList<String>();
+    List<String> clientFeatures = new ArrayList<String>();
 
     public void identify(String [] blocks){
-        System.out.println("IDENTIFYOK" + msgSeperator + features);
+        System.out.println("IDENTIFYOK" + msgSeperator + clientFeatures);
 
     }
 
