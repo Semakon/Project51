@@ -3,10 +3,7 @@ package Model.Game;
 import Model.Game.Enumerations.Axis;
 import Model.Game.Enumerations.Identity;
 import Model.Game.Enumerations.Positioning;
-import Model.Game.Exceptions.InsufficientTilesInPoolException;
-import Model.Game.Exceptions.InvalidMoveException;
-import Model.Game.Exceptions.TilesNotInHandException;
-//import jdk.nashorn.internal.runtime.regexp.joni.Config;
+import Model.Game.Exceptions.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,7 +44,7 @@ public class Board {
     }
 
     private boolean validPut(PutMove move) throws InvalidMoveException {
-        boolean validLine = false;
+        boolean validLine;
         boolean validOrthogonalLines = true;
 
         for (Location loc : move.getMove().keySet()) {
@@ -95,7 +92,7 @@ public class Board {
 
         } else {
             //should not occur
-            //TODO: throw runtimeException: invalid positioning
+            throw new InvalidPositioningRuntimeException();
         }
         return validLine && validOrthogonalLines;
     }
@@ -137,7 +134,7 @@ public class Board {
      * @param line Line to be checked.
      * @return True if the line is valid.
      */
-    public boolean validOrthogonalLine(List<Tile> line) throws InvalidMoveException {
+    private boolean validOrthogonalLine(List<Tile> line) throws InvalidMoveException {
         boolean valid = true;
         boolean sameColor = true;
         boolean sameShape = true;
@@ -183,7 +180,7 @@ public class Board {
      * @param step Step the X or Y takes (1 or -1).
      * @return True if the move does not violate any game rules on the line.
      */
-    public boolean validLine(PutMove move, Axis axis, Location location, int step) throws InvalidMoveException { // step is either +1 or -1
+    private boolean validLine(PutMove move, Axis axis, Location location, int step) throws InvalidMoveException { // step is either +1 or -1
         System.out.println("\nChecking: (" + location.getX() + ", " + location.getY() + ")");
         for (Location loc : move.getMove().keySet()) {
             if (loc.isEqualTo(location)) {
@@ -202,11 +199,11 @@ public class Board {
 
                 //same color, different shapes
                 if (move.getIdentity() == Identity.color) {
-                    for (Location loc2 : move.getMove().keySet()) {
-                        if (field.get(loc).getColor() != move.getMove().get(loc2).getColor()) {
+                    for (Tile tile : move.getMove().values()) {
+                        if (field.get(loc).getColor() != tile.getColor()) {
                             throw new InvalidMoveException("Color doesn't fit in row/column.");
                         }
-                        if (field.get(loc).getShape() == move.getMove().get(loc2).getShape()) {
+                        if (field.get(loc).getShape() == tile.getShape()) {
                             throw new InvalidMoveException("Shape is already in row/column.");
                         }
                     }
@@ -218,11 +215,11 @@ public class Board {
 
                 //same shape, different colors
                 } else if (move.getIdentity() == Identity.shape) {
-                    for (Location loc2 : move.getMove().keySet()) {
-                        if (field.get(loc).getShape() != move.getMove().get(loc2).getShape()) {
+                    for (Tile tile : move.getMove().values()) {
+                        if (field.get(loc).getShape() != tile.getShape()) {
                             throw new InvalidMoveException("Shape doesn't fit in row/column.");
                         }
-                        if (field.get(loc).getColor() == move.getMove().get(loc2).getColor()) {
+                        if (field.get(loc).getColor() == tile.getColor()) {
                             throw new InvalidMoveException("Color is already in row/column.");
                         }
                     }
@@ -234,19 +231,19 @@ public class Board {
 
                 //one block in move set
                 } else if (move.getIdentity() == Identity.unspecified) {
-                    for (Location loc2 : move.getMove().keySet()) {
-                        if (field.get(loc).getColor() == move.getMove().get(loc2).getColor() &&
-                                field.get(loc).getShape() == move.getMove().get(loc2).getShape()) {
+                    for (Tile tile : move.getMove().values()) {
+                        if (field.get(loc).getColor() == tile.getColor() &&
+                                field.get(loc).getShape() == tile.getShape()) {
                             throw new InvalidMoveException("Same tile in row/column.");
                         }
-                        if (field.get(loc).getColor() != move.getMove().get(loc2).getColor() &&
-                                field.get(loc).getShape() != move.getMove().get(loc2).getShape()) {
+                        if (field.get(loc).getColor() != tile.getColor() &&
+                                field.get(loc).getShape() != tile.getShape()) {
                             throw new InvalidMoveException("Tile shares no identity with surrounding tiles.");
                         }
                     }
                 } else {
                     //should not occur
-                    //TODO: throw runtimeException: invalid identity
+                    throw new InvalidIdentityRuntimeException();
                 }
 
                 break; // right location is found on the field, no need to continue loop
@@ -352,9 +349,11 @@ public class Board {
         field.clear();
     }
 
+    /**
+     * Creates a string representation of field that can be used for a TUI.
+     * @return String representation of field.
+     */
     public String toString() {
-        String fieldString = "";
-
         if (field.isEmpty()) {
             return Configuration.EMPTY_FIELD;
         }
@@ -365,19 +364,27 @@ public class Board {
         int highY = higherBound(Axis.Y, field).getY();
         int length = highX - lowX + 2;
 
-        String staticRow = "|";
-        String emptyRow = "|";
+        String fieldString = "   |";
+        for (int i = lowX - 1; i <= highX + 1; i++) {
+            fieldString += topRow(i);
+        }
+        fieldString += "\n";
+        String emptyRow = "";
+        String staticRow = "---|";
+
         for (int i = 0; i < length; i++) {
             staticRow += Configuration.MID_ROW;
             emptyRow += Configuration.EMPTY_SPACE;
         }
+
         staticRow += Configuration.END_ROW + "\n";
         emptyRow += Configuration.EMPTY_SPACE + "\n";
 
-        fieldString += staticRow + emptyRow + staticRow;
+        fieldString += staticRow + startRow(lowY - 1) + emptyRow + staticRow;
 
         for (int j = lowY; j < highY + 1; j++) {
-            String row = "|" + Configuration.EMPTY_SPACE;
+            String row = startRow(j) + Configuration.EMPTY_SPACE;
+
             Map<Location, Tile> temp = new HashMap<>();
             for (Location loc : field.keySet()) {
                 if (loc.getY() == j) {
@@ -400,8 +407,26 @@ public class Board {
             fieldString += row + staticRow;
         }
 
-        fieldString += emptyRow + staticRow;
+        fieldString += startRow(highY + 1) + emptyRow + staticRow;
         return fieldString;
+    }
+
+    private String startRow(int i) {
+        String startRow = i < 0 ? "-" : " ";
+        if (i >= - 9 && i <= 9) {
+            startRow += "0";
+        }
+        startRow += Math.abs(i) + "|";
+        return startRow;
+    }
+
+    private String topRow(int i) {
+        String topRow = i < 0 ? "  -" : "   ";
+        if (i >= - 9 && i <= 9) {
+            topRow += "0";
+        }
+        topRow += Math.abs(i) + "   |";
+        return topRow;
     }
 
 }
