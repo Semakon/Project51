@@ -4,15 +4,11 @@ package Model.Network;
  * Created by Herjan on 20-1-2016.
  */
 import Model.Game.Game;
-import Model.Game.Tile;
-import Model.Player.HumanPlayer;
 
 import java.util.*;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-
-import Model.Network.*;
 
 /**
  * Created by Herjan on 20-1-2016.
@@ -40,18 +36,18 @@ public class Server extends Thread {
     }
 
     String msgSeperator = " ";
-    String startGame = "startGame";
+    String GAMESTART = "GAMESTART";
     String IDENTIFYOK = "IDENTIFYOK";
 
     private static int port;
     private List<ClientHandler> inactiveThreads;
-    private List<ClientHandler> waitingThreads;
+    private List<ClientHandler> lobby;
     private List<ClientHandler> matchedPlayers;
     private List<Game> activeGames;
 
     public Server(int port) {
         this.inactiveThreads = new ArrayList<ClientHandler>();
-        this.waitingThreads = new ArrayList<ClientHandler>();
+        this.lobby = new ArrayList<ClientHandler>();
         this.matchedPlayers = new ArrayList<ClientHandler>();
         this.activeGames = new ArrayList<Game>();
         this.start();
@@ -82,30 +78,42 @@ public class Server extends Thread {
         System.out.println(msg);
     }
 
+    List<String> serverFeatures = new ArrayList<String>(); //TODO: serverFeatures in lijst stoppen
+
     public void identify(ClientHandler c) {
         inactiveThreads.remove(c);
-        waitingThreads.add(c);
+        lobby.add(c);
         c.sendMessage("Welcome!");
-        c.sendMessage(IDENTIFYOK);
-        if (waitingThreads.size() == 2) {
-            this.matchedPlayers.add(waitingThreads.get(0));
-            this.matchedPlayers.add(waitingThreads.get(1));
+        c.sendMessage(IDENTIFYOK + serverFeatures);
+
+        //Dit moet in de methode die een game opstart, waarschijnlijk bij client_queue of client_challenge_accept
+        if (lobby.size() == 2) {
+            this.matchedPlayers.add(lobby.get(0));
+            this.matchedPlayers.add(lobby.get(1));
             //TODO: Game newGame = new Game(?);
             //this.activeGames.add(newGame);
-            for (ClientHandler c1 : waitingThreads) {
+            for (ClientHandler c1 : lobby) {
 
                 print("Sending to " + c1.clientName + " to start the game!");
-                c1.sendMessage(startGame + msgSeperator
-                        + waitingThreads.get(0).getClientName()
+                c1.sendMessage(GAMESTART + msgSeperator
+                        + lobby.get(0).getClientName()
                         + msgSeperator
-                        + waitingThreads.get(1).getClientName());
+                        + lobby.get(1).getClientName());
             }
-            this.waitingThreads = new ArrayList<ClientHandler>();
+            this.lobby = new ArrayList<ClientHandler>();
         } else {
-            //waitingThreads.remove(c);
+            //lobby.remove(c);
             //inactiveThreads.add(c);
             //invalidUserName error
         }
+    }
+
+    public void lobby(ClientHandler c) {
+        String names = "";
+        for(int i = 0; i < lobby.size(); i++) {
+            names += " " + lobby.get(i).getClientName();
+        }
+        c.sendMessage("LOBBYOK" + names);
     }
 
     public void broadcast(String msg, ClientHandler c) {
@@ -113,22 +121,28 @@ public class Server extends Thread {
         System.out.println("New message from " + c.getClientName() + ": " + msg);
         if (splitArray[0].equals("IDENTIFY")) {
             c.setClientName(splitArray[1]);
-            System.out.println("JAHOOR");
-            identify(c);/**
+            identify(c);
         } else {
-            if (splitArray[0].equals(ProtocolControl.getBoard)) {
-                sendBoard(c);
-            } else {
-                if (splitArray[0].equals(ProtocolControl.playerTurn)) {
-                    turn(c);
-                } else {
-                    if (splitArray[0].equals(ProtocolControl.doMove)) {
-                        makeMove(c, msg);
-                    }
+                if (splitArray[0].equals("LOBBY")) {
+                    lobby(c);}/**
+
+
+                     } else {
+ if (splitArray[0].equals(ProtocolControl.getBoard)) {
+ sendBoard(c);
+ } else {
+ if (splitArray[0].equals(ProtocolControl.playerTurn)) {
+ turn(c);
+ } else {
+ if (splitArray[0].equals(ProtocolControl.doMove)) {
+ makeMove(c, msg);
+ }
+ }
+ }*/
                 }
-            }*/
-        }
-    }
+            }
+
+
 
     /**
      * Add a ClientHandler to the collection of ClientHandlers.
