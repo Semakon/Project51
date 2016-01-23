@@ -63,6 +63,7 @@ public class Client extends Thread {
             System.out.println(host);
             System.out.println(port);
             Client client = new Client(clientNom, host, port);
+            client.setName(clientNom);
             client.sendMessage(clientNom);
             client.start();
 
@@ -102,12 +103,13 @@ public class Client extends Thread {
      * forwarded to the MessageUI
      */
     public void run() {
-        this.sendMessage("Hallo"+msgSeperator+clientName);
+        this.sendMessage(IDENTIFY);
+        System.out.println("Hallo"+msgSeperator+clientName);
         System.out.println("Waiting for other client...");
         try {
             System.out.println("nope");
             String message = in.readLine();
-            System.out.println("Hallo" + message + "Doei");
+            //System.out.println("Hallo" + message + "Doei");
             String[] blocks = message.split(msgSeperator);
             while (message != null) {
                 print("Command from server: " + message);

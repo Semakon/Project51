@@ -57,6 +57,40 @@ public class ClientHandler extends Thread {
     }
 
     /**
+     * This method takes care of sending messages from the Client.
+     * Every message that is received, is preprended with the name
+     * of the Client, and the new message is offered to the Server
+     * for broadcasting. If an IOException is thrown while reading
+     * the message, the method concludes that the socket connection is
+     * broken and shutdown() will be called.
+     */
+    public void run() {
+        try {
+            String msg = in.readLine();
+            while (msg != null) {
+
+                server.broadcast(msg, this);
+                msg = in.readLine();
+
+            }
+
+        } catch (IOException e) {
+            shutdown();
+        }
+    }
+
+        /**
+         * This ClientHandler signs off from the Server and subsequently
+         * sends a last broadcast to the Server to inform that the Client
+         * is no longer participating in the chat.
+         */
+        private void shutdown() {
+            //server.removeInactiveHandler(this);
+            server.broadcast("[" + clientName + " has left]", this);
+        }
+
+
+    /**
      * This method can be used to send a message over the socket
      * connection to the Client. If the writing of a message fails,
      * the method concludes that the socket connection has been lost

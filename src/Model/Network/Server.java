@@ -40,7 +40,6 @@ public class Server extends Thread {
     }
 
     String msgSeperator = " ";
-    String joinRequest = "joinRequest";
     String startGame = "startGame";
 
     private static int port;
@@ -72,8 +71,8 @@ public class Server extends Thread {
                 System.out.println("[Client no. " + (++i) + "]" + "connected.");
                 handler.start();
                 addInactiveHandler(handler);
+                System.out.println(inactiveThreads);
                 print("yes");
-                //broadcast();
 
             }
         } catch (IOException e) {
@@ -88,10 +87,11 @@ public class Server extends Thread {
         inactiveThreads.remove(c);
         waitingThreads.add(c);
         if (waitingThreads.size() == 2) {
-            /**this.matchedPlayers.add(waitingThreads);
-            Game newGame = new Game(new HumanPlayer(waitingThreads.get(0).getClientName(), null));
-            //Game newGame = new Game(new HumanPlayer(waitingThreads.get(0).getClientName(), null), new HumanPlayer(waitingThreads.get(1).getClientName(), null));
-            this.activeGames.add(newGame);
+            c.sendMessage("Welcome!");
+            this.matchedPlayers.add(waitingThreads.get(0));
+            this.matchedPlayers.add(waitingThreads.get(1));
+            //TODO: Game newGame = new Game(?);
+            //this.activeGames.add(newGame);
             for (ClientHandler c1 : waitingThreads) {
 
                 print("Sending to " + c1.clientName + " to start the game!");
@@ -101,7 +101,7 @@ public class Server extends Thread {
                         + waitingThreads.get(1).getClientName());
             }
             this.waitingThreads = new ArrayList<ClientHandler>();
-        */} else {
+        } else {
             waitingThreads.remove(c);
             inactiveThreads.add(c);
             //invalidUserName error
