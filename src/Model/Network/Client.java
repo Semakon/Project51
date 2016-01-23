@@ -3,6 +3,9 @@ package Model.Network;
 /**
  * Created by Herjan on 20-1-2016.
  */
+import Model.Game.Game;
+import Model.IProtocol;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -23,6 +26,7 @@ public class Client extends Thread {
     public static String clientNom;
     public static String clientHostAd;
     public static String clientPort;
+    public Game newGame;
 
     /** Start een Client-applicatie op. */
     public static void main(String[] args) {
@@ -59,6 +63,7 @@ public class Client extends Thread {
             System.out.println(host);
             System.out.println(port);
             Client client = new Client(clientNom, host, port);
+            client.setName(clientNom);
             client.sendMessage(clientNom);
             client.start();
 
@@ -84,33 +89,34 @@ public class Client extends Thread {
      */
     public Client(String name, InetAddress host, int port) throws IOException {
         clientName = name;
-        System.out.println(host);
-        System.out.println(port);
         sock = new Socket(host, port);
         in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-        System.out.println("DubbelCheck");
         out = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
 
     }
 
     String msgSeperator = " ";
-    String joinRequest = "joinRequest";
+    String IDENTIFY = "IDENTIFY";
 
     /**
      * Reads the messages in the socket connection. Each message will be
      * forwarded to the MessageUI
      */
     public void run() {
-        this.sendMessage(joinRequest+msgSeperator+clientName);
+        this.sendMessage(IDENTIFY);
+        System.out.println("Hallo"+msgSeperator+clientName);
         System.out.println("Waiting for other client...");
         try {
+            System.out.println("nope");
             String message = in.readLine();
+            //System.out.println("Hallo" + message + "Doei");
             String[] blocks = message.split(msgSeperator);
             while (message != null) {
                 print("Command from server: " + message);
 
                 switch(blocks[0]) {
-                    //case acceptRequest: acceptRequest(blocks); break;
+                    case "hallo": System.out.println("Doei"); break;
+                    case "IDENTIFY": identify(blocks); break;
                     //case sendBoard: sendBoard(blocks); break;
                     //case startGame: startGame(blocks); break;
                     //case moveResult: moveResult(blocks); break;
@@ -122,11 +128,19 @@ public class Client extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println("WHUT");
         shutdown();
     }
 
-    public void acceptRequest(String [] blocks){
-        System.out.println("Welcome!");
+    /** returns the client name */
+    public String getClientName() {
+        return clientName;
+    }
+
+    List<String> features = new ArrayList<String>();
+
+    public void identify(String [] blocks){
+        System.out.println("IDENTIFYOK" + msgSeperator + features);
 
     }
 
@@ -156,7 +170,6 @@ public class Client extends Thread {
     private static void print(String message) {
         System.out.println(message + "\n");
     }
-    //welke variabele moeten we gebruiken ipv message/tekst?
 
     public static String readString(String tekst) {
         System.out.print(tekst);
