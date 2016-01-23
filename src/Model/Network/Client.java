@@ -103,11 +103,10 @@ public class Client extends Thread {
      * forwarded to the MessageUI
      */
     public void run() {
-        this.sendMessage(IDENTIFY);
+        this.sendMessage(IDENTIFY + " " + this.getClientName());
         System.out.println("Hallo"+msgSeperator+clientName);
         System.out.println("Waiting for other client...");
         try {
-            System.out.println("nope");
             String message = in.readLine();
             //System.out.println("Hallo" + message + "Doei");
             String[] blocks = message.split(msgSeperator);

@@ -41,6 +41,7 @@ public class Server extends Thread {
 
     String msgSeperator = " ";
     String startGame = "startGame";
+    String IDENTIFYOK = "IDENTIFYOK";
 
     private static int port;
     private List<ClientHandler> inactiveThreads;
@@ -72,8 +73,6 @@ public class Server extends Thread {
                 handler.start();
                 addInactiveHandler(handler);
                 System.out.println(inactiveThreads);
-                print("yes");
-
             }
         } catch (IOException e) {
         }
@@ -86,8 +85,9 @@ public class Server extends Thread {
     public void identify(ClientHandler c) {
         inactiveThreads.remove(c);
         waitingThreads.add(c);
+        c.sendMessage("Welcome!");
+        c.sendMessage(IDENTIFYOK);
         if (waitingThreads.size() == 2) {
-            c.sendMessage("Welcome!");
             this.matchedPlayers.add(waitingThreads.get(0));
             this.matchedPlayers.add(waitingThreads.get(1));
             //TODO: Game newGame = new Game(?);
@@ -102,8 +102,8 @@ public class Server extends Thread {
             }
             this.waitingThreads = new ArrayList<ClientHandler>();
         } else {
-            waitingThreads.remove(c);
-            inactiveThreads.add(c);
+            //waitingThreads.remove(c);
+            //inactiveThreads.add(c);
             //invalidUserName error
         }
     }
@@ -113,6 +113,7 @@ public class Server extends Thread {
         System.out.println("New message from " + c.getClientName() + ": " + msg);
         if (splitArray[0].equals("IDENTIFY")) {
             c.setClientName(splitArray[1]);
+            System.out.println("JAHOOR");
             identify(c);/**
         } else {
             if (splitArray[0].equals(ProtocolControl.getBoard)) {
