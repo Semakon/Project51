@@ -83,8 +83,8 @@ public class Server extends Thread {
     public void identify(ClientHandler c) {
         inactiveThreads.remove(c);
         lobby.add(c);
+        c.sendMessage(IDENTIFYOK + msgSeperator + serverFeatures);
         c.sendMessage("Welcome to the lobby!");
-        c.sendMessage(IDENTIFYOK + serverFeatures);
 
         //Dit moet in de methode die een game opstart, waarschijnlijk bij client_queue of client_challenge_accept
         /**if (lobby.size() == 2) {
@@ -120,9 +120,30 @@ public class Server extends Thread {
     public void challenge(ClientHandler c, String uitgedaagde) {
         for (int i = 0; i < lobby.size(); i++) {
             if (lobby.get(i).getClientName().equals(uitgedaagde)) {
-                lobby.get(i).sendMessage("CHALLENGEBY " + c.getClientName());
+                lobby.get(i).sendMessage("CHALLENGEDBY " + c.getClientName());
             }
         }
+    }
+
+    public void challengeDecline(ClientHandler c, String uitdager) {
+        for (int i = 0; i < lobby.size(); i++) {
+            if (lobby.get(i).getClientName().equals(uitdager)) {
+                lobby.get(i).sendMessage("CHALLENGE_DECLINEDBY " + c.getClientName());
+            }
+        }
+    }
+
+    public void challengeAccept(ClientHandler c, String uitdager) {
+        //TODO: start a game between c and uitdager
+
+        /**
+         this.matchedPlayers.add(c.getClientName());
+         this.matchedPlayers.add(uitdager);
+         TODO: Game newGame = new Game(?);
+         this.activeGames.add(newGame);
+         lobby.remove(c);
+         lobby.remove(uitdager);
+         */
     }
 
     public void broadcast(String msg, ClientHandler c) {
@@ -139,6 +160,19 @@ public class Server extends Thread {
                         String uitgedaagde = splitArray[1];
                         challenge(c, uitgedaagde);
                     }
+                    else {
+                        if (splitArray[0].equals("CHALLENGE_DECLINE")) {
+                            String uitdager = splitArray[1];
+                            challengeDecline(c, uitdager);
+                        }
+                        else {
+                            if(splitArray[0].equals("CHALLENGE_ACCEPT")) {
+                                String uitdager = splitArray[1];
+                                challengeAccept(c, uitdager);
+                            }
+                        }
+                    }
+
                 }
 
             /**

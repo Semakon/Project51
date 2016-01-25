@@ -107,7 +107,6 @@ public class Client extends Thread {
         System.out.println("Hallo"+msgSeperator+clientName);
         try {
             String message = in.readLine();
-            //System.out.println("Hallo" + message + "Doei");
             String[] blocks = message.split(msgSeperator);
             while (message != null) {
                 print("Command from server: " + message);
@@ -117,6 +116,7 @@ public class Client extends Thread {
                     case "IDENTIFYOK": identify(blocks); break;
                     case "CHALLENGEDBY": challenge(blocks); break;
                     case "CHALLENGEFAIL": System.out.println("Couldn't challenge player"); break;
+                    case "CHALLENGE_DECLINEDBY": challengeDecline(blocks); break;
                     //case sendBoard: sendBoard(blocks); break;
                     //case startGame: startGame(blocks); break;
                     //case moveResult: moveResult(blocks); break;
@@ -145,6 +145,10 @@ public class Client extends Thread {
 
     public void challenge(String [] blocks){
         System.out.println("You're challenged by " + blocks[1]);
+    }
+
+    public void challengeDecline(String [] blocks) {
+        System.out.println("Your challenge is declined by " + blocks[1]);
     }
 
     /** send a message to a ClientHandler. */
