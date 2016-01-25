@@ -44,12 +44,18 @@ public class Server extends Thread {
     private List<ClientHandler> lobby;
     private List<ClientHandler> matchedPlayers;
     private List<Game> activeGames;
+    private List<ClientHandler> twoPlayerGame;
+    private List<ClientHandler> threePlayerGame;
+    private List<ClientHandler> fourPlayerGame;
 
     public Server(int port) {
         this.inactiveThreads = new ArrayList<ClientHandler>();
         this.lobby = new ArrayList<ClientHandler>();
         this.matchedPlayers = new ArrayList<ClientHandler>();
         this.activeGames = new ArrayList<Game>();
+        this.twoPlayerGame = new ArrayList<ClientHandler>();
+        this.threePlayerGame = new ArrayList<ClientHandler>();
+        this.fourPlayerGame = new ArrayList<ClientHandler>();
         this.start();
     }
 
@@ -146,6 +152,37 @@ public class Server extends Thread {
          */
     }
 
+    public void queue(ClientHandler c, String message) {
+        String [] numbers = message.split(",");
+        for (int i = 0; i < numbers.length; i++) {
+            int nr = Integer.parseInt(numbers[i]);
+            if (nr == 2) {
+                twoPlayerGame.add(c);
+                if (twoPlayerGame.size() == 2) {
+                    //TODO: start a game
+                }
+            }
+            else {
+                if (nr == 3) {
+                    threePlayerGame.add(c);
+                    if (threePlayerGame.size() == 3) {
+                        //TODO: start a game
+                    }
+                } else {
+                    if (nr == 4) {
+                        fourPlayerGame.add(c);
+                        if(fourPlayerGame.size() == 4) {
+                            //TODO: start a game
+                        }
+                    }
+                    else {
+                        c.sendMessage("WRONGNUMBER");
+                    }
+                }
+            }
+        }
+    }
+
     public void broadcast(String msg, ClientHandler c) {
         String[] splitArray = msg.split(msgSeperator);
         System.out.println("New message from " + c.getClientName() + ": " + msg);
@@ -169,6 +206,12 @@ public class Server extends Thread {
                             if(splitArray[0].equals("CHALLENGE_ACCEPT")) {
                                 String uitdager = splitArray[1];
                                 challengeAccept(c, uitdager);
+                            }
+                            else {
+                                if(splitArray[0].equals("QUEUE")) {
+                                    String message = splitArray[1];
+                                    queue(c, message);
+                                }
                             }
                         }
                     }

@@ -117,6 +117,7 @@ public class Client extends Thread {
                     case "CHALLENGEDBY": challenge(blocks); break;
                     case "CHALLENGEFAIL": System.out.println("Couldn't challenge player"); break;
                     case "CHALLENGE_DECLINEDBY": challengeDecline(blocks); break;
+                    case "WRONGNUMBER": wrongNumber(blocks);
                     //case sendBoard: sendBoard(blocks); break;
                     //case startGame: startGame(blocks); break;
                     //case moveResult: moveResult(blocks); break;
@@ -149,6 +150,10 @@ public class Client extends Thread {
 
     public void challengeDecline(String [] blocks) {
         System.out.println("Your challenge is declined by " + blocks[1]);
+    }
+
+    public void wrongNumber(String [] Blocks) {
+        System.out.print("Choose a valid number: 2, 3 or 4");
     }
 
     /** send a message to a ClientHandler. */
