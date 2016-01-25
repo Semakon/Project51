@@ -31,7 +31,94 @@ public class Board {
         return pool;
     }
 
+    public Map<Location, List<Tile>> getPossibleMoves() {
+        Map<Location, List<Tile>> possibleMoves = new HashMap<>();
+        List<Location> openLocations = getOpenLocations();
+        for (Location loc : openLocations) {
+            List<Tile> tilesX = createLine(Axis.X, loc, loc, 1);
 
+
+            List<Tile> tilesY = createLine(Axis.Y, loc, loc, 1);
+
+
+        }
+        return possibleMoves;
+    }
+
+    public Identity getIdentity(List<Tile> line) {
+        Identity identity = Identity.unspecified;
+        boolean sameColor = true;
+        boolean sameShape = true;
+
+        for (Tile tile : line) {
+            for (Tile tile2 : line) {
+                if (tile != tile2 && tile.getColor() != tile2.getColor()) {
+                    sameColor = false;
+                }
+                if (tile != tile2 && tile.getShape() != tile2.getShape()) {
+                    sameShape = false;
+                }
+            }
+        }
+        if (sameColor && !sameShape) {
+            for (Tile tile :line) {
+                for (Tile tile2 : line) {
+                    if (tile != tile2 && tile.getShape() == tile2.getShape()) {
+                        identity = Identity.invalid;
+                        //TODO: FIX
+                    }
+                }
+            }
+        } else if (!sameColor && sameShape) {
+            for (Tile tile : line) {
+                for (Tile tile2 : line) {
+                    if (tile != tile2 && tile.getColor() == tile2.getColor()) {
+                        identity = Identity.invalid;
+                        //TODO: FIX
+                    }
+                }
+            }
+        } else if (sameColor /** && sameShape */){
+            identity = Identity.unspecified;
+        } else {
+            identity = Identity.invalid;
+        }
+        return identity;
+    }
+
+    /**
+     * Creates a List of Tiles that are on one line on a certain axis. The Location startPoint is not included.
+     * This method uses recursion to create the List.
+     * @param axis The axis on which the line lies.
+     * @param location The location checked in this iteration of the method.
+     * @param startPoint The start location of the method. This location is the reference point.
+     * @param step The step taken on the line to the next location. Must be either 1 or -1.
+     * @return A list of Tiles that lie on one line. The Location startPoint is not included.
+     */
+    public List<Tile> createLine(Axis axis, Location location, Location startPoint, int step) {
+        List<Tile> line = new ArrayList<>();
+        if (location.isEqualTo(startPoint)) {
+            List<Tile> temp = axis == Axis.X ? createLine(axis, new Location(location.getX() + step, location.getY()), startPoint, step) :
+                    createLine(axis, new Location(location.getX(), location.getY() + step), startPoint, step);
+            line.addAll(temp);
+        } else {
+            for (Location loc : field.keySet()) {
+                if (loc.isEqualTo(location)) {
+                    line.add(field.get(loc));
+                    List<Tile> temp = axis == Axis.X ? createLine(axis, new Location(location.getX() + step, location.getY()), startPoint, step) :
+                            createLine(axis, new Location(location.getX(), location.getY() + step), startPoint, step);
+                    line.addAll(temp);
+                    break; //right location is found, further looping is unnecessary
+                }
+            }
+        }
+        if (step > 0) {
+            List<Tile> temp = axis == Axis.X ? createLine(axis, new Location(location.getX() - step, location.getY()), startPoint, -step) :
+                    createLine(axis, new Location(location.getX(), location.getY() - step), startPoint, -step);
+            line.addAll(temp);
+        }
+        return line;
+    }
 
     /**
      * Creates a List of all empty Locations next to used Locations. This List is used to determine possible moves.
@@ -105,7 +192,7 @@ public class Board {
                 List<Tile> orthogonalLine = new ArrayList<>();
                 orthogonalLine.addAll(orthogonalLine(move, Axis.Y, loc, loc, 1));
                 orthogonalLine.addAll(orthogonalLine(move, Axis.Y, loc, loc, -1));
-                if (orthogonalLine.size() > 1 && !validOrthogonalLine(orthogonalLine)) {
+                if (orthogonalLine.size() > 1 && !validLine(orthogonalLine)) {
                     validOrthogonalLines = false;
                     break;
                 }
@@ -118,7 +205,7 @@ public class Board {
                 List<Tile> orthogonalLine = new ArrayList<>();
                 orthogonalLine.addAll(orthogonalLine(move, Axis.X, loc, loc, 1));
                 orthogonalLine.addAll(orthogonalLine(move, Axis.X, loc, loc, -1));
-                if (orthogonalLine.size() > 1 && !validOrthogonalLine(orthogonalLine)) {
+                if (orthogonalLine.size() > 1 && !validLine(orthogonalLine)) {
                     validOrthogonalLines = false;
                     break;
                 }
@@ -173,7 +260,7 @@ public class Board {
      * @param line Line to be checked.
      * @return True if the line is valid.
      */
-    private boolean validOrthogonalLine(List<Tile> line) throws InvalidMoveException {
+    private boolean validLine(List<Tile> line) throws InvalidMoveException {
         boolean valid = true;
         boolean sameColor = true;
         boolean sameShape = true;
@@ -419,9 +506,9 @@ public class Board {
         staticRow += Configuration.END_ROW + "\n";
         emptyRow += Configuration.EMPTY_SPACE + "\n";
 
-        fieldString += staticRow + startRow(lowY - 1) + emptyRow + staticRow;
+        fieldString += staticRow + startRow(highY + 1) + emptyRow + staticRow;
 
-        for (int j = lowY; j < highY + 1; j++) {
+        for (int j = highY; j > lowY - 1; j--) {
             String row = startRow(j) + Configuration.EMPTY_SPACE;
 
             Map<Location, Tile> temp = new HashMap<>();
@@ -446,7 +533,7 @@ public class Board {
             fieldString += row + staticRow;
         }
 
-        fieldString += startRow(highY + 1) + emptyRow + staticRow;
+        fieldString += startRow(lowY - 1) + emptyRow + staticRow;
         return fieldString;
     }
 

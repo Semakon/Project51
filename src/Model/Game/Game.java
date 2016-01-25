@@ -19,7 +19,6 @@ public class Game {
      * @param thisPlayer The player of this client. Null if this instance of Game runs on a Server. Is not present in players.
      * @param players Array of names of players. Does not contain thisPlayer.
      * @param firstMove Name of player with the first move.
-     * @throws InsufficientTilesInPoolException
      */
     public Game(String thisPlayer, String[] players, String firstMove) {
         board = new Board();
@@ -45,7 +44,9 @@ public class Game {
                 }
             }
         } catch (InsufficientTilesInPoolException e) {
+            //should not occur
             e.printStackTrace();
+            System.exit(0);
         }
     }
 
