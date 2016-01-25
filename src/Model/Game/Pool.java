@@ -38,8 +38,8 @@ public class Pool {
      * @throws InsufficientTilesInPoolException If the pool doesn't have enough tiles to take
      */
     public List<Tile> takeTiles(int amount) throws InsufficientTilesInPoolException {
-        if (amount <= 0 || amount > Configuration.MAXIMUM_HAND) {
-            throw new InvalidAmountRuntimeException("Amount must be between 0 (exclusive) and " + Configuration.MAXIMUM_HAND + " (inclusive).");
+        if (amount <= 0 || amount > Configuration.HAND) {
+            throw new InvalidAmountRuntimeException("Amount must be between 0 (exclusive) and " + Configuration.HAND + " (inclusive).");
         }
         if (pool.size() < amount) {
             throw new InsufficientTilesInPoolException("Pool doesn't contain enough tiles.");
@@ -62,8 +62,8 @@ public class Pool {
      * @throws InsufficientTilesInPoolException If the pool doesn't have enough tiles to trade
      */
     public List<Tile> tradeTiles(List<Tile> oldTiles) throws InsufficientTilesInPoolException {
-        if (oldTiles.size() <= 0 || oldTiles.size() > Configuration.MAXIMUM_HAND) {
-            throw new InvalidAmountRuntimeException("Amount must be between 0 (exclusive) and " + Configuration.MAXIMUM_HAND + " (inclusive).");
+        if (oldTiles.size() <= 0 || oldTiles.size() > Configuration.HAND) {
+            throw new InvalidAmountRuntimeException("Amount must be between 0 (exclusive) and " + Configuration.HAND + " (inclusive).");
         }
         if (pool.size() < oldTiles.size()) {
             throw new InsufficientTilesInPoolException("Pool doesn't contain enough tiles.");

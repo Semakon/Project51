@@ -14,9 +14,6 @@ public class Configuration {
     //Amount of duplicates of a unique tile
     public static final int TILE_DUPLICATES = 3;
 
-    //Maximum amount of tiles in a hand
-    public static final int MAXIMUM_HAND = 6;
-
     //Strings used to create a String presentation of board
     public static final String EMPTY_SPACE = "        |";
     public static final String MID_ROW = "--------+";

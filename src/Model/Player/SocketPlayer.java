@@ -22,19 +22,19 @@ public class SocketPlayer extends Player {
 
     @Override
     public PutMove determinePutMove(Board board) {
-        //TODO: get correct Move from server.
+        //Get move from server.
         return null;
     }
 
     @Override
     public TradeMove determineTradeMove(Board board) {
-        //TODO: get correct Move from server.
+        //Get move from server.
         return null;
     }
 
     @Override
     public Move determineMove(Board board) throws InvalidMoveException {
-        //TODO: get correct Move from server.
+        //Get choice from server.
         return null;
     }
 }
