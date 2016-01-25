@@ -43,17 +43,33 @@ public class Board {
         }
     }
 
+    /**
+     * Checks whether a PutMove is valid. A PutMove is invalid if
+     * @param move
+     * @return
+     * @throws InvalidMoveException
+     */
     private boolean validPut(PutMove move) throws InvalidMoveException {
         boolean validLine;
         boolean validOrthogonalLines = true;
+        boolean touchesField = false;
 
         for (Location loc : move.getMove().keySet()) {
             for (Location loc2 : field.keySet()) {
                 if (loc.isEqualTo(loc2)) {
                     throw new InvalidMoveException("Location already in use."); //return false;
                 }
-                //TODO: check if move is attached to anything in the field
+                if (!touchesField) {
+                    if (loc.isEqualTo(loc2.getX(), loc2.getY() + 1) || loc.isEqualTo(loc2.getX(), loc2.getY() - 1) || loc.isEqualTo(loc2.getX() + 1, loc2.getY()) ||
+                            loc.isEqualTo(loc2.getX() - 1, loc2.getY())) {
+                        touchesField = true;
+                    }
+                }
             }
+        }
+
+        if (!touchesField) {
+            throw new InvalidMoveException("Tiles are not connected to any other Tiles in the field.");
         }
 
         Location startPoint = new ArrayList<>(move.getMove().keySet()).get(0);
