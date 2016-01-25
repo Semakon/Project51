@@ -3,6 +3,7 @@ package Model.Network;
 /**
  * Created by Herjan on 20-1-2016.
  */
+import Model.Game.Exceptions.InsufficientTilesInPoolException;
 import Model.Game.Game;
 
 import java.util.*;
@@ -140,16 +141,18 @@ public class Server extends Thread {
     }
 
     public void challengeAccept(ClientHandler c, String uitdager) {
-        //TODO: start a game between c and uitdager
-
-        /**
-         this.matchedPlayers.add(c.getClientName());
-         this.matchedPlayers.add(uitdager);
-         TODO: Game newGame = new Game(?);
-         this.activeGames.add(newGame);
-         lobby.remove(c);
-         lobby.remove(uitdager);
-         */
+        String [] playersList = new String[1];
+        playersList[0] = uitdager;
+        Game newGame = new Game(c.getClientName(), playersList, uitdager);
+        c.sendMessage(GAMESTART + msgSeperator + c.getClientName() + msgSeperator + uitdager);
+        for (int i = 0; i < lobby.size(); i++) {
+            if(lobby.get(i).getClientName().equals(uitdager)) {
+                lobby.get(i).sendMessage(GAMESTART + msgSeperator + c.getClientName() + msgSeperator + uitdager);
+                lobby.remove(i);
+            }
+        }
+        this.activeGames.add(newGame);
+        lobby.remove(c);
     }
 
     public void queue(ClientHandler c, String message) {
@@ -159,20 +162,44 @@ public class Server extends Thread {
             if (nr == 2) {
                 twoPlayerGame.add(c);
                 if (twoPlayerGame.size() == 2) {
-                    //TODO: start a game
+                    String [] playersList = new String[1];
+                    playersList[0] = twoPlayerGame.get(0).getClientName();
+                    Game newGame = new Game(c.getClientName(), playersList, twoPlayerGame.get(0).getClientName());
+                    c.sendMessage(GAMESTART + msgSeperator + c.getClientName() + msgSeperator + twoPlayerGame.get(0).getClientName());
+                    twoPlayerGame.get(0).sendMessage(GAMESTART + msgSeperator + c.getClientName() + msgSeperator + twoPlayerGame.get(0).getClientName());
+                    this.activeGames.add(newGame);
+                    lobby.remove(c);
+                    lobby.remove(twoPlayerGame.get(0));
                 }
             }
             else {
                 if (nr == 3) {
                     threePlayerGame.add(c);
                     if (threePlayerGame.size() == 3) {
-                        //TODO: start a game
+                        String [] playerList = new String[2];
+                        playerList[0] = threePlayerGame.get(0).getClientName();
+                        playerList[1] = threePlayerGame.get(1).getClientName();
+                        Game newGame = new Game(c.getClientName(), playerList, threePlayerGame.get(0).getClientName());
+                        for (int j = 0; j < threePlayerGame.size(); j++) {
+                            threePlayerGame.get(j).sendMessage(GAMESTART + msgSeperator + c.getClientName() + msgSeperator + threePlayerGame.get(0) + threePlayerGame.get(2));
+                            lobby.remove(threePlayerGame.get(i));
+                        }
+                        this.activeGames.add(newGame);
                     }
                 } else {
                     if (nr == 4) {
                         fourPlayerGame.add(c);
                         if(fourPlayerGame.size() == 4) {
-                            //TODO: start a game
+                            String [] playerList = new String[3];
+                            playerList[0] = fourPlayerGame.get(0).getClientName();
+                            playerList[1] = fourPlayerGame.get(1).getClientName();
+                            playerList[2] = fourPlayerGame.get(2).getClientName();
+                            Game newGame = new Game(c.getClientName(), playerList, fourPlayerGame.get(0).getClientName());
+                            for (int k = 0; k < fourPlayerGame.size(); k++) {
+                                fourPlayerGame.get(k).sendMessage(GAMESTART + msgSeperator + c.getClientName() + msgSeperator + fourPlayerGame.get(0) + fourPlayerGame.get(2));
+                                lobby.remove(threePlayerGame.get(i));
+                            }
+                            this.activeGames.add(newGame);
                         }
                     }
                     else {
@@ -181,6 +208,38 @@ public class Server extends Thread {
                 }
             }
         }
+    }
+
+    public void quit(ClientHandler c) {
+        //TODO: remove clienthandler from the game
+    }
+
+    private String move;
+
+    //TODO: nog onbekend welk type move moet hebben, evt later aanpassen
+    public void movePut(ClientHandler c, String [] tiles) {
+        for(int i = 1; i < tiles.length; i++) {
+            move = tiles[i];
+        }//TODO: checken of if voldoet, en dan move doen en sendMessage
+        /**if (tiles are owned & move is valid) {
+            move = c.getGame().doMove(move);
+            String resultMove = "MOVEOK_PUT" + tiles;
+            for(int i = 0; i < aantalSpelers.length; i++) {
+                aantalSpelers.get(i).sendMessage(resultMove);
+            }
+            if (c.getGame().hasWinner()) {
+                c.getGame().printResult();
+                endGameWinner(c);
+            }
+         } else {
+            invalidUserTurn(c);
+            }
+         }*/
+
+    }
+
+    public void moveTrade(ClientHandler c, String [] tiles) {
+        //TODO: implement
     }
 
     public void broadcast(String msg, ClientHandler c) {
@@ -211,6 +270,23 @@ public class Server extends Thread {
                                 if(splitArray[0].equals("QUEUE")) {
                                     String message = splitArray[1];
                                     queue(c, message);
+                                }
+                                else {
+                                    if(splitArray[0].equals("QUIT")) {
+                                        quit(c);
+                                    }
+                                    else {
+                                        if(splitArray[0].equals("MOVE_PUT")) {
+                                            String [] tiles = splitArray;
+                                            movePut(c, tiles);
+                                        }
+                                        else {
+                                            if(splitArray[0].equals("MOVE_TRADE")) {
+                                                String [] tiles = splitArray;
+                                                moveTrade(c, tiles);
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }

@@ -112,15 +112,13 @@ public class Client extends Thread {
                 print("Command from server: " + message);
 
                 switch(blocks[0]) {
-                    //case "someString": doSomething; break;
                     case "IDENTIFYOK": identify(blocks); break;
                     case "CHALLENGEDBY": challenge(blocks); break;
-                    case "CHALLENGEFAIL": System.out.println("Couldn't challenge player"); break;
+                    case "CHALLENGEFAIL": challengeFail(); break;
                     case "CHALLENGE_DECLINEDBY": challengeDecline(blocks); break;
                     case "WRONGNUMBER": wrongNumber(blocks);
-                    //case sendBoard: sendBoard(blocks); break;
-                    //case startGame: startGame(blocks); break;
-                    //case moveResult: moveResult(blocks); break;
+                    case "GAMESTART": startGame(blocks);
+                    case "MOVEOK_PUT": moveOk();
                 }
 
                 message = in.readLine();
@@ -128,8 +126,7 @@ public class Client extends Thread {
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        System.out.println("WHUT");
+        };
         shutdown();
     }
 
@@ -154,6 +151,24 @@ public class Client extends Thread {
 
     public void wrongNumber(String [] Blocks) {
         System.out.print("Choose a valid number: 2, 3 or 4");
+    }
+
+    public void startGame(String [] blocks) {
+        String [] playersList = new String[blocks.length - 2];
+        for(int i = 0; i < blocks.length - 2; i++) {
+            playersList[i] = blocks[i + 2];
+        }
+        String name1 = blocks[1];
+        newGame = new Game(name1, playersList, name1);
+        System.out.println(newGame.getBoard().toString());
+    }
+
+    public void moveOk() {
+        System.out.println("Move was successful put on the board");
+    }
+
+    public void challengeFail() {
+        System.out.println("Couldn't challenge player");
     }
 
     /** send a message to a ClientHandler. */
