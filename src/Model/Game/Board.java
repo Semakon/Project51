@@ -31,6 +31,23 @@ public class Board {
         return pool;
     }
 
+    public List<Location> getOpenLocations() {
+        List<Location> openLocations = new ArrayList<>();
+        for (Location loc : field.keySet()) {
+            Location locX = new Location(loc.getX() + 1, loc.getY());
+            Location locY = new Location(loc.getX(), loc.getY() + 1);
+            Location locMinusX = new Location(loc.getX() - 1, loc.getY());
+            Location locMinusY = new Location(loc.getX(), loc.getY() - 1);
+            for (Location loc2 : field.keySet()) {
+                if (loc != loc2 && !openLocations.contains(loc2) && (loc2.isEqualTo(locX) || loc2.isEqualTo(locMinusX) ||
+                        loc2.isEqualTo(locY) || loc2.isEqualTo(locMinusY))) {
+                    openLocations.add(loc2);
+                }
+            }
+        }
+        return openLocations;
+    }
+
     public void makePutMove(PutMove move) throws InvalidMoveException {
         if (move.validMove() && validPut(move)) {
             field.putAll(move.getMove());
@@ -50,7 +67,7 @@ public class Board {
         for (Location loc : move.getMove().keySet()) {
             for (Location loc2 : field.keySet()) {
                 if (loc.isEqualTo(loc2)) {
-                    throw new InvalidMoveException("Location already in use."); //return false;
+                    throw new InvalidMoveException("Location already in use."); //return false
                 }
                 //TODO: check if move is attached to anything in the field
             }
