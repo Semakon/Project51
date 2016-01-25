@@ -112,16 +112,13 @@ public class Client extends Thread {
                 print("Command from server: " + message);
 
                 switch(blocks[0]) {
-                    //case "someString": doSomething; break;
                     case "IDENTIFYOK": identify(blocks); break;
                     case "CHALLENGEDBY": challenge(blocks); break;
-                    case "CHALLENGEFAIL": System.out.println("Couldn't challenge player"); break;
+                    case "CHALLENGEFAIL": challengeFail(); break;
                     case "CHALLENGE_DECLINEDBY": challengeDecline(blocks); break;
                     case "WRONGNUMBER": wrongNumber(blocks);
                     case "GAMESTART": startGame(blocks);
-                    //case sendBoard: sendBoard(blocks); break;
-                    //case startGame: startGame(blocks); break;
-                    //case moveResult: moveResult(blocks); break;
+                    case "MOVEOK_PUT": moveOk();
                 }
 
                 message = in.readLine();
@@ -129,8 +126,7 @@ public class Client extends Thread {
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        System.out.println("WHUT");
+        };
         shutdown();
     }
 
@@ -165,6 +161,14 @@ public class Client extends Thread {
         String name1 = blocks[1];
         newGame = new Game(name1, playersList, name1);
         System.out.println(newGame.getBoard().toString());
+    }
+
+    public void moveOk() {
+        System.out.println("Move was successful put on the board");
+    }
+
+    public void challengeFail() {
+        System.out.println("Couldn't challenge player");
     }
 
     /** send a message to a ClientHandler. */
