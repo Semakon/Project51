@@ -191,9 +191,9 @@ public class Server extends Thread {
                         fourPlayerGame.add(c);
                         if(fourPlayerGame.size() == 4) {
                             String [] playerList = new String[3];
-                            playerList[0] = threePlayerGame.get(0).getClientName();
-                            playerList[1] = threePlayerGame.get(1).getClientName();
-                            playerList[2] = threePlayerGame.get(2).getClientName();
+                            playerList[0] = fourPlayerGame.get(0).getClientName();
+                            playerList[1] = fourPlayerGame.get(1).getClientName();
+                            playerList[2] = fourPlayerGame.get(2).getClientName();
                             Game newGame = new Game(c.getClientName(), playerList, fourPlayerGame.get(0).getClientName());
                             for (int k = 0; k < fourPlayerGame.size(); k++) {
                                 fourPlayerGame.get(k).sendMessage(GAMESTART + msgSeperator + c.getClientName() + msgSeperator + fourPlayerGame.get(0) + fourPlayerGame.get(2));
@@ -212,6 +212,34 @@ public class Server extends Thread {
 
     public void quit(ClientHandler c) {
         //TODO: remove clienthandler from the game
+    }
+
+    private String move;
+
+    //TODO: nog onbekend welk type move moet hebben, evt later aanpassen
+    public void movePut(ClientHandler c, String [] tiles) {
+        for(int i = 1; i < tiles.length; i++) {
+            move = tiles[i];
+        }//TODO: checken of if voldoet, en dan move doen en sendMessage
+        /**if (tiles are owned & move is valid) {
+            move = c.getGame().doMove(move);
+            String resultMove = "MOVEOK_PUT" + tiles;
+            for(int i = 0; i < aantalSpelers.length; i++) {
+                aantalSpelers.get(i).sendMessage(resultMove);
+            }
+            if (c.getGame().hasWinner()) {
+                c.getGame().printResult();
+                endGameWinner(c);
+            }
+         } else {
+            invalidUserTurn(c);
+            }
+         }*/
+
+    }
+
+    public void moveTrade(ClientHandler c, String [] tiles) {
+        //TODO: implement
     }
 
     public void broadcast(String msg, ClientHandler c) {
@@ -246,6 +274,18 @@ public class Server extends Thread {
                                 else {
                                     if(splitArray[0].equals("QUIT")) {
                                         quit(c);
+                                    }
+                                    else {
+                                        if(splitArray[0].equals("MOVE_PUT")) {
+                                            String [] tiles = splitArray;
+                                            movePut(c, tiles);
+                                        }
+                                        else {
+                                            if(splitArray[0].equals("MOVE_TRADE")) {
+                                                String [] tiles = splitArray;
+                                                moveTrade(c, tiles);
+                                            }
+                                        }
                                     }
                                 }
                             }
