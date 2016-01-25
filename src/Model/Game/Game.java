@@ -34,7 +34,7 @@ public class Game {
                 //Game is on Client
                 this.players = new Player[players.length + 1];
                 this.players[0] = new HumanPlayer(thisPlayer, board.getPool().takeTiles(Configuration.HAND));
-                for (int i = 0; i < this.players.length; i++) {
+                for (int i = 0; i < players.length; i++) {
                     this.players[i] = new SocketPlayer(players[i], board.getPool().takeTiles(Configuration.HAND));
                 }
             }

@@ -181,7 +181,7 @@ public class Server extends Thread {
                     playersList[0] = twoPlayerGame.get(0).getClientName();
                     Game newGame = new Game(c.getClientName(), playersList, twoPlayerGame.get(0).getClientName());
                     c.sendMessage(GAMESTART + msgSeperator + c.getClientName() + twoPlayerGame.get(0).getClientName());
-                    twoPlayerGame.get(0).sendMessage(GAMESTART + msgSeperator + c.getClientName() + twoPlayerGame.get(0).getClientName());
+                    twoPlayerGame.get(0).sendMessage(GAMESTART + msgSeperator + c.getClientName() + msgSeperator + twoPlayerGame.get(0).getClientName());
                 }
             }
             else {
@@ -194,7 +194,7 @@ public class Server extends Thread {
                         playerList[1] = threePlayerGame.get(1).getClientName();
                         Game newGame = new Game(c.getClientName(), playerList, threePlayerGame.get(0).getClientName());
                         for (int j = 0; j < threePlayerGame.size(); j++) {
-                            threePlayerGame.get(j).sendMessage(GAMESTART + msgSeperator + c.getClientName() + threePlayerGame.get(0) + threePlayerGame.get(2));
+                            threePlayerGame.get(j).sendMessage(GAMESTART + msgSeperator + c.getClientName() + msgSeperator + threePlayerGame.get(0) + threePlayerGame.get(2));
                         }
                     }
                 } else {
@@ -208,7 +208,7 @@ public class Server extends Thread {
                             playerList[2] = threePlayerGame.get(2).getClientName();
                             Game newGame = new Game(c.getClientName(), playerList, fourPlayerGame.get(0).getClientName());
                             for (int k = 0; k < fourPlayerGame.size(); k++) {
-                                fourPlayerGame.get(k).sendMessage(GAMESTART + msgSeperator + c.getClientName() + fourPlayerGame.get(0) + fourPlayerGame.get(2));
+                                fourPlayerGame.get(k).sendMessage(GAMESTART + msgSeperator + c.getClientName() + msgSeperator + fourPlayerGame.get(0) + fourPlayerGame.get(2));
                             }
                         }
                     }
