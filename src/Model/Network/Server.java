@@ -140,33 +140,20 @@ public class Server extends Thread {
         }
     }
 
-    // zit nog een foutmelding in
     public void challengeAccept(ClientHandler c, String uitdager) {
         //TODO: start a game between c and uitdager
         String [] playersList = new String[1];
         playersList[0] = uitdager;
-        System.out.println("Players zijn: " + playersList);
-        System.out.println("Aantal spelers: " + playersList.length);
-        System.out.println(playersList[0]);
-        System.out.println("1. " + c.getClientName());
-        System.out.println("2. " + playersList);
-        System.out.println("3. " + uitdager);
         Game newGame = new Game(c.getClientName(), playersList, uitdager);
-        c.sendMessage(GAMESTART + msgSeperator + c.getClientName() + uitdager);
-        //nog een sendMessage naar de uitdager
-        System.out.println("Players: " + playersList);
+        c.sendMessage(GAMESTART + msgSeperator + c.getClientName() + msgSeperator + uitdager);
+        for (int i = 0; i < lobby.size(); i++) {
+            if(lobby.get(i).getClientName() == uitdager) {
+                lobby.get(i).sendMessage(GAMESTART + msgSeperator + c.getClientName() + msgSeperator + uitdager);
+                lobby.remove(i);
+            }
+        }
         this.activeGames.add(newGame);
         lobby.remove(c);
-        lobby.remove(uitdager);
-
-        /**
-         this.matchedPlayers.add(c.getClientName());
-         this.matchedPlayers.add(uitdager);
-         TODO: Game newGame = new Game(?);
-         this.activeGames.add(newGame);
-         lobby.remove(c);
-         lobby.remove(uitdager);
-         */
     }
 
     public void queue(ClientHandler c, String message) {
@@ -180,8 +167,11 @@ public class Server extends Thread {
                     String [] playersList = new String[1];
                     playersList[0] = twoPlayerGame.get(0).getClientName();
                     Game newGame = new Game(c.getClientName(), playersList, twoPlayerGame.get(0).getClientName());
-                    c.sendMessage(GAMESTART + msgSeperator + c.getClientName() + twoPlayerGame.get(0).getClientName());
+                    c.sendMessage(GAMESTART + msgSeperator + c.getClientName() + msgSeperator + twoPlayerGame.get(0).getClientName());
                     twoPlayerGame.get(0).sendMessage(GAMESTART + msgSeperator + c.getClientName() + msgSeperator + twoPlayerGame.get(0).getClientName());
+                    this.activeGames.add(newGame);
+                    lobby.remove(c);
+                    lobby.remove(twoPlayerGame.get(0));
                 }
             }
             else {
@@ -195,7 +185,9 @@ public class Server extends Thread {
                         Game newGame = new Game(c.getClientName(), playerList, threePlayerGame.get(0).getClientName());
                         for (int j = 0; j < threePlayerGame.size(); j++) {
                             threePlayerGame.get(j).sendMessage(GAMESTART + msgSeperator + c.getClientName() + msgSeperator + threePlayerGame.get(0) + threePlayerGame.get(2));
+                            lobby.remove(threePlayerGame.get(i));
                         }
+                        this.activeGames.add(newGame);
                     }
                 } else {
                     if (nr == 4) {
@@ -209,7 +201,9 @@ public class Server extends Thread {
                             Game newGame = new Game(c.getClientName(), playerList, fourPlayerGame.get(0).getClientName());
                             for (int k = 0; k < fourPlayerGame.size(); k++) {
                                 fourPlayerGame.get(k).sendMessage(GAMESTART + msgSeperator + c.getClientName() + msgSeperator + fourPlayerGame.get(0) + fourPlayerGame.get(2));
+                                lobby.remove(threePlayerGame.get(i));
                             }
+                            this.activeGames.add(newGame);
                         }
                     }
                     else {
