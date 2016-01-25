@@ -141,13 +141,12 @@ public class Server extends Thread {
     }
 
     public void challengeAccept(ClientHandler c, String uitdager) {
-        //TODO: start a game between c and uitdager
         String [] playersList = new String[1];
         playersList[0] = uitdager;
         Game newGame = new Game(c.getClientName(), playersList, uitdager);
         c.sendMessage(GAMESTART + msgSeperator + c.getClientName() + msgSeperator + uitdager);
         for (int i = 0; i < lobby.size(); i++) {
-            if(lobby.get(i).getClientName() == uitdager) {
+            if(lobby.get(i).getClientName().equals(uitdager)) {
                 lobby.get(i).sendMessage(GAMESTART + msgSeperator + c.getClientName() + msgSeperator + uitdager);
                 lobby.remove(i);
             }
@@ -163,7 +162,6 @@ public class Server extends Thread {
             if (nr == 2) {
                 twoPlayerGame.add(c);
                 if (twoPlayerGame.size() == 2) {
-                    //TODO: start a game
                     String [] playersList = new String[1];
                     playersList[0] = twoPlayerGame.get(0).getClientName();
                     Game newGame = new Game(c.getClientName(), playersList, twoPlayerGame.get(0).getClientName());
@@ -178,7 +176,6 @@ public class Server extends Thread {
                 if (nr == 3) {
                     threePlayerGame.add(c);
                     if (threePlayerGame.size() == 3) {
-                        //TODO: start a game
                         String [] playerList = new String[2];
                         playerList[0] = threePlayerGame.get(0).getClientName();
                         playerList[1] = threePlayerGame.get(1).getClientName();
@@ -193,7 +190,6 @@ public class Server extends Thread {
                     if (nr == 4) {
                         fourPlayerGame.add(c);
                         if(fourPlayerGame.size() == 4) {
-                            //TODO: start a game
                             String [] playerList = new String[3];
                             playerList[0] = threePlayerGame.get(0).getClientName();
                             playerList[1] = threePlayerGame.get(1).getClientName();

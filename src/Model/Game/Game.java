@@ -38,7 +38,7 @@ public class Game {
                     this.players[i] = new SocketPlayer(players[i], board.getPool().takeTiles(Configuration.HAND));
                 }
             }
-            for (int i = 0; i < this.players.length; i++) {
+            for (int i = 0; i < players.length; i++) {
                 if (this.players[i].getName().equals(firstMove)) {
                     currentPlayer = i;
                     break;
