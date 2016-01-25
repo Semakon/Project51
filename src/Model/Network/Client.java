@@ -105,7 +105,6 @@ public class Client extends Thread {
     public void run() {
         this.sendMessage(IDENTIFY + " " + this.getClientName());
         System.out.println("Hallo"+msgSeperator+clientName);
-        System.out.println("Waiting for other client...");
         try {
             String message = in.readLine();
             //System.out.println("Hallo" + message + "Doei");
@@ -116,6 +115,8 @@ public class Client extends Thread {
                 switch(blocks[0]) {
                     //case "someString": doSomething; break;
                     case "IDENTIFYOK": identify(blocks); break;
+                    case "CHALLENGEDBY": challenge(blocks); break;
+                    case "CHALLENGEFAIL": System.out.println("Couldn't challenge player"); break;
                     //case sendBoard: sendBoard(blocks); break;
                     //case startGame: startGame(blocks); break;
                     //case moveResult: moveResult(blocks); break;
@@ -136,11 +137,14 @@ public class Client extends Thread {
         return clientName;
     }
 
-    List<String> clientFeatures = new ArrayList<String>();
+    List<String> clientFeatures = new ArrayList<String>(); //TODO: clientFeatures toevoegen
 
     public void identify(String [] blocks){
         System.out.println("IDENTIFYOK" + msgSeperator + clientFeatures);
+    }
 
+    public void challenge(String [] blocks){
+        System.out.println("You're challenged by " + blocks[1]);
     }
 
     /** send a message to a ClientHandler. */

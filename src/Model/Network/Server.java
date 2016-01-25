@@ -83,11 +83,11 @@ public class Server extends Thread {
     public void identify(ClientHandler c) {
         inactiveThreads.remove(c);
         lobby.add(c);
-        c.sendMessage("Welcome!");
+        c.sendMessage("Welcome to the lobby!");
         c.sendMessage(IDENTIFYOK + serverFeatures);
 
         //Dit moet in de methode die een game opstart, waarschijnlijk bij client_queue of client_challenge_accept
-        if (lobby.size() == 2) {
+        /**if (lobby.size() == 2) {
             this.matchedPlayers.add(lobby.get(0));
             this.matchedPlayers.add(lobby.get(1));
             //TODO: Game newGame = new Game(?);
@@ -105,15 +105,24 @@ public class Server extends Thread {
             //lobby.remove(c);
             //inactiveThreads.add(c);
             //invalidUserName error
-        }
+        }*/
     }
 
+    //werkt nog niet helemaal correct, names pakt nog de lege string ipv die uit de for-loop
     public void lobby(ClientHandler c) {
         String names = "";
         for(int i = 0; i < lobby.size(); i++) {
             names += " " + lobby.get(i).getClientName();
         }
         c.sendMessage("LOBBYOK" + names);
+    }
+
+    public void challenge(ClientHandler c, String uitgedaagde) {
+        for (int i = 0; i < lobby.size(); i++) {
+            if (lobby.get(i).getClientName().equals(uitgedaagde)) {
+                lobby.get(i).sendMessage("CHALLENGEBY " + c.getClientName());
+            }
+        }
     }
 
     public void broadcast(String msg, ClientHandler c) {
@@ -124,7 +133,15 @@ public class Server extends Thread {
             identify(c);
         } else {
                 if (splitArray[0].equals("LOBBY")) {
-                    lobby(c);}/**
+                    lobby(c);}
+            else {
+                    if (splitArray[0].equals("CHALLENGE")) {
+                        String uitgedaagde = splitArray[1];
+                        challenge(c, uitgedaagde);
+                    }
+                }
+
+            /**
 
 
                      } else {
