@@ -21,26 +21,31 @@ public class Game {
      * @param firstMove Name of player with the first move.
      * @throws InsufficientTilesInPoolException
      */
-    public Game(String thisPlayer, String[] players, String firstMove) throws InsufficientTilesInPoolException {
+    public Game(String thisPlayer, String[] players, String firstMove) {
         board = new Board();
-        if (thisPlayer == null) {
-            //Game is on Server
-            this.players = new SocketPlayer[players.length];
+        try {
+            if (thisPlayer == null) {
+                //Game is on Server
+                this.players = new SocketPlayer[players.length];
+                for (int i = 0; i < this.players.length; i++) {
+                    this.players[i] = new SocketPlayer(players[i], board.getPool().takeTiles(Configuration.HAND));
+                }
+            } else {
+                //Game is on Client
+                this.players = new Player[players.length + 1];
+                this.players[0] = new HumanPlayer(thisPlayer, board.getPool().takeTiles(Configuration.HAND));
+                for (int i = 0; i < this.players.length; i++) {
+                    this.players[i] = new SocketPlayer(players[i], board.getPool().takeTiles(Configuration.HAND));
+                }
+            }
             for (int i = 0; i < this.players.length; i++) {
-                this.players[i] = new SocketPlayer(players[i], board.getPool().takeTiles(Configuration.HAND));
+                if (this.players[i].getName().equals(firstMove)) {
+                    currentPlayer = i;
+                    break;
+                }
             }
-        } else {
-            //Game is on Client
-            this.players = new Player[players.length + 1];
-            this.players[0] = new HumanPlayer(thisPlayer, board.getPool().takeTiles(Configuration.HAND));
-            for (int i = 0; i < this.players.length; i++) {
-                this.players[i] = new SocketPlayer(players[i], board.getPool().takeTiles(Configuration.HAND));
-            }
-        }
-        for (int i = 0; i < this.players.length; i++) {
-            if (this.players[i].getName().equals(firstMove)) {
-                currentPlayer = i;
-            }
+        } catch (InsufficientTilesInPoolException e) {
+            e.printStackTrace();
         }
     }
 

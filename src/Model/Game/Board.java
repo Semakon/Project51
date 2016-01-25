@@ -31,6 +31,12 @@ public class Board {
         return pool;
     }
 
+
+
+    /**
+     * Creates a List of all empty Locations next to used Locations. This List is used to determine possible moves.
+     * @return A List of all empty Locations next to used Locations.
+     */
     public List<Location> getOpenLocations() {
         List<Location> openLocations = new ArrayList<>();
         for (Location loc : field.keySet()) {
