@@ -3,6 +3,7 @@ package Model.Network;
 /**
  * Created by Herjan on 20-1-2016.
  */
+import Model.Game.Exceptions.InsufficientTilesInPoolException;
 import Model.Game.Game;
 
 import java.util.*;
@@ -139,8 +140,24 @@ public class Server extends Thread {
         }
     }
 
+    // zit nog een foutmelding in
     public void challengeAccept(ClientHandler c, String uitdager) {
         //TODO: start a game between c and uitdager
+        String [] playersList = new String[1];
+        playersList[0] = uitdager;
+        System.out.println("Players zijn: " + playersList);
+        System.out.println("Aantal spelers: " + playersList.length);
+        System.out.println(playersList[0]);
+        System.out.println("1. " + c.getClientName());
+        System.out.println("2. " + playersList);
+        System.out.println("3. " + uitdager);
+        Game newGame = new Game(c.getClientName(), playersList, uitdager);
+        c.sendMessage(GAMESTART + msgSeperator + c.getClientName() + uitdager);
+        //nog een sendMessage naar de uitdager
+        System.out.println("Players: " + playersList);
+        this.activeGames.add(newGame);
+        lobby.remove(c);
+        lobby.remove(uitdager);
 
         /**
          this.matchedPlayers.add(c.getClientName());
@@ -160,6 +177,11 @@ public class Server extends Thread {
                 twoPlayerGame.add(c);
                 if (twoPlayerGame.size() == 2) {
                     //TODO: start a game
+                    String [] playersList = new String[1];
+                    playersList[0] = twoPlayerGame.get(0).getClientName();
+                    Game newGame = new Game(c.getClientName(), playersList, twoPlayerGame.get(0).getClientName());
+                    c.sendMessage(GAMESTART + msgSeperator + c.getClientName() + twoPlayerGame.get(0).getClientName());
+                    twoPlayerGame.get(0).sendMessage(GAMESTART + msgSeperator + c.getClientName() + twoPlayerGame.get(0).getClientName());
                 }
             }
             else {
@@ -167,12 +189,27 @@ public class Server extends Thread {
                     threePlayerGame.add(c);
                     if (threePlayerGame.size() == 3) {
                         //TODO: start a game
+                        String [] playerList = new String[2];
+                        playerList[0] = threePlayerGame.get(0).getClientName();
+                        playerList[1] = threePlayerGame.get(1).getClientName();
+                        Game newGame = new Game(c.getClientName(), playerList, threePlayerGame.get(0).getClientName());
+                        for (int j = 0; j < threePlayerGame.size(); j++) {
+                            threePlayerGame.get(j).sendMessage(GAMESTART + msgSeperator + c.getClientName() + threePlayerGame.get(0) + threePlayerGame.get(2));
+                        }
                     }
                 } else {
                     if (nr == 4) {
                         fourPlayerGame.add(c);
                         if(fourPlayerGame.size() == 4) {
                             //TODO: start a game
+                            String [] playerList = new String[3];
+                            playerList[0] = threePlayerGame.get(0).getClientName();
+                            playerList[1] = threePlayerGame.get(1).getClientName();
+                            playerList[2] = threePlayerGame.get(2).getClientName();
+                            Game newGame = new Game(c.getClientName(), playerList, fourPlayerGame.get(0).getClientName());
+                            for (int k = 0; k < fourPlayerGame.size(); k++) {
+                                fourPlayerGame.get(k).sendMessage(GAMESTART + msgSeperator + c.getClientName() + fourPlayerGame.get(0) + fourPlayerGame.get(2));
+                            }
                         }
                     }
                     else {
@@ -181,6 +218,10 @@ public class Server extends Thread {
                 }
             }
         }
+    }
+
+    public void quit(ClientHandler c) {
+        //TODO: remove clienthandler from the game
     }
 
     public void broadcast(String msg, ClientHandler c) {
@@ -211,6 +252,11 @@ public class Server extends Thread {
                                 if(splitArray[0].equals("QUEUE")) {
                                     String message = splitArray[1];
                                     queue(c, message);
+                                }
+                                else {
+                                    if(splitArray[0].equals("QUIT")) {
+                                        quit(c);
+                                    }
                                 }
                             }
                         }
