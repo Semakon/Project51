@@ -227,11 +227,8 @@ public class Server extends Thread {
     }
 
     private Tile tile;
-    //private Location location;
-    //private Map<Location, Tile> realMove = new HashMap<Location, Tile>();
     private PutMove realMove;
 
-    //TODO: nog onbekend welk type move moet hebben, evt later aanpassen
     public void movePut(ClientHandler c, String [] blocks) {
         for(int i = 1; i < blocks.length; i++) {
             String move = blocks[i];
@@ -264,57 +261,24 @@ public class Server extends Thread {
                             }
                             c.getGame().getCurrentPlayer().getHand().remove(tile);
                             System.out.println("einde van de methode, alles ging goed");
+
+                            /**String resultMove = "MOVEOK_PUT" + tiles;
+                            for(int i = 0; i < aantalSpelers.length; i++) {
+                                aantalSpelers.get(i).sendMessage(resultMove);
+                            }
+                            if (c.getGame().hasWinner()) {
+                                c.getGame().printResult();
+                                endGameWinner(c);
+                            }
+                        } else {
+                            invalidUserTurn(c);
+                        }*/
                         }
                     }
                 }
             }
-
-
-           /** for(int j = 0; j < c.getGame().getCurrentPlayer().getHand().size(); j++) {
-                tile = c.getGame().getCurrentPlayer().getHand().get(i);
-                if(tile.equals(Integer.parseInt(tileLoc[0]))) {
-                    realMove.put(location, tile);
-                    c.getGame().getCurrentPlayer().getHand().remove(tile);
-                }*/
-            }
-
-            //tile = tileLoc[0];
-            //location = tileLoc[1];
-            //realMove.put(location, tile);
-            //c.getGame().getCurrentPlayer().getHand().remove(tile);
-            //TODO: c.getGame().makePutMove(realMove);
         }
-
-
-        /**
-        Map<Tile, Location> tile = new HashMap<Tile, Location>();
-        tile = moves.split(msgSeperator);
-        for(int i = 1; i < moves.size(); i++) {
-            tile = moves.getKey();
-            location = moves.get(Location location);
-            String [] tiles = move.split("@");
-            System.out.println("Tiles 0: " + tiles[0] + "Tiles 1: " + tiles[1]);
-            realMove.put(location, tile);
-            c.getGame().makePutMove(realMove);
-        }*/
-
-
-        //TODO: checken of if voldoet, en dan move doen en sendMessage
-        /**if (tiles are owned & move is valid) {
-            move = c.getGame().doMove(move);
-            String resultMove = "MOVEOK_PUT" + tiles;
-            for(int i = 0; i < aantalSpelers.length; i++) {
-                aantalSpelers.get(i).sendMessage(resultMove);
-            }
-            if (c.getGame().hasWinner()) {
-                c.getGame().printResult();
-                endGameWinner(c);
-            }
-         } else {
-            invalidUserTurn(c);
-            }
-         }*/
-
+    }
 
 
     public void moveTrade(ClientHandler c, String [] tiles) {
