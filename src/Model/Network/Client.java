@@ -116,9 +116,9 @@ public class Client extends Thread {
                     case "CHALLENGEDBY": challenge(blocks); break;
                     case "CHALLENGEFAIL": challengeFail(); break;
                     case "CHALLENGE_DECLINEDBY": challengeDecline(blocks); break;
-                    case "WRONGNUMBER": wrongNumber(blocks);
-                    case "GAMESTART": startGame(blocks);
-                    case "MOVEOK_PUT": moveOk();
+                    case "WRONGNUMBER": wrongNumber(blocks);break;
+                    case "GAMESTART": startGame(blocks);break;
+                    case "MOVEOK_PUT": moveOk();break;
                 }
 
                 message = in.readLine();

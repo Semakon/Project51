@@ -4,7 +4,11 @@ package Model.Network;
  * Created by Herjan on 20-1-2016.
  */
 import Model.Game.Exceptions.InsufficientTilesInPoolException;
+import Model.Game.Exceptions.InvalidMoveException;
 import Model.Game.Game;
+import Model.Game.Location;
+import Model.Game.PutMove;
+import Model.Game.Tile;
 
 import java.util.*;
 import java.io.IOException;
@@ -147,6 +151,8 @@ public class Server extends Thread {
         c.sendMessage(GAMESTART + msgSeperator + c.getClientName() + msgSeperator + uitdager);
         for (int i = 0; i < lobby.size(); i++) {
             if(lobby.get(i).getClientName().equals(uitdager)) {
+                c.setGame(newGame);
+                lobby.get(i).setGame(newGame);
                 lobby.get(i).sendMessage(GAMESTART + msgSeperator + c.getClientName() + msgSeperator + uitdager);
                 lobby.remove(i);
             }
@@ -165,6 +171,8 @@ public class Server extends Thread {
                     String [] playersList = new String[1];
                     playersList[0] = twoPlayerGame.get(0).getClientName();
                     Game newGame = new Game(c.getClientName(), playersList, twoPlayerGame.get(0).getClientName());
+                    c.setGame(newGame);
+                    twoPlayerGame.get(0).setGame(newGame);
                     c.sendMessage(GAMESTART + msgSeperator + c.getClientName() + msgSeperator + twoPlayerGame.get(0).getClientName());
                     twoPlayerGame.get(0).sendMessage(GAMESTART + msgSeperator + c.getClientName() + msgSeperator + twoPlayerGame.get(0).getClientName());
                     this.activeGames.add(newGame);
@@ -181,6 +189,8 @@ public class Server extends Thread {
                         playerList[1] = threePlayerGame.get(1).getClientName();
                         Game newGame = new Game(c.getClientName(), playerList, threePlayerGame.get(0).getClientName());
                         for (int j = 0; j < threePlayerGame.size(); j++) {
+                            c.setGame(newGame);
+                            threePlayerGame.get(j).setGame(newGame);
                             threePlayerGame.get(j).sendMessage(GAMESTART + msgSeperator + c.getClientName() + msgSeperator + threePlayerGame.get(0) + threePlayerGame.get(2));
                             lobby.remove(threePlayerGame.get(i));
                         }
@@ -196,6 +206,8 @@ public class Server extends Thread {
                             playerList[2] = fourPlayerGame.get(2).getClientName();
                             Game newGame = new Game(c.getClientName(), playerList, fourPlayerGame.get(0).getClientName());
                             for (int k = 0; k < fourPlayerGame.size(); k++) {
+                                c.setGame(newGame);
+                                fourPlayerGame.get(k).setGame(newGame);
                                 fourPlayerGame.get(k).sendMessage(GAMESTART + msgSeperator + c.getClientName() + msgSeperator + fourPlayerGame.get(0) + fourPlayerGame.get(2));
                                 lobby.remove(threePlayerGame.get(i));
                             }
@@ -214,13 +226,80 @@ public class Server extends Thread {
         //TODO: remove clienthandler from the game
     }
 
-    private String move;
+    private Tile tile;
+    //private Location location;
+    //private Map<Location, Tile> realMove = new HashMap<Location, Tile>();
+    private PutMove realMove;
 
     //TODO: nog onbekend welk type move moet hebben, evt later aanpassen
-    public void movePut(ClientHandler c, String [] tiles) {
-        for(int i = 1; i < tiles.length; i++) {
-            move = tiles[i];
-        }//TODO: checken of if voldoet, en dan move doen en sendMessage
+    public void movePut(ClientHandler c, String [] blocks) {
+        for(int i = 1; i < blocks.length; i++) {
+            String move = blocks[i];
+            String [] tileLoc = move.split("@");
+            String locTile = tileLoc[1];
+            String [] coords = locTile.split(",");
+            int x = Integer.parseInt(coords[0]);
+            int y = Integer.parseInt(coords[1]);
+            System.out.println("int x: " + x);
+            System.out.println("int y: " + y);
+
+            Location location = new Location(x,y);
+
+            System.out.println("Client name: " + c.getClientName());
+            System.out.println("Current player: " + c.getGame().getCurrentPlayer());
+            System.out.println("Open locations: " + c.getGame().getBoard().getOpenLocations());
+            System.out.println("Open locations size: " + c.getGame().getBoard().getOpenLocations().size());
+
+            for(int k = 0; k < c.getGame().getBoard().getOpenLocations().size(); k++) {
+                if(c.getGame().getBoard().getOpenLocations().get(i).isEqualTo(location)) {
+                    for(int j = 0; j < c.getGame().getCurrentPlayer().getHand().size(); j++) {
+                        tile = c.getGame().getCurrentPlayer().getHand().get(i);
+                        if(tile.equals(Integer.parseInt(tileLoc[0]))) {
+                            System.out.println("Alleen de move nog leggen");
+                            realMove.getMove().put(location, tile);
+                            try {
+                                c.getGame().getBoard().makePutMove(realMove);
+                            } catch (InvalidMoveException e) {
+                                e.printStackTrace();
+                            }
+                            c.getGame().getCurrentPlayer().getHand().remove(tile);
+                            System.out.println("einde van de methode, alles ging goed");
+                        }
+                    }
+                }
+            }
+
+
+           /** for(int j = 0; j < c.getGame().getCurrentPlayer().getHand().size(); j++) {
+                tile = c.getGame().getCurrentPlayer().getHand().get(i);
+                if(tile.equals(Integer.parseInt(tileLoc[0]))) {
+                    realMove.put(location, tile);
+                    c.getGame().getCurrentPlayer().getHand().remove(tile);
+                }*/
+            }
+
+            //tile = tileLoc[0];
+            //location = tileLoc[1];
+            //realMove.put(location, tile);
+            //c.getGame().getCurrentPlayer().getHand().remove(tile);
+            //TODO: c.getGame().makePutMove(realMove);
+        }
+
+
+        /**
+        Map<Tile, Location> tile = new HashMap<Tile, Location>();
+        tile = moves.split(msgSeperator);
+        for(int i = 1; i < moves.size(); i++) {
+            tile = moves.getKey();
+            location = moves.get(Location location);
+            String [] tiles = move.split("@");
+            System.out.println("Tiles 0: " + tiles[0] + "Tiles 1: " + tiles[1]);
+            realMove.put(location, tile);
+            c.getGame().makePutMove(realMove);
+        }*/
+
+
+        //TODO: checken of if voldoet, en dan move doen en sendMessage
         /**if (tiles are owned & move is valid) {
             move = c.getGame().doMove(move);
             String resultMove = "MOVEOK_PUT" + tiles;
@@ -236,7 +315,7 @@ public class Server extends Thread {
             }
          }*/
 
-    }
+
 
     public void moveTrade(ClientHandler c, String [] tiles) {
         //TODO: implement
@@ -282,8 +361,8 @@ public class Server extends Thread {
                                         }
                                         else {
                                             if(splitArray[0].equals("MOVE_TRADE")) {
-                                                String [] tiles = splitArray;
-                                                moveTrade(c, tiles);
+                                                String [] move = splitArray;
+                                                moveTrade(c, move);
                                             }
                                         }
                                     }

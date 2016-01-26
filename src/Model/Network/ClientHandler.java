@@ -6,6 +6,8 @@ package Model.Network;
 
 //import Model.Game.Game;
 
+import Model.Game.Game;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -23,6 +25,7 @@ public class ClientHandler extends Thread {
     private BufferedReader in;
     private BufferedWriter out;
     public String clientName;
+    private Game newGame;
     private ClientHandler opponent;
 
     /**
@@ -54,6 +57,14 @@ public class ClientHandler extends Thread {
 
     public String getClientName(){
         return clientName;
+    }
+
+    public Game getGame(){
+        return newGame;
+    }
+
+    public void setGame(Game newGame){
+        this.newGame = newGame;
     }
 
     /**
