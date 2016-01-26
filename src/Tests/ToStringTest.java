@@ -28,6 +28,9 @@ public class ToStringTest {
 
         b.getField().put(new Location(0, -1), new Tile(32));
         b.getField().put(new Location(-1, -1), new Tile(26));
+//
+//        b.getField().put(new Location(98, 98), new Tile(0));
+//        b.getField().put(new Location(-98, -98), new Tile(0));
 
         System.out.println(b.toString());
     }

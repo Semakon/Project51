@@ -45,7 +45,7 @@ public class Location {
      * @return x,y
      */
     public String toString() {
-        return x + "," + y;
+        return "(" + x + ", " + y + ")";
     }
 
 }

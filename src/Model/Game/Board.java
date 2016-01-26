@@ -31,11 +31,16 @@ public class Board {
         return pool;
     }
 
+    /**
+     * Creates a Map with a Location and a List of Tiles. The Locations are open spaces in the field where a Tile could be placed.
+     * For every Location in the Map a List of Tiles is created that contains all Tiles that could be placed there. If a Location
+     * yields an empty List, the Location is not included in the Map.
+     * @return A Map with a Location and a List of Tiles that can be placed on that Location.
+     */
     public Map<Location, List<Tile>> getPossibleMoves() {
         Map<Location, List<Tile>> possibleMoves = new HashMap<>();
         List<Location> openLocations = getOpenLocations();
         for (Location loc : openLocations) {
-            List<Tile> possibleTiles = new ArrayList<>();
 
             List<Tile> tilesX = createLine(Axis.X, loc, loc, 1);
             Identity identityX = getIdentity(tilesX);
@@ -43,31 +48,48 @@ public class Board {
             List<Tile> tilesY = createLine(Axis.Y, loc, loc, 1);
             Identity identityY = getIdentity(tilesY);
 
-            if (tilesX.size() >= 6 || identityX == Identity.invalid || tilesY.size() >= 6 || identityY == Identity.invalid) {
-                //TODO: implement further
-            }
+            if (tilesX.size() < 6 && identityX != Identity.invalid && tilesY.size() < 6 && identityY != Identity.invalid) {
+                List<Tile> possibleTiles = new ArrayList<>();
+                List<Tile> listX = new ArrayList<>();
+                List<Tile> listY = new ArrayList<>();
 
-            if (identityX == Identity.color) {
-                possibleTiles = initiateList(possibleTiles, tilesX, tilesX.get(0).getColor().getId(), 1);
-            } else if (identityX == Identity.shape) {
-                possibleTiles = initiateList(possibleTiles, tilesX, tilesX.get(0).getShape().getId(), Configuration.RANGE);
-            } else if (identityX == Identity.unspecified) {
-                possibleTiles = initiateList(possibleTiles, tilesX, tilesX.get(0).getColor().getId(), 1);
-                possibleTiles = initiateList(possibleTiles, tilesX, tilesX.get(0).getShape().getId(), Configuration.RANGE);
-            } else {
-                //TODO: invalid exception (?)
+                if (!tilesX.isEmpty()) {
+                    if (identityX == Identity.color) {
+                        listX = checkId(listX, tilesX, identityX, tilesX.get(0).getColor().getId(), 1);
+                    } else if (identityX == Identity.shape) {
+                        listX = checkId(listX, tilesX, identityX, tilesX.get(0).getShape().getId(), Configuration.RANGE);
+                    } else if (identityX == Identity.unspecified) {
+                        listX = checkId(listX, tilesX, Identity.color, tilesX.get(0).getColor().getId(), 1);
+                        listX = checkId(listX, tilesX, Identity.shape, tilesX.get(0).getShape().getId(), Configuration.RANGE);
+                    }
+                }
+                if (!tilesY.isEmpty()) {
+                    if (identityY == Identity.color) {
+                        listY = checkId(listY, tilesY, identityY, tilesY.get(0).getColor().getId(), 1);
+                    } else if (identityY == Identity.shape) {
+                        listY = checkId(listY, tilesY, identityY, tilesY.get(0).getShape().getId(), Configuration.RANGE);
+                    } else if (identityY == Identity.unspecified) {
+                        listY = checkId(listY, tilesY, Identity.color, tilesY.get(0).getColor().getId(), 1);
+                        listY = checkId(listY, tilesY, Identity.shape, tilesY.get(0).getShape().getId(), Configuration.RANGE);
+                    }
+                }
+                if (listX.isEmpty() && !listY.isEmpty()) {
+                    listY.stream().filter(tile -> !possibleTiles.contains(tile)).forEach(possibleTiles::add);
+                } else if (!listX.isEmpty() && listY.isEmpty()) {
+                    listX.stream().filter(tile -> !possibleTiles.contains(tile)).forEach(possibleTiles::add);
+                } else {
+                    for (Tile tile : listX) {
+                        boolean add = false;
+                        for (Tile tile2 : listY) {
+                            if (tile.isEqualTo(tile2)) add = true;
+                        }
+                        if (add && !possibleTiles.contains(tile)) possibleTiles.add(tile);
+                    }
+                }
+                if (!possibleTiles.isEmpty()) {
+                    possibleMoves.put(loc, possibleTiles);
+                }
             }
-            if (identityY == Identity.color) {
-                possibleTiles = initiateList(possibleTiles, tilesY, tilesY.get(0).getColor().getId(), 1);
-            } else if (identityY == Identity.shape) {
-                possibleTiles = initiateList(possibleTiles, tilesY, tilesY.get(0).getShape().getId(), Configuration.RANGE);
-            } else if (identityY == Identity.unspecified) {
-                possibleTiles = initiateList(possibleTiles, tilesY, tilesY.get(0).getColor().getId(), 1);
-                possibleTiles = initiateList(possibleTiles, tilesY, tilesY.get(0).getShape().getId(), Configuration.RANGE);
-            } else {
-                //TODO: invalid exception (?)
-            }
-            //TODO: possibleMoves.put(loc, possibleTiles);
         }
         return possibleMoves;
     }
@@ -80,8 +102,15 @@ public class Board {
      * @param step Step taken by for loop that is determined by the identity.
      * @return A list with usable Tiles.
      */
-    public List<Tile> initiateList(List<Tile> list, List<Tile> tiles, int id, int step) {
-        for (int i = id; i < Configuration.RANGE * Configuration.RANGE; i += step) {
+    public List<Tile> checkId(List<Tile> list, List<Tile> tiles, Identity identity, int id, int step) {
+        int max = 0;
+        if (identity == Identity.color) {
+            id = id * Configuration.RANGE;
+            max = id + Configuration.RANGE;
+        } else if (identity == Identity.shape) {
+            max = Configuration.RANGE * Configuration.RANGE;
+        }
+        for (int i = id; i < max; i += step) {
             Tile temp = new Tile(i);
             boolean add = true;
             for (Tile tile : tiles) {
@@ -149,14 +178,17 @@ public class Board {
      * @return A list of Tiles that lie on one line. The Location startPoint is not included.
      */
     public List<Tile> createLine(Axis axis, Location location, Location startPoint, int step) {
+//        System.out.println("\nBegin:\t\t step: " + step + ",\taxis: " + axis + ",\tloc: " + location);
         List<Tile> line = new ArrayList<>();
         if (location.isEqualTo(startPoint)) {
+//            System.out.println("start point");
             List<Tile> temp = axis == Axis.X ? createLine(axis, new Location(location.getX() + step, location.getY()), startPoint, step) :
                     createLine(axis, new Location(location.getX(), location.getY() + step), startPoint, step);
             line.addAll(temp);
         } else {
             for (Location loc : field.keySet()) {
                 if (loc.isEqualTo(location)) {
+//                    System.out.println("in Field:\t step: " + step + ",\taxis: " + axis + ",\tloc: " + loc);
                     line.add(field.get(loc));
                     List<Tile> temp = axis == Axis.X ? createLine(axis, new Location(location.getX() + step, location.getY()), startPoint, step) :
                             createLine(axis, new Location(location.getX(), location.getY() + step), startPoint, step);
@@ -164,11 +196,44 @@ public class Board {
                     break; //right location is found, further looping is unnecessary
                 }
             }
+            if (step > 0) {
+//                System.out.println("step > 0:\t step: " + step + ",\taxis: " + axis + ",\tloc: " + location);
+                List<Tile> temp = axis == Axis.X ? createLine(axis, new Location(startPoint.getX() - step, startPoint.getY()), startPoint, -step) :
+                        createLine(axis, new Location(startPoint.getX(), startPoint.getY() - step), startPoint, -step);
+                line.addAll(temp);
+            }
         }
-        if (step > 0) {
-            List<Tile> temp = axis == Axis.X ? createLine(axis, new Location(location.getX() - step, location.getY()), startPoint, -step) :
-                    createLine(axis, new Location(location.getX(), location.getY() - step), startPoint, -step);
+        return line;
+    }
+
+    /**
+     * Creates a List of Tiles from the field that form a line with the Tile that lies on startPoint. This method is recursive.
+     * @param move PutMove with startPoint
+     * @param axis Axis on which the line lies.
+     * @param location Location of Tile that is checked.
+     * @param startPoint Location of the original Tile from the move that is checked.
+     * @param step Step the X or Y takes (1 or -1).
+     * @return A List of Tiles that form a line with the Tile that lies on startPoint.
+     */
+    public List<Tile> orthogonalLine(PutMove move, Axis axis, Location location, Location startPoint, int step) { //TODO: merge with createLine()
+        List<Tile> line = new ArrayList<>();
+        if (location.isEqualTo(startPoint)) {
+            if (step > 0) {
+                line.add(move.getMove().get(startPoint));
+            }
+            List<Tile> temp = axis == Axis.Y ? orthogonalLine(move, axis, new Location(location.getX() + step, location.getY()), startPoint, step) :
+                    orthogonalLine(move, axis, new Location(location.getX(), location.getY() + step), startPoint, step);
             line.addAll(temp);
+        } else {
+            for (Location loc : field.keySet()) {
+                if (loc.isEqualTo(location)) {
+                    line.add(field.get(loc));
+                    List<Tile> temp = axis == Axis.Y ? orthogonalLine(move, axis, new Location(location.getX() + step, location.getY()), startPoint, step) :
+                            orthogonalLine(move, axis, new Location(location.getX(), location.getY() + step), startPoint, step);
+                    line.addAll(temp);
+                    break; //right location is found, further looping is unnecessary
+                }
+            }
         }
         return line;
     }
@@ -180,15 +245,20 @@ public class Board {
     public List<Location> getOpenLocations() {
         List<Location> openLocations = new ArrayList<>();
         for (Location loc : field.keySet()) {
-            Location locX = new Location(loc.getX() + 1, loc.getY());
-            Location locY = new Location(loc.getX(), loc.getY() + 1);
-            Location locMinusX = new Location(loc.getX() - 1, loc.getY());
-            Location locMinusY = new Location(loc.getX(), loc.getY() - 1);
-            for (Location loc2 : field.keySet()) {
-                if (loc != loc2 && !openLocations.contains(loc2) && (loc2.isEqualTo(locX) || loc2.isEqualTo(locMinusX) ||
-                        loc2.isEqualTo(locY) || loc2.isEqualTo(locMinusY))) {
-                    openLocations.add(loc2);
+            List<Location> temp = new ArrayList<>();
+            temp.add(new Location(loc.getX() + 1, loc.getY()));
+            temp.add(new Location(loc.getX() - 1, loc.getY()));
+            temp.add(new Location(loc.getX(), loc.getY() + 1));
+            temp.add(new Location(loc.getX(), loc.getY() - 1));
+            for (Location loc2 : temp) {
+                boolean add = true;
+                for (Location loc3 : field.keySet()) {
+                    if (loc2.isEqualTo(loc3)) add = false;
                 }
+                for (Location loc4 : openLocations) {
+                    if (loc2.isEqualTo(loc4)) add = false;
+                }
+                if (add) openLocations.add(loc2);
             }
         }
         return openLocations;
@@ -205,10 +275,12 @@ public class Board {
     }
 
     /**
-     * Checks whether a PutMove is valid. A PutMove is invalid if
-     * @param move
-     * @return
-     * @throws InvalidMoveException
+     * Checks whether a PutMove is valid. A PutMove is invalid if all Tiles in a line have the same color and a different shape
+     * or all the same shape and different shape. The same Tile in a line is not allowed and the move must be connected to the field,
+     * but may not override it.
+     * @param move The move to be checked.
+     * @return True if the move is valid on this board.
+     * @throws InvalidMoveException If the move is invalid.
      */
     private boolean validPut(PutMove move) throws InvalidMoveException {
         boolean validLine;
@@ -272,38 +344,6 @@ public class Board {
             throw new InvalidPositioningRuntimeException();
         }
         return validLine && validOrthogonalLines;
-    }
-
-    /**
-     * Creates a List of Tiles from the field that form a line with the Tile that lies on startPoint. This method is recursive.
-     * @param move PutMove with startPoint
-     * @param axis Axis on which the line lies.
-     * @param location Location of Tile that is checked.
-     * @param startPoint Location of the original Tile from the move that is checked.
-     * @param step Step the X or Y takes (1 or -1).
-     * @return A List of Tiles that form a line with the Tile that lies on startPoint.
-     */
-    public List<Tile> orthogonalLine(PutMove move, Axis axis, Location location, Location startPoint, int step) { //TODO: merge with createLine()
-        List<Tile> line = new ArrayList<>();
-        if (!location.isEqualTo(startPoint)) {
-            for (Location loc : field.keySet()) {
-                if (loc.isEqualTo(location)) {
-                    line.add(field.get(loc));
-                    List<Tile> temp = axis == Axis.Y ? orthogonalLine(move, axis, new Location(location.getX() + step, location.getY()), startPoint, step) :
-                            orthogonalLine(move, axis, new Location(location.getX(), location.getY() + step), startPoint, step);
-                    line.addAll(temp);
-                    break; //right location is found, further looping is unnecessary
-                }
-            }
-        } else {
-            if (step > 0) {
-                line.add(move.getMove().get(startPoint));
-            }
-            List<Tile> temp = axis == Axis.Y ? orthogonalLine(move, axis, new Location(location.getX() + step, location.getY()), startPoint, step) :
-                    orthogonalLine(move, axis, new Location(location.getX(), location.getY() + step), startPoint, step);
-            line.addAll(temp);
-        }
-        return line;
     }
 
     /**
@@ -541,11 +581,7 @@ public class Board {
         int highY = higherBound(Axis.Y, field).getY();
         int length = highX - lowX + 2;
 
-        String fieldString = "   |";
-        for (int i = lowX - 1; i <= highX + 1; i++) {
-            fieldString += topRow(i);
-        }
-        fieldString += "\n";
+
         String emptyRow = "";
         String staticRow = "---|";
 
@@ -557,7 +593,7 @@ public class Board {
         staticRow += Configuration.END_ROW + "\n";
         emptyRow += Configuration.EMPTY_SPACE + "\n";
 
-        fieldString += staticRow + startRow(highY + 1) + emptyRow + staticRow;
+        String fieldString = staticRow + startRow(highY + 1) + emptyRow + staticRow;
 
         for (int j = highY; j > lowY - 1; j--) {
             String row = startRow(j) + Configuration.EMPTY_SPACE;
@@ -585,6 +621,11 @@ public class Board {
         }
 
         fieldString += startRow(lowY - 1) + emptyRow + staticRow;
+        fieldString += "y/x|";
+        for (int i = lowX - 1; i <= highX + 1; i++) {
+            fieldString += bottomRow(i);
+        }
+        fieldString += "\n";
         return fieldString;
     }
 
@@ -597,7 +638,7 @@ public class Board {
         return startRow;
     }
 
-    private String topRow(int i) {
+    private String bottomRow(int i) {
         String topRow = i < 0 ? "  -" : "   ";
         if (i >= - 9 && i <= 9) {
             topRow += "0";

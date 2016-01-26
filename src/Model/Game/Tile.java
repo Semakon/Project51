@@ -40,11 +40,20 @@ public class Tile {
 
     /**
      * Checks whether a Tile is equal to this Tile.
-     * @param tile Tile to be checked
-     * @return True if this Tile and tile have the same shape and color
+     * @param tile Tile to be checked.
+     * @return True if this Tile and tile have the same shape and color.
      */
     public boolean isEqualTo(Tile tile) {
         return tile.getColor() == color && tile.getShape() == shape;
+    }
+
+    /**
+     * Checks whether an ID is equal to this Tile's ID.
+     * @param id ID to be checked.
+     * @return True if this Tile has the same ID as id.
+     */
+    public boolean isEqualTo(int id) {
+        return this.id == id;
     }
 
     /**
