@@ -54,13 +54,13 @@ public class Server extends Thread {
     private List<ClientHandler> fourPlayerGame;
 
     public Server(int port) {
-        this.inactiveThreads = new ArrayList<ClientHandler>();
-        this.lobby = new ArrayList<ClientHandler>();
-        this.matchedPlayers = new ArrayList<ClientHandler>();
-        this.activeGames = new ArrayList<Game>();
-        this.twoPlayerGame = new ArrayList<ClientHandler>();
-        this.threePlayerGame = new ArrayList<ClientHandler>();
-        this.fourPlayerGame = new ArrayList<ClientHandler>();
+        this.inactiveThreads = new ArrayList<>();
+        this.lobby = new ArrayList<>();
+        this.matchedPlayers = new ArrayList<>();
+        this.activeGames = new ArrayList<>();
+        this.twoPlayerGame = new ArrayList<>();
+        this.threePlayerGame = new ArrayList<>();
+        this.fourPlayerGame = new ArrayList<>();
         this.start();
     }
 
@@ -72,11 +72,11 @@ public class Server extends Thread {
     public void run() {
         int i = 0;
         try {
-            ServerSocket ssocket = new ServerSocket(this.port);
+            ServerSocket ssocket = new ServerSocket(port);
             while (true) {
                 Socket socket = ssocket.accept();
                 ClientHandler handler = new ClientHandler(this, socket);
-                System.out.println("[Client no. " + (++i) + "]" + "connected.");
+                print("[Client no. " + (++i) + "]" + "connected.");
                 handler.start();
                 addInactiveHandler(handler);
                 System.out.println(inactiveThreads);
@@ -96,27 +96,6 @@ public class Server extends Thread {
         lobby.add(c);
         c.sendMessage(IDENTIFYOK + msgSeperator + serverFeatures);
         c.sendMessage("Welcome to the lobby!");
-
-        //Dit moet in de methode die een game opstart, waarschijnlijk bij client_queue of client_challenge_accept
-        /**if (lobby.size() == 2) {
-            this.matchedPlayers.add(lobby.get(0));
-            this.matchedPlayers.add(lobby.get(1));
-            //TODO: Game newGame = new Game(?);
-            //this.activeGames.add(newGame);
-            for (ClientHandler c1 : lobby) {
-
-                print("Sending to " + c1.clientName + " to start the game!");
-                c1.sendMessage(GAMESTART + msgSeperator
-                        + lobby.get(0).getClientName()
-                        + msgSeperator
-                        + lobby.get(1).getClientName());
-            }
-            this.lobby = new ArrayList<ClientHandler>();
-        } else {
-            //lobby.remove(c);
-            //inactiveThreads.add(c);
-            //invalidUserName error
-        }*/
     }
 
     //werkt nog niet helemaal correct, names pakt nog de lege string ipv die uit de for-loop
@@ -226,7 +205,6 @@ public class Server extends Thread {
         //TODO: remove clienthandler from the game
     }
 
-    private Tile tile;
     private PutMove realMove;
 
     public void movePut(ClientHandler c, String [] blocks) {
@@ -250,9 +228,9 @@ public class Server extends Thread {
             for(int k = 0; k < c.getGame().getBoard().getOpenLocations().size(); k++) {
                 if(c.getGame().getBoard().getOpenLocations().get(i).isEqualTo(location)) {
                     for(int j = 0; j < c.getGame().getCurrentPlayer().getHand().size(); j++) {
-                        tile = c.getGame().getCurrentPlayer().getHand().get(i);
+                        Tile tile = c.getGame().getCurrentPlayer().getHand().get(i);
                         if(tile.equals(Integer.parseInt(tileLoc[0]))) {
-                            System.out.println("Alleen de move nog leggen");
+                            print("Alleen de move nog leggen");
                             realMove.getMove().put(location, tile);
                             try {
                                 c.getGame().getBoard().makePutMove(realMove);
@@ -260,7 +238,7 @@ public class Server extends Thread {
                                 e.printStackTrace();
                             }
                             c.getGame().getCurrentPlayer().getHand().remove(tile);
-                            System.out.println("einde van de methode, alles ging goed");
+                            print("einde van de methode, alles ging goed");
 
                             /**String resultMove = "MOVEOK_PUT" + tiles;
                             for(int i = 0; i < aantalSpelers.length; i++) {
@@ -287,7 +265,7 @@ public class Server extends Thread {
 
     public void broadcast(String msg, ClientHandler c) {
         String[] splitArray = msg.split(msgSeperator);
-        System.out.println("New message from " + c.getClientName() + ": " + msg);
+        print("New message from " + c.getClientName() + ": " + msg);
         if (splitArray[0].equals("IDENTIFY")) {
             c.setClientName(splitArray[1]);
             identify(c);
@@ -320,13 +298,11 @@ public class Server extends Thread {
                                     }
                                     else {
                                         if(splitArray[0].equals("MOVE_PUT")) {
-                                            String [] tiles = splitArray;
-                                            movePut(c, tiles);
+                                            movePut(c, splitArray);
                                         }
                                         else {
                                             if(splitArray[0].equals("MOVE_TRADE")) {
-                                                String [] move = splitArray;
-                                                moveTrade(c, move);
+                                                moveTrade(c, splitArray);
                                             }
                                         }
                                     }
@@ -334,28 +310,9 @@ public class Server extends Thread {
                             }
                         }
                     }
-
                 }
-
-            /**
-
-
-                     } else {
- if (splitArray[0].equals(ProtocolControl.getBoard)) {
- sendBoard(c);
- } else {
- if (splitArray[0].equals(ProtocolControl.playerTurn)) {
- turn(c);
- } else {
- if (splitArray[0].equals(ProtocolControl.doMove)) {
- makeMove(c, msg);
- }
- }
- }*/
                 }
             }
-
-
 
     /**
      * Add a ClientHandler to the collection of ClientHandlers.
