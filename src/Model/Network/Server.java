@@ -96,6 +96,7 @@ public class Server extends Thread {
         serverFeatures.add("LOBBY");
         serverFeatures.add("CHALLENGE");
         c.sendMessage(IDENTIFYOK + msgSeperator + serverFeatures);
+        serverFeatures.clear();
         c.sendMessage("Welcome to the lobby!");
     }
 
@@ -222,7 +223,7 @@ public class Server extends Thread {
             Location location = new Location(x,y);
 
             System.out.println("Client name: " + c.getClientName());
-            System.out.println("Current player: " + c.getGame().getCurrentPlayer());
+            System.out.println("Current player: " + c.getGame().getCurrentPlayer().getName());
             System.out.println("Open locations: " + c.getGame().getBoard().getOpenLocations());
             System.out.println("Open locations size: " + c.getGame().getBoard().getOpenLocations().size());
 
@@ -259,9 +260,30 @@ public class Server extends Thread {
         }
     }
 
+    private List<Tile> oldTiles;
+    private List<Tile> newTiles;
+    int amount;
 
     public void moveTrade(ClientHandler c, String [] tiles) {
-        //TODO: implement
+        for(int i = 1; i < tiles.length; i++) {
+            String blocks = tiles[i];
+            int tile = Integer.parseInt(blocks);
+            c.getGame().getCurrentPlayer().getHand().remove(tile);
+            amount = tiles.length - 1;
+            try {
+                newTiles = c.getGame().getBoard().getPool().takeTiles(amount);
+                System.out.println("NewTiles: " + newTiles);
+                //oldTiles.add(tile); //oude tiles moeten omgezet worden van een String/int naar een Tile
+                //c.getGame().getBoard().getPool().tradeTiles(oldTiles);
+            } catch (InsufficientTilesInPoolException e) {
+                e.printStackTrace();
+            }
+            for(int k = 0; k < newTiles.size(); k++) {
+                c.getGame().getCurrentPlayer().getHand().add(newTiles.get(k));
+            }
+        }
+        c.sendMessage("MOVEOK_TRADE" + msgSeperator + amount);
+        c.sendMessage("DRAWTILE" + msgSeperator + newTiles);
     }
 
     public void broadcast(String msg, ClientHandler c) {

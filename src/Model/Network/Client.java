@@ -102,6 +102,7 @@ public class Client extends Thread {
         clientFeatures.add("LOBBY");
         clientFeatures.add("CHALLENGE");
         this.sendMessage(IDENTIFY + msgSeperator + this.getClientName() + msgSeperator + clientFeatures);
+        clientFeatures.clear();
         System.out.println("Hallo"+msgSeperator+clientName);
         try {
             String message = in.readLine();
