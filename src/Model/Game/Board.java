@@ -244,21 +244,25 @@ public class Board {
      */
     public List<Location> getOpenLocations() {
         List<Location> openLocations = new ArrayList<>();
-        for (Location loc : field.keySet()) {
-            List<Location> temp = new ArrayList<>();
-            temp.add(new Location(loc.getX() + 1, loc.getY()));
-            temp.add(new Location(loc.getX() - 1, loc.getY()));
-            temp.add(new Location(loc.getX(), loc.getY() + 1));
-            temp.add(new Location(loc.getX(), loc.getY() - 1));
-            for (Location loc2 : temp) {
-                boolean add = true;
-                for (Location loc3 : field.keySet()) {
-                    if (loc2.isEqualTo(loc3)) add = false;
+        if (field.isEmpty()) {
+            openLocations.add(new Location(0, 0));
+        } else {
+            for (Location loc : field.keySet()) {
+                List<Location> temp = new ArrayList<>();
+                temp.add(new Location(loc.getX() + 1, loc.getY()));
+                temp.add(new Location(loc.getX() - 1, loc.getY()));
+                temp.add(new Location(loc.getX(), loc.getY() + 1));
+                temp.add(new Location(loc.getX(), loc.getY() - 1));
+                for (Location loc2 : temp) {
+                    boolean add = true;
+                    for (Location loc3 : field.keySet()) {
+                        if (loc2.isEqualTo(loc3)) add = false;
+                    }
+                    for (Location loc4 : openLocations) {
+                        if (loc2.isEqualTo(loc4)) add = false;
+                    }
+                    if (add) openLocations.add(loc2);
                 }
-                for (Location loc4 : openLocations) {
-                    if (loc2.isEqualTo(loc4)) add = false;
-                }
-                if (add) openLocations.add(loc2);
             }
         }
         return openLocations;
