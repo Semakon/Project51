@@ -48,8 +48,8 @@ public class Tile {
     }
 
     /**
-     * Divides the id of this tile by RANGE and uses the outcome to give the color of this tile in a String presentation.
-     * @return String presentation of this tile's color.
+     * Divides the id of this tile by RANGE and uses the outcome to give the color of this tile.
+     * @return Color of this Tile.
      */
     private Color idToColor(int id) {
         id = id / Configuration.RANGE;
@@ -65,8 +65,8 @@ public class Tile {
     }
 
     /**
-     * Divides the id of this tile by RANGE and uses the outcome to give the shape of this tile in a String presentation.
-     * @return String presentation of this tile's shape.
+     * Divides the id of this tile by RANGE and uses the outcome to give the shape of this tile.
+     * @return Shape of this Tile.
      */
     private Shape idToShape(int id) {
         id = id % Configuration.RANGE;

@@ -7,6 +7,25 @@ public enum Color {
 
     Green, Yellow, Red, Purple, Orange, Blue;
 
+    public int getId() {
+        int id = -1;
+        switch (this) {
+            case Green: id = 0;
+                break;
+            case Yellow: id = 1;
+                break;
+            case Red: id = 2;
+                break;
+            case Blue: id = 3;
+                break;
+            case Purple: id = 4;
+                break;
+            case Orange: id = 5;
+                break;
+        }
+        return id;
+    }
+
     public String toString() {
         String color = "XX";
         switch (this) {

@@ -7,6 +7,25 @@ public enum Shape {
 
     Cross, Plus, Square, Star, Circle, Diamond;
 
+    public int getId() {
+        int id = -1;
+        switch (this) {
+            case Cross: id = 0;
+                break;
+            case Plus: id = 1;
+                break;
+            case Square: id = 2;
+                break;
+            case Star: id = 3;
+                break;
+            case Circle: id = 4;
+                break;
+            case Diamond: id = 5;
+                break;
+        }
+        return id;
+    }
+
     public String toString() {
         String shape = "XX";
         switch (this) {

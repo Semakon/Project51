@@ -35,50 +35,103 @@ public class Board {
         Map<Location, List<Tile>> possibleMoves = new HashMap<>();
         List<Location> openLocations = getOpenLocations();
         for (Location loc : openLocations) {
-            List<Tile> tilesX = createLine(Axis.X, loc, loc, 1);
+            List<Tile> possibleTiles = new ArrayList<>();
 
+            List<Tile> tilesX = createLine(Axis.X, loc, loc, 1);
+            Identity identityX = getIdentity(tilesX);
 
             List<Tile> tilesY = createLine(Axis.Y, loc, loc, 1);
+            Identity identityY = getIdentity(tilesY);
 
+            if (tilesX.size() >= 6 || identityX == Identity.invalid || tilesY.size() >= 6 || identityY == Identity.invalid) {
+                //TODO: implement further
+            }
 
+            if (identityX == Identity.color) {
+                possibleTiles = initiateList(possibleTiles, tilesX, tilesX.get(0).getColor().getId(), 1);
+            } else if (identityX == Identity.shape) {
+                possibleTiles = initiateList(possibleTiles, tilesX, tilesX.get(0).getShape().getId(), Configuration.RANGE);
+            } else if (identityX == Identity.unspecified) {
+                possibleTiles = initiateList(possibleTiles, tilesX, tilesX.get(0).getColor().getId(), 1);
+                possibleTiles = initiateList(possibleTiles, tilesX, tilesX.get(0).getShape().getId(), Configuration.RANGE);
+            } else {
+                //TODO: invalid exception (?)
+            }
+            if (identityY == Identity.color) {
+                possibleTiles = initiateList(possibleTiles, tilesY, tilesY.get(0).getColor().getId(), 1);
+            } else if (identityY == Identity.shape) {
+                possibleTiles = initiateList(possibleTiles, tilesY, tilesY.get(0).getShape().getId(), Configuration.RANGE);
+            } else if (identityY == Identity.unspecified) {
+                possibleTiles = initiateList(possibleTiles, tilesY, tilesY.get(0).getColor().getId(), 1);
+                possibleTiles = initiateList(possibleTiles, tilesY, tilesY.get(0).getShape().getId(), Configuration.RANGE);
+            } else {
+                //TODO: invalid exception (?)
+            }
+            //TODO: possibleMoves.put(loc, possibleTiles);
         }
         return possibleMoves;
     }
 
+    /**
+     * Checks all ID's of Tiles with a certain identity if they are in <code>tiles</code>. If not, they will be added to <code>list</code>.
+     * @param list List of possible Tiles for a certain Location on the board.
+     * @param tiles List of Tiles that are in a line on the board.
+     * @param id ID of concerned Tile.
+     * @param step Step taken by for loop that is determined by the identity.
+     * @return A list with usable Tiles.
+     */
+    public List<Tile> initiateList(List<Tile> list, List<Tile> tiles, int id, int step) {
+        for (int i = id; i < Configuration.RANGE * Configuration.RANGE; i += step) {
+            Tile temp = new Tile(i);
+            boolean add = true;
+            for (Tile tile : tiles) {
+                if (tile.isEqualTo(temp)) add = false;
+            }
+            if (add) list.add(temp);
+        }
+        return list;
+    }
+
+    /**
+     * Checks all Tiles in a List and determines its identity.
+     * @param line List of Tiles to be checked.
+     * @return Identity of List of Tiles.
+     */
     public Identity getIdentity(List<Tile> line) {
-        Identity identity = Identity.unspecified;
+        Identity identity;
         boolean sameColor = true;
         boolean sameShape = true;
 
         for (Tile tile : line) {
             for (Tile tile2 : line) {
-                if (tile != tile2 && tile.getColor() != tile2.getColor()) {
-                    sameColor = false;
-                }
-                if (tile != tile2 && tile.getShape() != tile2.getShape()) {
-                    sameShape = false;
-                }
+                if (tile != tile2 && tile.getColor() != tile2.getColor()) sameColor = false;
+                if (tile != tile2 && tile.getShape() != tile2.getShape()) sameShape = false;
             }
         }
         if (sameColor && !sameShape) {
-            for (Tile tile :line) {
+            identity = Identity.color;
+            outerLoop:
+            for (Tile tile : line) {
                 for (Tile tile2 : line) {
                     if (tile != tile2 && tile.getShape() == tile2.getShape()) {
                         identity = Identity.invalid;
-                        //TODO: FIX
+                        break outerLoop;
                     }
                 }
             }
         } else if (!sameColor && sameShape) {
+            identity = Identity.shape;
+            outerLoop:
             for (Tile tile : line) {
                 for (Tile tile2 : line) {
                     if (tile != tile2 && tile.getColor() == tile2.getColor()) {
                         identity = Identity.invalid;
-                        //TODO: FIX
+                        break outerLoop;
                     }
                 }
             }
         } else if (sameColor /** && sameShape */){
+            //This means that line only contains one tile.
             identity = Identity.unspecified;
         } else {
             identity = Identity.invalid;
@@ -148,9 +201,7 @@ public class Board {
     }
 
     public void makeTradeMove(TradeMove move, List<Tile> hand) throws InvalidMoveException {
-        if (validTrade(move, hand)) {
-            pool.tradeTiles(move.getMove());
-        }
+        if (validTrade(move, hand)) pool.tradeTiles(move.getMove());
     }
 
     /**
@@ -232,7 +283,7 @@ public class Board {
      * @param step Step the X or Y takes (1 or -1).
      * @return A List of Tiles that form a line with the Tile that lies on startPoint.
      */
-    public List<Tile> orthogonalLine(PutMove move, Axis axis, Location location, Location startPoint, int step) {
+    public List<Tile> orthogonalLine(PutMove move, Axis axis, Location location, Location startPoint, int step) { //TODO: merge with createLine()
         List<Tile> line = new ArrayList<>();
         if (!location.isEqualTo(startPoint)) {
             for (Location loc : field.keySet()) {
@@ -260,7 +311,7 @@ public class Board {
      * @param line Line to be checked.
      * @return True if the line is valid.
      */
-    private boolean validLine(List<Tile> line) throws InvalidMoveException {
+    private boolean validLine(List<Tile> line) throws InvalidMoveException { //TODO: merge with getIdentity()
         boolean valid = true;
         boolean sameColor = true;
         boolean sameShape = true;
@@ -275,7 +326,7 @@ public class Board {
             }
         }
         if (sameColor && !sameShape) {
-            for (Tile tile :line) {
+            for (Tile tile : line) {
                 for (Tile tile2 : line) {
                     if (tile != tile2 && tile.getShape() == tile2.getShape()) {
                         throw new InvalidMoveException("Line contains double(s).");
