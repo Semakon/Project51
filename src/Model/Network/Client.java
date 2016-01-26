@@ -59,12 +59,8 @@ public class Client extends Thread {
         }
 
         try {
-            System.out.println(clientNom);
-            System.out.println(host);
-            System.out.println(port);
             Client client = new Client(clientNom, host, port);
-            client.setName(clientNom);
-            client.sendMessage(clientNom);
+            client.setName(clientNom);;
             client.start();
 
             do {
@@ -103,7 +99,9 @@ public class Client extends Thread {
      * forwarded to the MessageUI
      */
     public void run() {
-        this.sendMessage(IDENTIFY + " " + this.getClientName());
+        clientFeatures.add("LOBBY");
+        clientFeatures.add("CHALLENGE");
+        this.sendMessage(IDENTIFY + msgSeperator + this.getClientName() + msgSeperator + clientFeatures);
         System.out.println("Hallo"+msgSeperator+clientName);
         try {
             String message = in.readLine();
@@ -136,9 +134,13 @@ public class Client extends Thread {
     }
 
     List<String> clientFeatures = new ArrayList<String>(); //TODO: clientFeatures toevoegen
+    List<String> serverFeatures = new ArrayList<String>();
 
     public void identify(String [] blocks){
-        System.out.println("IDENTIFYOK" + msgSeperator + clientFeatures);
+        for(int i = 1; i < blocks.length; i++) {
+            serverFeatures.add(blocks[i]);
+        }
+        System.out.println("IDENTIFYOK" + msgSeperator + serverFeatures);
     }
 
     public void challenge(String [] blocks){

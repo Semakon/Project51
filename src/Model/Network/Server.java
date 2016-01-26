@@ -79,7 +79,6 @@ public class Server extends Thread {
                 print("[Client no. " + (++i) + "]" + "connected.");
                 handler.start();
                 addInactiveHandler(handler);
-                System.out.println(inactiveThreads);
             }
         } catch (IOException e) {
         }
@@ -94,6 +93,8 @@ public class Server extends Thread {
     public void identify(ClientHandler c) {
         inactiveThreads.remove(c);
         lobby.add(c);
+        serverFeatures.add("LOBBY");
+        serverFeatures.add("CHALLENGE");
         c.sendMessage(IDENTIFYOK + msgSeperator + serverFeatures);
         c.sendMessage("Welcome to the lobby!");
     }
