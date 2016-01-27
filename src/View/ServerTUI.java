@@ -2,13 +2,15 @@ package View;
 
 import Model.Game.Board;
 
+import java.util.Scanner;
+
 /**
  * Created by Martijn on 27-1-2016.
  */
 public class ServerTUI implements ServerView {
     @Override
     public void start() {
-
+        Scanner in = new Scanner(System.in);
     }
 
     @Override

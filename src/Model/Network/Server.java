@@ -9,6 +9,9 @@ import Model.Game.Game;
 import Model.Game.Location;
 import Model.Game.PutMove;
 import Model.Game.Tile;
+import View.ClientView;
+import View.ServerTUI;
+import View.ServerView;
 
 import java.util.*;
 import java.io.IOException;
@@ -29,13 +32,14 @@ public class Server extends Thread {
             System.out.println(USAGE);
             //System.exit(0);
         }
-        Scanner in = new Scanner(System.in);
-        System.out.println("Enter portnumber: ");
-        String portInput = in.nextLine();
-        port = Integer.parseInt(portInput);
-        System.out.println("De server luistert nu naar poort: " + port);
+        serverView = new ServerTUI();
+        //Scanner in = new Scanner(System.in);
+        serverView.showMessage("Enter portnumber: ");
+        //String portInput = in.nextLine();
+        //port = Integer.parseInt(portInput);
+        serverView.showMessage("De server luistert nu naar poort: " + port);
         Server server = new Server(port);
-        System.out.println("Server starting.");
+        serverView.showMessage("Server starting.");
         server.run();
 
     }
@@ -45,6 +49,7 @@ public class Server extends Thread {
     public static String IDENTIFYOK = "IDENTIFYOK";
 
     private static int port;
+    private static ServerView serverView;
     private List<ClientHandler> inactiveThreads;
     private List<ClientHandler> lobby;
     private List<ClientHandler> matchedPlayers;
@@ -54,6 +59,7 @@ public class Server extends Thread {
     private List<ClientHandler> fourPlayerGame;
 
     public Server(int port) {
+
         this.inactiveThreads = new ArrayList<>();
         this.lobby = new ArrayList<>();
         this.matchedPlayers = new ArrayList<>();
@@ -76,16 +82,12 @@ public class Server extends Thread {
             while (true) {
                 Socket socket = sSocket.accept();
                 ClientHandler handler = new ClientHandler(this, socket);
-                print("[Client no. " + (++i) + "]" + "connected.");
+                serverView.showMessage("[Client no. " + (++i) + "]" + "connected.");
                 handler.start();
                 addInactiveHandler(handler);
             }
         } catch (IOException e) {
         }
-    }
-
-    public void print(String msg) {
-        System.out.println(msg);
     }
 
     List<String> serverFeatures = new ArrayList<String>(); //TODO: serverFeatures in lijst stoppen
@@ -232,7 +234,7 @@ public class Server extends Thread {
                     for(int j = 0; j < c.getGame().getCurrentPlayer().getHand().size(); j++) {
                         Tile tile = c.getGame().getCurrentPlayer().getHand().get(i);
                         if(tile.isEqualTo(Integer.parseInt(tileLoc[0]))) {
-                            print("Alleen de move nog leggen");
+                            System.out.println("Alleen de move nog leggen");
                             realMove.getMove().put(location, tile);
                             try {
                                 c.getGame().getBoard().makePutMove(realMove);
@@ -240,7 +242,7 @@ public class Server extends Thread {
                                 e.printStackTrace();
                             }
                             c.getGame().getCurrentPlayer().getHand().remove(tile);
-                            print("einde van de methode, alles ging goed");
+                            System.out.println("einde van de methode, alles ging goed");
 
                             /**String resultMove = "MOVEOK_PUT" + tiles;
                             for(int i = 0; i < aantalSpelers.length; i++) {
@@ -289,7 +291,7 @@ public class Server extends Thread {
 
     public void broadcast(String msg, ClientHandler c) {
         String[] splitArray = msg.split(MSG_SEPARATOR);
-        print("New message from " + c.getClientName() + ": " + msg);
+        serverView.showMessage("New message from " + c.getClientName() + ": " + msg);
         String challenger;
         switch (splitArray[0]) {
             case "IDENTIFY":
