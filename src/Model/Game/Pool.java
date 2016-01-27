@@ -32,6 +32,14 @@ public class Pool {
     }
 
     /**
+     * Checks whether pool is empty.
+     * @return True if pool has no Tiles left.
+     */
+    public boolean isEmpty() {
+        return pool.isEmpty();
+    }
+
+    /**
      * Takes a specified amount of tiles out of the pool. The amount must be between 0 (exclusive) and Configuration.MAXIMUM_HAND (inclusive).
      * @param amount tiles taken from the pool
      * @return a List of Tiles
