@@ -5,14 +5,17 @@ import Model.Player.HumanPlayer;
 import Model.Player.Player;
 import Model.Player.SocketPlayer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Martijn on 11-1-16.
  */
 public class Game {
 
     private Board board;
-    private Player[] players;
-    private int currentPlayer;
+    private List<Player> players;
+    private String currentPlayer;
 
     /**
      * Creates an instance of Game. This can be on a Server or on a Client and the behaviour changes accordingly.
@@ -22,27 +25,21 @@ public class Game {
      */
     public Game(String thisPlayer, String[] players, String firstMove) {
         board = new Board();
+        this.players = new ArrayList<>();
         try {
             if (thisPlayer == null) {
                 //Game is on Server
-                this.players = new SocketPlayer[players.length];
-                for (int i = 0; i < this.players.length; i++) {
-                    this.players[i] = new SocketPlayer(players[i], board.getPool().takeTiles(Configuration.HAND));
+                for (String player : players) {
+                    this.players.add(new SocketPlayer(player, board.getPool().takeTiles(Configuration.HAND)));
                 }
             } else {
                 //Game is on Client
-                this.players = new Player[players.length + 1];
-                this.players[0] = new HumanPlayer(thisPlayer, board.getPool().takeTiles(Configuration.HAND));
-                for (int i = 0; i < players.length; i++) {
-                    this.players[i] = new SocketPlayer(players[i], board.getPool().takeTiles(Configuration.HAND));
+                this.players.add(new HumanPlayer(thisPlayer, board.getPool().takeTiles(Configuration.HAND)));
+                for (String player : players) {
+                    this.players.add(new SocketPlayer(player, board.getPool().takeTiles(Configuration.HAND)));
                 }
             }
-            for (int i = 0; i < players.length; i++) {
-                if (this.players[i].getName().equals(firstMove)) {
-                    currentPlayer = i;
-                    break;
-                }
-            }
+            currentPlayer = firstMove;
         } catch (InsufficientTilesInPoolException e) {
             //should not occur
             e.printStackTrace();
@@ -50,12 +47,20 @@ public class Game {
         }
     }
 
+    public String update() {
+        return board.toString();
+    }
+
     public Board getBoard() {
         return board;
     }
 
     public Player getCurrentPlayer() {
-        return players[currentPlayer];
+        Player player = null;
+        for (Player p : players) {
+            if (currentPlayer.equals(p.getName())) player = p;
+        }
+        return player;
     }
 
 }

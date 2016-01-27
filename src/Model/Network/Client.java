@@ -60,7 +60,7 @@ public class Client extends Thread {
 
         try {
             Client client = new Client(clientNom, host, port);
-            client.setName(clientNom);;
+            client.setName(clientNom);
             client.start();
 
             do {
@@ -125,7 +125,7 @@ public class Client extends Thread {
             }
         } catch (IOException e) {
             e.printStackTrace();
-        };
+        }
         shutdown();
     }
 

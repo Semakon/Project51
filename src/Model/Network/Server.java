@@ -227,7 +227,7 @@ public class Server extends Thread {
             System.out.println("Open locations: " + c.getGame().getBoard().getOpenLocations());
             System.out.println("Open locations size: " + c.getGame().getBoard().getOpenLocations().size());
 
-            for(int k = 0; k < c.getGame().getBoard().getOpenLocations().size(); k++) {
+            for (int k = 0; k < c.getGame().getBoard().getOpenLocations().size(); k++) {
                 if(c.getGame().getBoard().getOpenLocations().get(i).isEqualTo(location)) {
                     for(int j = 0; j < c.getGame().getCurrentPlayer().getHand().size(); j++) {
                         Tile tile = c.getGame().getCurrentPlayer().getHand().get(i);
@@ -260,15 +260,16 @@ public class Server extends Thread {
         }
     }
 
-    private List<Tile> oldTiles;
-    private List<Tile> newTiles;
-    int amount;
+
 
     public void moveTrade(ClientHandler c, String[] tiles) {
-        for(int i = 1; i < tiles.length; i++) {
-            String blocks = tiles[i];
-            int tile = Integer.parseInt(blocks);
-            c.getGame().getCurrentPlayer().getHand().remove(tile);
+        List<Tile> oldTiles = new ArrayList<>();
+        List<Tile> newTiles = new ArrayList<>();
+        int amount = 0;
+        for (int i = 1; i < tiles.length; i++) {
+            String tile = tiles[i];
+            int tileId = Integer.parseInt(tile);
+            c.getGame().getCurrentPlayer().getHand().remove(tileId);
             amount = tiles.length - 1;
             try {
                 newTiles = c.getGame().getBoard().getPool().takeTiles(amount);
