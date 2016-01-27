@@ -9,8 +9,7 @@ package Model;
  *
  * @author Erik Gaal
  * @version 0.1
- * @since 0.1-w01
- */
+ * @since 0.1-w01 */
 public interface IProtocol {
 
     /**
