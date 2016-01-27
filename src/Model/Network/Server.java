@@ -33,10 +33,10 @@ public class Server extends Thread {
             //System.exit(0);
         }
         serverView = new ServerTUI();
-        //Scanner in = new Scanner(System.in);
+        Scanner in = new Scanner(System.in);
         serverView.showMessage("Enter portnumber: ");
-        //String portInput = in.nextLine();
-        //port = Integer.parseInt(portInput);
+        String portInput = in.nextLine();
+        port = Integer.parseInt(portInput);
         serverView.showMessage("De server luistert nu naar poort: " + port);
         Server server = new Server(port);
         serverView.showMessage("Server starting.");
@@ -135,6 +135,7 @@ public class Server extends Thread {
         for (int i = 0; i < lobby.size(); i++) {
             if(lobby.get(i).getClientName().equals(challenger)) {
                 c.setGame(newGame);
+                serverView.showBoard(newGame.getBoard());
                 lobby.get(i).setGame(newGame);
                 lobby.get(i).sendMessage(GAMESTART + MSG_SEPARATOR + c.getClientName() + MSG_SEPARATOR + challenger);
                 lobby.remove(i);
@@ -154,6 +155,7 @@ public class Server extends Thread {
                     String [] playersList = new String[1];
                     playersList[0] = twoPlayerGame.get(0).getClientName();
                     Game newGame = new Game(c.getClientName(), playersList, twoPlayerGame.get(0).getClientName());
+                    serverView.showBoard(newGame.getBoard());
                     c.setGame(newGame);
                     twoPlayerGame.get(0).setGame(newGame);
                     c.sendMessage(GAMESTART + MSG_SEPARATOR + c.getClientName() + MSG_SEPARATOR + twoPlayerGame.get(0).getClientName());
