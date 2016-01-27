@@ -1,6 +1,7 @@
 package View;
 
 import Model.Game.Board;
+import Model.Network.Server;
 
 import java.util.Scanner;
 
@@ -11,6 +12,7 @@ public class ServerTUI implements ServerView {
     @Override
     public void start() {
         Scanner in = new Scanner(System.in);
+        String portInput = in.nextLine();
     }
 
     @Override

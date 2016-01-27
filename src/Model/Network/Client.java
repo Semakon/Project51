@@ -5,6 +5,8 @@ package Model.Network;
  */
 import Model.Game.Game;
 import Model.IProtocol;
+import View.ClientTUI;
+import View.ClientView;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -26,18 +28,20 @@ public class Client extends Thread {
     public static String clientNom;
     public static String clientHostAd;
     public static String clientPort;
+    private static ClientView clientView;
     public Game newGame;
 
     /** Start een Client-applicatie op. */
     public static void main(String[] args) {
-        System.out.println(USAGE);
-        System.out.println("");
+        clientView = new ClientTUI();
+        clientView.showMessage(USAGE);
+        clientView.showMessage("");
         Scanner in = new Scanner(System.in);
-        System.out.println("Enter name: ");
+        clientView.showMessage("Enter name: ");
         clientNom = in.nextLine();
-        System.out.println("Enter host-address: ");
+        clientView.showMessage("Enter host-address: ");
         clientHostAd = in.nextLine();
-        System.out.println("Enter portnumber: ");
+        clientView.showMessage("Enter portnumber: ");
         clientPort = in.nextLine();
 
         InetAddress host = null;
@@ -46,7 +50,7 @@ public class Client extends Thread {
         try {
             host = InetAddress.getByName(clientHostAd);
         } catch (UnknownHostException e) {
-            print("ERROR: no valid hostname!");
+            clientView.showMessage("ERROR: no valid hostname!");
             System.exit(0);
 
         }
@@ -54,7 +58,7 @@ public class Client extends Thread {
         try {
             port = Integer.parseInt(clientPort);
         } catch (NumberFormatException e) {
-            print("ERROR: no valid portnumber!");
+            clientView.showMessage("ERROR: no valid portnumber!");
             System.exit(0);
         }
 
@@ -69,7 +73,7 @@ public class Client extends Thread {
             } while (true);
 
         } catch (IOException e) {
-            print("ERROR: couldn't construct a client object!");
+            clientView.showMessage("ERROR: couldn't construct a client object!");
             System.exit(0);
         }
 
@@ -103,12 +107,12 @@ public class Client extends Thread {
         clientFeatures.add("CHALLENGE");
         this.sendMessage(IDENTIFY + msgSeperator + this.getClientName() + msgSeperator + clientFeatures);
         clientFeatures.clear();
-        System.out.println("Hallo"+msgSeperator+clientName);
+        clientView.showMessage("Hallo"+msgSeperator+clientName);
         try {
             String message = in.readLine();
             String[] blocks = message.split(msgSeperator);
             while (message != null) {
-                print("Command from server: " + message);
+                clientView.showMessage("Command from server: " + message);
 
                 switch(blocks[0]) {
                     case "IDENTIFYOK": identify(blocks); break;
@@ -141,19 +145,19 @@ public class Client extends Thread {
         for(int i = 1; i < blocks.length; i++) {
             serverFeatures.add(blocks[i]);
         }
-        System.out.println("IDENTIFYOK" + msgSeperator + serverFeatures);
+        clientView.showMessage("IDENTIFYOK" + msgSeperator + serverFeatures);
     }
 
     public void challenge(String [] blocks){
-        System.out.println("You're challenged by " + blocks[1]);
+        clientView.showMessage("You're challenged by " + blocks[1]);
     }
 
     public void challengeDecline(String [] blocks) {
-        System.out.println("Your challenge is declined by " + blocks[1]);
+        clientView.showMessage("Your challenge is declined by " + blocks[1]);
     }
 
     public void wrongNumber(String [] Blocks) {
-        System.out.print("Choose a valid number: 2, 3 or 4");
+        clientView.showMessage("Choose a valid number: 2, 3 or 4");
     }
 
     public void startGame(String [] blocks) {
@@ -163,15 +167,15 @@ public class Client extends Thread {
         }
         String name1 = blocks[1];
         newGame = new Game(name1, playersList, name1);
-        System.out.println(newGame.getBoard().toString());
+        clientView.showBoard(newGame.getBoard());
     }
 
     public void moveOk() {
-        System.out.println("Move was successful put on the board");
+        clientView.showMessage("Move was successful put on the board");
     }
 
     public void challengeFail() {
-        System.out.println("Couldn't challenge player");
+        clientView.showMessage("Couldn't challenge player");
     }
 
     /** send a message to a ClientHandler. */
@@ -197,12 +201,8 @@ public class Client extends Thread {
         }
     }
 
-    private static void print(String message) {
-        System.out.println(message + "\n");
-    }
-
     public static String readString(String tekst) {
-        System.out.print(tekst);
+        clientView.showMessage(tekst);
         String antw = null;
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(
