@@ -166,7 +166,7 @@ public class Client extends Thread {
             playersList[i] = blocks[i + 2];
         }
         String name1 = blocks[1];
-        newGame = new Game(name1, playersList, name1);
+        newGame = new Game(name1, null, playersList, name1);
         clientView.showBoard(newGame.getBoard());
     }
 
