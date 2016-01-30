@@ -21,18 +21,6 @@ public class SocketPlayer extends Player {
     }
 
     @Override
-    public PutMove determinePutMove(Board board) {
-        //Get move from server.
-        return null;
-    }
-
-    @Override
-    public TradeMove determineTradeMove(Board board) {
-        //Get move from server.
-        return null;
-    }
-
-    @Override
     public Move determineMove(Board board) throws InvalidMoveException {
         //Get choice from server.
         return null;

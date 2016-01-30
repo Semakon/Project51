@@ -24,16 +24,6 @@ public class ComputerPlayer extends Player {
     }
 
     @Override
-    public PutMove determinePutMove(Board board) {
-        return strategy.determinePutMove(board, getHand());
-    }
-
-    @Override
-    public TradeMove determineTradeMove(Board board) {
-        return strategy.determineTradeMove(board, getHand());
-    }
-
-    @Override
     public Move determineMove(Board board) throws InvalidMoveException {
         return strategy.determineMove(board, getHand());
     }

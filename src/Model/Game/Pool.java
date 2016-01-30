@@ -50,7 +50,7 @@ public class Pool {
             throw new InvalidAmountRuntimeException("Amount must be between 0 (exclusive) and " + Configuration.HAND + " (inclusive).");
         }
         if (pool.size() < amount) {
-            throw new InsufficientTilesInPoolException("Pool doesn't contain enough tiles.");
+            throw new InsufficientTilesInPoolException();
         }
 
         List<Tile> tiles = new ArrayList<>();
@@ -74,7 +74,7 @@ public class Pool {
             throw new InvalidAmountRuntimeException("Amount must be between 0 (exclusive) and " + Configuration.HAND + " (inclusive).");
         }
         if (pool.size() < oldTiles.size()) {
-            throw new InsufficientTilesInPoolException("Pool doesn't contain enough tiles.");
+            throw new InsufficientTilesInPoolException();
         }
 
         List<Tile> newTiles = new ArrayList<>();

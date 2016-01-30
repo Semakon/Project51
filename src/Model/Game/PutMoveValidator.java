@@ -9,7 +9,6 @@ import Model.Game.Exceptions.InvalidPositioningRuntimeException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Martijn on 30-1-2016.
@@ -20,6 +19,11 @@ public class PutMoveValidator {
     private PutMove move;
     private boolean firstMove = false;
 
+    /**
+     * Creates a new instance of PutMoveValidator. This class is used to validate a PutMove.
+     * @param board The board on which the move must be validated.
+     * @param move The move to be validated.
+     */
     public PutMoveValidator(Board board, PutMove move) {
         this.board = board;
         this.move = move;
@@ -128,11 +132,9 @@ public class PutMoveValidator {
      * distance from one another. Also checks whether the move set has duplicates.
      * @return True if the Location of the move is valid
      */
-    private boolean validPositioning() {
+    private boolean validPositioning() throws InvalidMoveException {
         boolean verticalLine = true;
         boolean horizontalLine = true;
-        boolean duplicate = false;
-        boolean valid = true;
 
         outerLoop:
         for (Location loc : move.getMove().keySet()) {
@@ -155,7 +157,7 @@ public class PutMoveValidator {
         for (Location loc : move.getMove().keySet()) {
             for (Location loc2 : move.getMove().keySet()) {
                 if (loc != loc2 && loc.isEqualTo(loc2)) {
-                    duplicate = true;
+                    throw new InvalidMoveException("Move contains the same tile twice or more.");
                 }
             }
         }
@@ -166,19 +168,17 @@ public class PutMoveValidator {
         } else if (!horizontalLine && verticalLine) {
             move.setPositioning(Positioning.vertical);
         } else {
-            valid = false;
             move.setPositioning(Positioning.invalid);
+            throw new InvalidMoveException("Invalid Positioning");
         }
-
-        return valid && !duplicate;
+        return true;
     }
 
     /**
      * Checks whether a move has all Tiles with the same color and different shape or same shape and different color.
      * @return True if the Tiles have valid shapes/colors
      */
-    private boolean validIdentity() {
-        boolean valid = true;
+    private boolean validIdentity() throws InvalidMoveException {
         boolean sameColor = true;
         boolean sameShape = true;
 
@@ -204,32 +204,25 @@ public class PutMoveValidator {
         }
 
         if (move.getIdentity() == Identity.color) {
-            outerLoop:
             for (Tile tile : move.getMove().values()) {
                 for (Tile tile2 : move.getMove().values()) {
                     if (tile != tile2 && tile.getShape() == tile2.getShape()) {
-                        //m contains one or more doubles.
-                        valid = false;
-                        break outerLoop;
+                        throw new InvalidMoveException("Move contains the same tile twice or more.");
                     }
                 }
             }
         } else if (move.getIdentity() == Identity.shape) {
-            outerLoop:
             for (Tile tile : move.getMove().values()) {
                 for (Tile tile2 : move.getMove().values()) {
                     if (tile != tile2 && tile.getColor() == tile2.getColor()) {
-                        //m contains one or more doubles.
-                        valid = false;
-                        break outerLoop;
+                        throw new InvalidMoveException("Move contains the same tile twice or more.");
                     }
                 }
             }
-        } else {
-            valid = move.getIdentity() == Identity.unspecified;
+        } else if (move.getIdentity() == Identity.invalid){
+            throw new InvalidMoveException("Identity is invalid.");
         }
-
-        return valid;
+        return true;
     }
 
     /**
@@ -314,10 +307,8 @@ public class PutMoveValidator {
      * @return True if the move does not violate any game rules on the line.
      */
     private boolean validLine(Axis axis, Location location, int step) throws InvalidMoveException { // step is either +1 or -1
-        System.out.println("\nChecking: (" + location.getX() + ", " + location.getY() + ")");
         for (Location loc : move.getMove().keySet()) {
             if (loc.isEqualTo(location)) {
-                System.out.println("in Move");
                 if (axis == Axis.X) {
                     return validLine(axis, new Location(loc.getX() + step, loc.getY()), step);          // recursive
                 } else {
@@ -328,7 +319,6 @@ public class PutMoveValidator {
 
         for (Location loc : board.getField().keySet()) {
             if (loc.isEqualTo(location)) {
-                System.out.println("in Field");
 
                 //same color, different shapes
                 if (move.getIdentity() == Identity.color) {
@@ -382,15 +372,12 @@ public class PutMoveValidator {
                 break; // right location is found on the field, no need to continue loop
             }
         }
-        System.out.println("Empty space");
         if (axis == Axis.X) {
             if (location.getX() < board.higherBound(axis, move.getMove()).getX() && location.getX() > board.lowerBound(axis, move.getMove()).getX()) {
-                System.out.println("Gap in move");
                 return validLine(axis, new Location(location.getX() + step, location.getY()), step);                // recursive
             }
         } else {
             if (location.getY() < board.higherBound(axis, move.getMove()).getY() && location.getY() > board.lowerBound(axis, move.getMove()).getY()) {
-                System.out.println("Gap in move");
                 return validLine(axis, new Location(location.getX(), location.getY() + step), step);                // recursive
             }
         }

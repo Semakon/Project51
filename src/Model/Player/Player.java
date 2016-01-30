@@ -54,9 +54,11 @@ public abstract class Player {
         try {
             move = determineMove(board);
             if (move instanceof PutMove) {
-                board.makePutMove((PutMove) move);
+                if (new PutMoveValidator(board, (PutMove)move).validMove()) {
+                    board.makePutMove((PutMove) move);
+                }
             } else if (move instanceof TradeMove) {
-                board.makeTradeMove((TradeMove) move, hand);
+
             }
         } catch (InvalidMoveException e) {
             move = null;

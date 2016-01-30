@@ -1,6 +1,5 @@
 package Tests;
 
-import Model.Game.Exceptions.InsufficientTilesInPoolException;
 import Model.Game.Exceptions.InvalidAmountRuntimeException;
 import Model.Game.Pool;
 import Model.Game.Tile;

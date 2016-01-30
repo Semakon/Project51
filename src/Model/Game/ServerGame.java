@@ -15,6 +15,7 @@ public class ServerGame {
     private Board board;
     private List<Player> players;
     private Player currentPlayer;
+    private Pool pool;
 
     /**
      * Creates an instance of Game. This can be on a Server or on a Client and the behaviour changes accordingly.
@@ -23,10 +24,11 @@ public class ServerGame {
      */
     public ServerGame(String[] players, String firstMove) {
         board = new Board();
+        pool = new Pool();
         this.players = new ArrayList<>();
         try {
             for (String player : players) {
-                this.players.add(new SocketPlayer(player, board.getPool().takeTiles(Configuration.HAND)));
+                this.players.add(new SocketPlayer(player, pool.takeTiles(Configuration.HAND)));
             }
             for (Player p : this.players) {
                 if (firstMove.equals(p.getName())) currentPlayer = p;
@@ -70,7 +72,7 @@ public class ServerGame {
     public boolean gameOver() {
         boolean gameOver = false;
         for (Player p : players) {
-            if (p.getHand().isEmpty() && board.getPool().isEmpty()) {
+            if (p.getHand().isEmpty() && pool.isEmpty()) {
                 gameOver = true;
             }
         }

@@ -3,14 +3,11 @@ package Model.Network;
 /**
  * Created by Herjan on 20-1-2016.
  */
-import Model.Game.Exceptions.InsufficientTilesInPoolException;
 import Model.Game.Exceptions.InvalidMoveException;
 import Model.Game.ServerGame;
 import Model.Game.Location;
 import Model.Game.PutMove;
 import Model.Game.Tile;
-import Model.Player.Player;
-import View.ClientView;
 import View.ServerTUI;
 import View.ServerView;
 

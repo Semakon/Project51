@@ -2,8 +2,6 @@ package Model.Game;
 
 import Model.Game.Enumerations.Axis;
 import Model.Game.Enumerations.Identity;
-import Model.Game.Enumerations.Positioning;
-import Model.Game.Exceptions.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,23 +14,16 @@ import java.util.Map;
 public class Board {
 
     private Map<Location, Tile> field;
-    private Pool pool;
 
     /**
-     * Creates a new instance of Board with a field and a pool. The field is a Map with a Location and a Tile. The pool
-     * is an instance of Pool, which contains a List of Tiles.
+     * Creates a new instance of Board with a field. The field is a Map with a Location and a Tile.
      */
     public Board() {
         field = new HashMap<>();
-        pool = new Pool();
     }
 
     public Map<Location, Tile> getField() {
         return field;
-    }
-
-    public Pool getPool() {
-        return pool;
     }
 
     /**
@@ -249,49 +240,11 @@ public class Board {
     }
 
     /**
-     * Makes a put move on the board if that move is valid.
+     * Makes a put move on the board. This method does NOT check the validity of the move.
      * @param move The move to be made.
-     * @throws InvalidMoveException If the move is invalid.
      */
-    public void makePutMove(PutMove move) throws InvalidMoveException {
-        PutMoveValidator validator = new PutMoveValidator(this, move);
-        if (validator.validMove()) {
-            field.putAll(move.getMove());
-        }
-    }
-
-    /**
-     * Makes a trade move with the pool if it is valid.
-     * @param move The move to be made.
-     * @param hand The player's hand.
-     * @throws InvalidMoveException If the move is invalid.
-     */
-    public void makeTradeMove(TradeMove move, List<Tile> hand) throws InvalidMoveException {
-        if (validTrade(move, hand)) pool.tradeTiles(move.getMove());
-    }
-
-    /**
-     * Checks whether the Pool has enough Tiles to trade.
-     * @param move Move with Tile amount.
-     * @return True if the amount of Tiles in the pool is larger or equal to the amount of Tiles in the Move.
-     */
-    private boolean validTrade(TradeMove move, List<Tile> hand) throws InvalidMoveException {
-        if (move.getMove().size() <= pool.getPool().size()) {
-            if (hand.containsAll(move.getMove())) {
-                return true;
-            } else {
-                throw new TilesNotInHandException("Hand doesn't contain all Tiles from move.");
-            }
-        } else {
-            throw new InsufficientTilesInPoolException("Pool contains insufficient Tiles to make this trade.");
-        }
-    }
-
-    /**
-     * Clears the field of all Tiles.
-     */
-    public void reset() {
-        field.clear();
+    public void makePutMove(PutMove move) {
+        field.putAll(move.getMove());
     }
 
     /**
@@ -417,6 +370,11 @@ public class Board {
         return fieldString;
     }
 
+    /**
+     * Creates a String that is used at the start of a row that represents the Y axis.
+     * @param i Coordinate on the Y axis.
+     * @return The coordinate on the Y axis in a proper format.
+     */
     private String startRow(int i) {
         String startRow = i < 0 ? "-" : " ";
         if (i >= - 9 && i <= 9) {
@@ -426,6 +384,11 @@ public class Board {
         return startRow;
     }
 
+    /**
+     * Creates a String that is used as the bottom row that represents the X axis.
+     * @param i Coordinate on the X axis.
+     * @return The bottom row of the toString() method with the coordinates of the X axis in the proper format.
+     */
     private String bottomRow(int i) {
         String topRow = i < 0 ? "  -" : "   ";
         if (i >= - 9 && i <= 9) {
