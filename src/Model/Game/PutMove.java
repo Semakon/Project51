@@ -35,7 +35,18 @@ public class PutMove extends Move {
         return positioning;
     }
 
-    public boolean validMove() throws InvalidMoveException {
+    public boolean validMove(boolean firstMove) throws InvalidMoveException {
+        if (firstMove) {
+            boolean validFirstMove = false;
+            for (Location loc : move.keySet()) {
+                if (loc.isEqualTo(0, 0)) {
+                    validFirstMove = true;
+                }
+            }
+            if (!validFirstMove) {
+                throw new InvalidMoveException("First move does not have a Tile on Location (0, 0).");
+            }
+        }
         if (validPositioning() && validIdentity()) {
             return true;
         } else {

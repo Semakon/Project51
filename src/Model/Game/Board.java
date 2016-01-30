@@ -276,12 +276,24 @@ public class Board {
         return openLocations;
     }
 
+    /**
+     * Makes a put move on the board if that move is valid.
+     * @param move The move to be made.
+     * @throws InvalidMoveException If the move is invalid.
+     */
     public void makePutMove(PutMove move) throws InvalidMoveException {
-        if (move.validMove() && validPut(move)) {
+        boolean firstMove = field.isEmpty();
+        if (move.validMove(firstMove) && validPut(move, firstMove)) {
             field.putAll(move.getMove());
         }
     }
 
+    /**
+     * Makes a trade move with the pool if it is valid.
+     * @param move The move to be made.
+     * @param hand The player's hand.
+     * @throws InvalidMoveException If the move is invalid.
+     */
     public void makeTradeMove(TradeMove move, List<Tile> hand) throws InvalidMoveException {
         if (validTrade(move, hand)) pool.tradeTiles(move.getMove());
     }
@@ -294,28 +306,30 @@ public class Board {
      * @return True if the move is valid on this board.
      * @throws InvalidMoveException If the move is invalid.
      */
-    private boolean validPut(PutMove move) throws InvalidMoveException {
+    private boolean validPut(PutMove move, boolean firstMove) throws InvalidMoveException {
         boolean validLine;
         boolean validOrthogonalLines = true;
         boolean touchesField = false;
 
-        for (Location loc : move.getMove().keySet()) {
-            for (Location loc2 : field.keySet()) {
-                if (loc.isEqualTo(loc2)) {
-                    throw new InvalidMoveException("Location already in use."); //return false
-                }
-                if (!touchesField) {
-                    if (loc.isEqualTo(loc2.getX(), loc2.getY() + 1) || loc.isEqualTo(loc2.getX(), loc2.getY() - 1) || loc.isEqualTo(loc2.getX() + 1, loc2.getY()) ||
-                            loc.isEqualTo(loc2.getX() - 1, loc2.getY())) {
-                        touchesField = true;
+        if (!firstMove) {
+            for (Location loc : move.getMove().keySet()) {
+                for (Location loc2 : field.keySet()) {
+                    if (loc.isEqualTo(loc2)) {
+                        throw new InvalidMoveException("Location already in use."); //return false
+                    }
+                    if (!touchesField) {
+                        if (loc.isEqualTo(loc2.getX(), loc2.getY() + 1) || loc.isEqualTo(loc2.getX(), loc2.getY() - 1) || loc.isEqualTo(loc2.getX() + 1, loc2.getY()) ||
+                                loc.isEqualTo(loc2.getX() - 1, loc2.getY())) {
+                            touchesField = true;
+                        }
                     }
                 }
             }
+            if (!touchesField) {
+                throw new InvalidMoveException("Tiles are not connected to any other Tiles in the field.");
+            }
         }
 
-        if (!touchesField) {
-            throw new InvalidMoveException("Tiles are not connected to any other Tiles in the field.");
-        }
 
         Location startPoint = new ArrayList<>(move.getMove().keySet()).get(0);
 

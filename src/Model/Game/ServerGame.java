@@ -1,8 +1,6 @@
 package Model.Game;
 
 import Model.Game.Exceptions.InsufficientTilesInPoolException;
-import Model.Player.ComputerPlayer;
-import Model.Player.HumanPlayer;
 import Model.Player.Player;
 import Model.Player.SocketPlayer;
 
