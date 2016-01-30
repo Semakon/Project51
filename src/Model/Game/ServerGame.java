@@ -96,4 +96,6 @@ public class ServerGame {
         return currentPlayer;
     }
 
+    public List<Player> getPlayers() { return players;}
+
 }

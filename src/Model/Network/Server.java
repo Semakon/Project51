@@ -9,6 +9,8 @@ import Model.Game.ServerGame;
 import Model.Game.Location;
 import Model.Game.PutMove;
 import Model.Game.Tile;
+import Model.Player.Player;
+import View.ClientView;
 import View.ServerTUI;
 import View.ServerView;
 
@@ -46,6 +48,10 @@ public class Server extends Thread {
     public static String MSG_SEPARATOR = " ";
     public static String GAMESTART = "GAMESTART";
     public static String IDENTIFYOK = "IDENTIFYOK";
+
+    private String checkChallenger;
+    private PutMove realMove;
+    private Map<Location, Tile> finalMove = new HashMap<>();
 
     private static int port;
     private static ServerView serverView;
@@ -110,10 +116,19 @@ public class Server extends Thread {
         c.sendMessage("LOBBYOK" + names);
     }
 
+    public String getCheckChallenger() {
+        return checkChallenger;
+    }
+
+    public void setCheckChallenger(String challenger) {
+        checkChallenger = challenger;
+    }
+
     public void challenge(ClientHandler c, String challenged) {
         for (ClientHandler aLobby : lobby) {
             if (aLobby.getClientName().equals(challenged)) {
                 aLobby.sendMessage("CHALLENGEDBY " + c.getClientName());
+                setCheckChallenger(c.getClientName());
             }
         }
     }
@@ -127,21 +142,26 @@ public class Server extends Thread {
     }
 
     public void challengeAccept(ClientHandler c, String challenger) {
-        String[] playersList = new String[1];
-        playersList[0] = challenger;
-        ServerGame newServerGame = new ServerGame(c.getClientName(), playersList, challenger);
-        c.sendMessage(GAMESTART + MSG_SEPARATOR + c.getClientName() + MSG_SEPARATOR + challenger);
-        for (int i = 0; i < lobby.size(); i++) {
-            if(lobby.get(i).getClientName().equals(challenger)) {
-                c.setGame(newServerGame);
-                serverView.showBoard(newServerGame.getBoard());
-                lobby.get(i).setGame(newServerGame);
-                lobby.get(i).sendMessage(GAMESTART + MSG_SEPARATOR + c.getClientName() + MSG_SEPARATOR + challenger);
-                lobby.remove(i);
+        System.out.println(getCheckChallenger());
+        if (challenger.equals(getCheckChallenger())) {
+            String[] playersList = new String[1];
+            playersList[0] = challenger;
+            ServerGame newServerGame = new ServerGame(playersList, challenger);
+            c.sendMessage(GAMESTART + MSG_SEPARATOR + c.getClientName() + MSG_SEPARATOR + challenger);
+            for (int i = 0; i < lobby.size(); i++) {
+                if (lobby.get(i).getClientName().equals(challenger)) {
+                    c.setGame(newServerGame);
+                    serverView.showBoard(newServerGame.getBoard());
+                    lobby.get(i).setGame(newServerGame);
+                    lobby.get(i).sendMessage(GAMESTART + MSG_SEPARATOR + c.getClientName() + MSG_SEPARATOR + challenger);
+                    lobby.remove(i);
+                }
             }
+            this.activeGames.add(newServerGame);
+            lobby.remove(c);
+        } else {
+            c.sendMessage("This player hasn't challenged you");
         }
-        this.activeGames.add(newServerGame);
-        lobby.remove(c);
     }
 
     public void queue(ClientHandler c, String message) {
@@ -153,13 +173,13 @@ public class Server extends Thread {
                 if (twoPlayerGame.size() == 2) {
                     String [] playersList = new String[1];
                     playersList[0] = twoPlayerGame.get(0).getClientName();
-                    ServerGame newServerGame = new ServerGame(c.getClientName(), playersList, twoPlayerGame.get(0).getClientName());
-                    serverView.showBoard(newServerGame.getBoard());
-                    c.setGame(newServerGame);
-                    twoPlayerGame.get(0).setGame(newServerGame);
+                    ServerGame newGame = new ServerGame(playersList, twoPlayerGame.get(0).getClientName());
+                    serverView.showBoard(newGame.getBoard());
+                    c.setGame(newGame);
+                    twoPlayerGame.get(0).setGame(newGame);
                     c.sendMessage(GAMESTART + MSG_SEPARATOR + c.getClientName() + MSG_SEPARATOR + twoPlayerGame.get(0).getClientName());
                     twoPlayerGame.get(0).sendMessage(GAMESTART + MSG_SEPARATOR + c.getClientName() + MSG_SEPARATOR + twoPlayerGame.get(0).getClientName());
-                    this.activeGames.add(newServerGame);
+                    this.activeGames.add(newGame);
                     lobby.remove(c);
                     lobby.remove(twoPlayerGame.get(0));
                 }
@@ -171,14 +191,14 @@ public class Server extends Thread {
                         String[] playerList = new String[2];
                         playerList[0] = threePlayerGame.get(0).getClientName();
                         playerList[1] = threePlayerGame.get(1).getClientName();
-                        ServerGame newServerGame = new ServerGame(c.getClientName(), playerList, threePlayerGame.get(0).getClientName());
+                        ServerGame newGame = new ServerGame(playerList, threePlayerGame.get(0).getClientName());
                         for (ClientHandler aThreePlayerGame : threePlayerGame) {
-                            c.setGame(newServerGame);
-                            aThreePlayerGame.setGame(newServerGame);
+                            c.setGame(newGame);
+                            aThreePlayerGame.setGame(newGame);
                             aThreePlayerGame.sendMessage(GAMESTART + MSG_SEPARATOR + c.getClientName() + MSG_SEPARATOR + threePlayerGame.get(0) + threePlayerGame.get(2));
                             lobby.remove(threePlayerGame.get(i));
                         }
-                        this.activeGames.add(newServerGame);
+                        this.activeGames.add(newGame);
                     }
                 } else {
                     if (nr == 4) {
@@ -188,14 +208,14 @@ public class Server extends Thread {
                             playerList[0] = fourPlayerGame.get(0).getClientName();
                             playerList[1] = fourPlayerGame.get(1).getClientName();
                             playerList[2] = fourPlayerGame.get(2).getClientName();
-                            ServerGame newServerGame = new ServerGame(c.getClientName(), playerList, fourPlayerGame.get(0).getClientName());
+                            ServerGame newGame = new ServerGame(playerList, fourPlayerGame.get(0).getClientName());
                             for (ClientHandler aFourPlayerGame : fourPlayerGame) {
-                                c.setGame(newServerGame);
-                                aFourPlayerGame.setGame(newServerGame);
+                                c.setGame(newGame);
+                                aFourPlayerGame.setGame(newGame);
                                 aFourPlayerGame.sendMessage(GAMESTART + MSG_SEPARATOR + c.getClientName() + MSG_SEPARATOR + fourPlayerGame.get(0) + fourPlayerGame.get(2));
-                                lobby.remove(threePlayerGame.get(i));
+                                lobby.remove(fourPlayerGame.get(i));
                             }
-                            this.activeGames.add(newServerGame);
+                            this.activeGames.add(newGame);
                         }
                     }
                     else {
@@ -210,57 +230,79 @@ public class Server extends Thread {
         //TODO: remove clienthandler from the game
     }
 
-    private PutMove realMove;
-
     public void movePut(ClientHandler c, String[] blocks) {
-        for(int i = 1; i < blocks.length; i++) {
-            String move = blocks[i];
-            String[] tileLoc = move.split("@");
-            String locTile = tileLoc[1];
-            String[] coords = locTile.split(",");
-            int x = Integer.parseInt(coords[0]);
-            int y = Integer.parseInt(coords[1]);
-            System.out.println("int x: " + x);
-            System.out.println("int y: " + y);
+        System.out.println(c.getGame().getCurrentPlayer().getName());
+        if(c.getClientName().equals(c.getGame().getCurrentPlayer().getName())){
+            for(int i = 1; i < blocks.length; i++) {
+                String move = blocks[i];
+                String[] tileLoc = move.split("@");
+                String locTile = tileLoc[1];
+                String[] coords = locTile.split(",");
+                int x = Integer.parseInt(coords[0]);
+                int y = Integer.parseInt(coords[1]);
+                System.out.println("int x: " + x);
+                System.out.println("int y: " + y);
 
-            Location location = new Location(x,y);
+                Location location = new Location(x,y);
 
-            System.out.println("Client name: " + c.getClientName());
-            System.out.println("Current player: " + c.getGame().getCurrentPlayer().getName());
-            System.out.println("Open locations: " + c.getGame().getBoard().getOpenLocations());
-            System.out.println("Open locations size: " + c.getGame().getBoard().getOpenLocations().size());
+                System.out.println("Client name: " + c.getClientName());
+                System.out.println("Current player: " + c.getGame().getCurrentPlayer().getName());
+                System.out.println("Open locations: " + c.getGame().getBoard().getOpenLocations());
+                System.out.println("Open locations size: " + c.getGame().getBoard().getOpenLocations().size());
 
-            for (int k = 0; k < c.getGame().getBoard().getOpenLocations().size(); k++) {
-                if(c.getGame().getBoard().getOpenLocations().get(i).isEqualTo(location)) {
-                    for(int j = 0; j < c.getGame().getCurrentPlayer().getHand().size(); j++) {
-                        Tile tile = c.getGame().getCurrentPlayer().getHand().get(i);
-                        if(tile.isEqualTo(Integer.parseInt(tileLoc[0]))) {
-                            System.out.println("Alleen de move nog leggen");
-                            realMove.getMove().put(location, tile);
-                            try {
-                                c.getGame().getBoard().makePutMove(realMove);
-                            } catch (InvalidMoveException e) {
-                                e.printStackTrace();
-                            }
-                            c.getGame().getCurrentPlayer().getHand().remove(tile);
-                            System.out.println("einde van de methode, alles ging goed");
+                System.out.println("Hand of player on turn: " + c.getGame().getCurrentPlayer().getHand());
+                for(int z = 0; z < c.getGame().getCurrentPlayer().getHand().size(); z++) {
+                    System.out.println("Hand of player on turn: " + c.getGame().getCurrentPlayer().getHand().get(z).getId());
+                }
+                for (int k = 0; k < c.getGame().getBoard().getOpenLocations().size(); k++) {
+                    System.out.println("Location: " + location);
+                    System.out.println("GetOpenLocation.get(k): " + c.getGame().getBoard().getOpenLocations().get(k));
+                    if(c.getGame().getBoard().getOpenLocations().get(k).isEqualTo(location)) {
+                        for(int j = 0; j < c.getGame().getCurrentPlayer().getHand().size(); j++) {
+                            Tile tile = c.getGame().getCurrentPlayer().getHand().get(j);
+                            if(tile.getId() == (Integer.parseInt(tileLoc[0]))) {
+                                System.out.println("Alleen de move nog leggen");
 
-                            /**String resultMove = "MOVEOK_PUT" + tiles;
-                            for(int i = 0; i < aantalSpelers.length; i++) {
-                                aantalSpelers.get(i).sendMessage(resultMove);
-                            }
-                            if (c.getGame().hasWinner()) {
+                                finalMove.put(location, tile);
+                                realMove = new PutMove(finalMove);
+                                System.out.println("Realmove: " + realMove);
+                                System.out.println("finalMove: " + finalMove);
+                                try {
+                                    c.getGame().getBoard().makePutMove(realMove);
+                                } catch (InvalidMoveException e) {
+                                    e.printStackTrace();
+                                }
+                                c.getGame().getCurrentPlayer().getHand().remove(tile);
+                                System.out.println("einde van de methode, alles ging goed");
+
+                                String resultMove = "MOVEOK_PUT" + move;
+
+                                for (int h = 0; h < c.getGame().getPlayers().size(); h++) {
+                                    if (c.getGame().getPlayers().size() == 2) {
+                                        twoPlayerGame.get(h).sendMessage("Move: " + move + " was successful put on the board by: " + c.getClientName());
+                                    }
+                                }
+
+                            /*if (c.getGame().hasWinner()) {
                                 c.getGame().printResult();
                                 endGameWinner(c);
                             }
-                        } else {
-                            invalidUserTurn(c);
-                        }*/
+                        } *///else {
+                                //invalidUserTurn(c);
+                                //}
+
+                            } else {
+                            c.sendMessage("You don't own this tile"); // deze staat nog niet goed, stuurt nu bijv 3x dit bericht als de 1e 3 tiles fout zijn en dan doet hij alsnog de move
                         }
                     }
                 }
             }
         }
+        } else {
+            c.sendMessage("It's not your turn");
+        }
+        c.getGame().update();
+        serverView.showBoard(c.getGame().getBoard());
     }
 
 
