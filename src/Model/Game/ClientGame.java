@@ -1,10 +1,8 @@
 package Model.Game;
 
-import Model.Game.Exceptions.InsufficientTilesInPoolException;
 import Model.Player.ComputerPlayer;
 import Model.Player.HumanPlayer;
 import Model.Player.Player;
-import Model.Player.SocketPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,62 +13,30 @@ import java.util.List;
 public class ClientGame {
 
     private Board board;
-    private List<Player> players;
-    private Player currentPlayer;
+    private String[] players;
+    private Player thisPlayer;
+    private String currentPlayer;
 
     public ClientGame(Strategy strategy, String thisPlayer, String[] players) {
         board = new Board();
-        this.players = new ArrayList<>();
-        try {
-            if (strategy == null) {
-                this.players.add(new HumanPlayer(thisPlayer, board.getPool().takeTiles(Configuration.HAND)));
-            } else {
-                this.players.add(new ComputerPlayer(strategy, board.getPool().takeTiles(Configuration.HAND)));
-            }
-            for (String player : players) {
-                this.players.add(new SocketPlayer(player, board.getPool().takeTiles(Configuration.HAND)));
-            }
-        } catch (InsufficientTilesInPoolException e) {
-            //should not occur
-            e.printStackTrace();
-            System.exit(0);
+        this.players = players;
+        if (strategy == null) {
+            //human player
+        } else {
+            //computer player
         }
     }
 
-    public String update() {
-        return board.toString();
+    public void update() {
+        //Player made a move.
     }
 
     public void play() {
-        boolean done = false;
-        while (!done) {
-            getCurrentPlayer().makeMove(board);
-            if (gameOver()) {
 
-            }
-        }
     }
 
-    public Move madeMove(String player, Move move) {
+    public void madeMove(Move move) {
 
-        return null;
-    }
-
-    /**
-     * Checks whether the game is over according to the game's rules. A game is over when
-     * - There are no longer any possible moves.
-     * - The pool is empty and at least one player's hand is also empty.
-     * @return True if the game is over according to the game's rules.
-     */
-    public boolean gameOver() {
-        boolean gameOver = false;
-        for (Player p : players) {
-            if (p.getHand().isEmpty() && board.getPool().isEmpty()) {
-                gameOver = true;
-            }
-        }
-        if (board.getPossibleMoves().isEmpty()) gameOver = true;
-        return gameOver;
     }
 
     public Board getBoard() {
@@ -78,16 +44,11 @@ public class ClientGame {
     }
 
     /**
-     * Gets the hand of the player with name <code>player</code>.
-     * @param player The player's name.
-     * @return Hand of player with name <code>player</code>.
+     * Gets the hand of the player.
+     * @return Hand of player.
      */
-    public List<Tile> getHand(String player) {
-        List<Tile> hand = null;
-        for (Player p : players) {
-            if (player.equals(p.getName())) hand = p.getHand();
-        }
-        return hand;
+    public List<Tile> getHand() {
+        return thisPlayer.getHand();
     }
 
     /**
@@ -95,14 +56,10 @@ public class ClientGame {
      * @param name Name of new current player.
      */
     public void setCurrentPlayer(String name) {
-        Player currentPlayer = null;
-        for (Player p : players) {
-            if (name.equals(p.getName())) currentPlayer = p;
-        }
-        this.currentPlayer = currentPlayer;
+        this.currentPlayer = name;
     }
 
-    public Player getCurrentPlayer() {
+    public String getCurrentPlayer() {
         return currentPlayer;
     }
 

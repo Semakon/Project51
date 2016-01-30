@@ -57,16 +57,15 @@ public class ValidLineTest {
         b.getField().put(loc7, tile7);
         b.getField().put(loc8, tile8);
 
-        System.out.println("validPositioning: " + move.validPositioning());
-        System.out.println("validIdentity: " + move.validIdentity());
+        PutMoveValidator pmv = new PutMoveValidator(b, move);
 
         try {
-            if (move.validPositioning() && move.validIdentity()) {
+            if (pmv.validMove()) {
                 b.makePutMove(move);
-                System.out.println("\nvalidMove: True");
+                System.out.println("Move valid: true");
             }
         } catch (InvalidMoveException e) {
-            System.out.println("\nvalidMove: " + false);
+            System.out.println("Move invalid: " + e.getMessage());
         }
 
     }

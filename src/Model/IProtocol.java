@@ -197,7 +197,7 @@ public interface IProtocol {
     String SERVER_MOVE_PUT = "MOVEOK_PUT";
 
     /**
-     * <p>Sent y the server to confirm trading tiles as a move.</p>
+     * <p>Sent by the server to confirm trading tiles as a move.</p>
      *
      * <dl>
      *     <dt>Parameters:</dt>

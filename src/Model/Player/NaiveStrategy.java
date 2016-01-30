@@ -1,5 +1,8 @@
-package Model.Game;
+package Model.Player;
 
+import Model.Game.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,13 +23,19 @@ public class NaiveStrategy implements Strategy {
 
     @Override
     public Move determineMove(Board board, List<Tile> hand) {
-        Move move;
-
-        if (board.getPossibleMoves().isEmpty()) {
-            move = determineTradeMove(board, hand);
-        } else {
-            move = determinePutMove(board, hand);
+        Move move = null;
+        List<Tile> placeableTiles = new ArrayList<>();
+        for (List<Tile> list : board.getPossibleMoves().values()) {
+            placeableTiles.addAll(list);
         }
+        for (Tile tile : hand) {
+            for (Tile tile2 : placeableTiles) {
+                if (tile.isEqualTo(tile2)) {
+                    move = determinePutMove(board, hand);
+                }
+            }
+        }
+        if (move == null) move = determineTradeMove(board, hand);
         return move;
     }
 

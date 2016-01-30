@@ -53,9 +53,12 @@ public class ServerGame {
         }
     }
 
-    public Move madeMove(String player, Move move) {
+    public void madeMove(String player, Move move) {
+        for (Player p : players) {
+            if (player.equals(p.getName())) {
 
-        return null;
+            }
+        }
     }
 
     /**

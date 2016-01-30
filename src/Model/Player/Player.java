@@ -38,10 +38,6 @@ public abstract class Player {
         return hand;
     }
 
-    public abstract PutMove determinePutMove(Board board);
-
-    public abstract TradeMove determineTradeMove(Board board);
-
     /**
      * Determines the next move.
      * @param board the current board.
