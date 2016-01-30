@@ -83,6 +83,9 @@ public class Client extends Thread {
     private BufferedReader in;
     private BufferedWriter out;
 
+    private List<String> clientFeatures = new ArrayList<>(); //TODO: add clientFeatures
+    private List<String> serverFeatures = new ArrayList<>();
+
     /**
      * Constructs a Client-object and tries to make a socket connection
      */
@@ -94,8 +97,7 @@ public class Client extends Thread {
 
     }
 
-    String msgSeperator = " ";
-    String IDENTIFY = "IDENTIFY";
+    private String msgSeparator = " ";
 
     /**
      * Reads the messages in the socket connection. Each message will be
@@ -104,12 +106,13 @@ public class Client extends Thread {
     public void run() {
         clientFeatures.add("LOBBY");
         clientFeatures.add("CHALLENGE");
-        this.sendMessage(IDENTIFY + msgSeperator + this.getClientName() + msgSeperator + clientFeatures);
+        String IDENTIFY = "IDENTIFY";
+        this.sendMessage(IDENTIFY + msgSeparator + this.getClientName() + msgSeparator + clientFeatures);
         clientFeatures.clear();
-        clientView.showMessage("Hallo"+msgSeperator+clientName);
+        clientView.showMessage("Hallo"+ msgSeparator +clientName);
         try {
             String message = in.readLine();
-            String[] blocks = message.split(msgSeperator);
+            String[] blocks = message.split(msgSeparator);
             while (message != null) {
                 clientView.showMessage("Command from server: " + message);
 
@@ -124,7 +127,7 @@ public class Client extends Thread {
                 }
 
                 message = in.readLine();
-                blocks = message.split(msgSeperator);
+                blocks = message.split(msgSeparator);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -137,14 +140,10 @@ public class Client extends Thread {
         return clientName;
     }
 
-    List<String> clientFeatures = new ArrayList<String>(); //TODO: clientFeatures toevoegen
-    List<String> serverFeatures = new ArrayList<String>();
 
     public void identify(String [] blocks){
-        for(int i = 1; i < blocks.length; i++) {
-            serverFeatures.add(blocks[i]);
-        }
-        clientView.showMessage("IDENTIFYOK" + msgSeperator + serverFeatures);
+        serverFeatures.addAll(Arrays.asList(blocks).subList(1, blocks.length));
+        clientView.showMessage("IDENTIFYOK" + msgSeparator + serverFeatures);
     }
 
     public void challenge(String [] blocks){
@@ -155,7 +154,7 @@ public class Client extends Thread {
         clientView.showMessage("Your challenge is declined by " + blocks[1]);
     }
 
-    public void wrongNumber(String [] Blocks) {
+    public void wrongNumber(String [] blocks) {
         clientView.showMessage("Choose a valid number: 2, 3 or 4");
     }
 
@@ -200,16 +199,16 @@ public class Client extends Thread {
         }
     }
 
-    public static String readString(String tekst) {
-        clientView.showMessage(tekst);
-        String antw = null;
+    public static String readString(String text) {
+        clientView.showMessage(text);
+        String answer = null;
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(
                     System.in));
-            antw = in.readLine();
+            answer = in.readLine();
         } catch (IOException e) {
         }
 
-        return (antw == null) ? "" : antw;
+        return (answer == null) ? "" : answer;
     }
 } //End of class Client
