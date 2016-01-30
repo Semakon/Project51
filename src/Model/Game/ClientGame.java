@@ -10,42 +10,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Martijn on 11-1-16.
+ * Created by Martijn on 30-1-2016.
  */
-public class Game {
+public class ClientGame {
 
     private Board board;
     private List<Player> players;
     private Player currentPlayer;
 
-    /**
-     * Creates an instance of Game. This can be on a Server or on a Client and the behaviour changes accordingly.
-     * @param thisPlayer The player of this client. Null if this instance of Game runs on a Server. Is not present in players.
-     * @param players Array of names of players. Does not contain thisPlayer.
-     * @param firstMove Name of player with the first move.
-     */
-    public Game(String thisPlayer, Strategy strategy, String[] players, String firstMove) {
+    public ClientGame(Strategy strategy, String thisPlayer, String[] players) {
         board = new Board();
         this.players = new ArrayList<>();
         try {
-            if (thisPlayer == null) {
-                //Game is on Server
-                for (String player : players) {
-                    this.players.add(new SocketPlayer(player, board.getPool().takeTiles(Configuration.HAND)));
-                }
+            if (strategy == null) {
+                this.players.add(new HumanPlayer(thisPlayer, board.getPool().takeTiles(Configuration.HAND)));
             } else {
-                //Game is on Client
-                if (strategy == null) {
-                    this.players.add(new HumanPlayer(thisPlayer, board.getPool().takeTiles(Configuration.HAND)));
-                } else {
-                    this.players.add(new ComputerPlayer(strategy, board.getPool().takeTiles(Configuration.HAND)));
-                }
-                for (String player : players) {
-                    this.players.add(new SocketPlayer(player, board.getPool().takeTiles(Configuration.HAND)));
-                }
+                this.players.add(new ComputerPlayer(strategy, board.getPool().takeTiles(Configuration.HAND)));
             }
-            for (Player p : this.players) {
-                if (firstMove.equals(p.getName())) currentPlayer = p;
+            for (String player : players) {
+                this.players.add(new SocketPlayer(player, board.getPool().takeTiles(Configuration.HAND)));
             }
         } catch (InsufficientTilesInPoolException e) {
             //should not occur
@@ -68,6 +51,17 @@ public class Game {
         }
     }
 
+    public Move madeMove(String player, Move move) {
+
+        return null;
+    }
+
+    /**
+     * Checks whether the game is over according to the game's rules. A game is over when
+     * - There are no longer any possible moves.
+     * - The pool is empty and at least one player's hand is also empty.
+     * @return True if the game is over according to the game's rules.
+     */
     public boolean gameOver() {
         boolean gameOver = false;
         for (Player p : players) {
@@ -83,6 +77,11 @@ public class Game {
         return board;
     }
 
+    /**
+     * Gets the hand of the player with name <code>player</code>.
+     * @param player The player's name.
+     * @return Hand of player with name <code>player</code>.
+     */
     public List<Tile> getHand(String player) {
         List<Tile> hand = null;
         for (Player p : players) {
@@ -92,13 +91,13 @@ public class Game {
     }
 
     /**
-     *
-     * @param player
+     * Sets the current player to the player with name <code>name</code>.
+     * @param name Name of new current player.
      */
-    public void setCurrentPlayer(String player) {
+    public void setCurrentPlayer(String name) {
         Player currentPlayer = null;
         for (Player p : players) {
-            if (player.equals(p.getName())) currentPlayer = p;
+            if (name.equals(p.getName())) currentPlayer = p;
         }
         this.currentPlayer = currentPlayer;
     }

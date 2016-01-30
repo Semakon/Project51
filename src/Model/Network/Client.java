@@ -3,8 +3,7 @@ package Model.Network;
 /**
  * Created by Herjan on 20-1-2016.
  */
-import Model.Game.Game;
-import Model.IProtocol;
+import Model.Game.ServerGame;
 import View.ClientTUI;
 import View.ClientView;
 
@@ -29,7 +28,7 @@ public class Client extends Thread {
     public static String clientHostAd;
     public static String clientPort;
     private static ClientView clientView;
-    public Game newGame;
+    public ServerGame newGame;
 
     /** Start een Client-applicatie op. */
     public static void main(String[] args) {
@@ -166,7 +165,7 @@ public class Client extends Thread {
             playersList[i] = blocks[i + 2];
         }
         String name1 = blocks[1];
-        newGame = new Game(name1, playersList, name1);
+        newGame = new ServerGame(name1, playersList, name1);
         clientView.showBoard(newGame.getBoard());
     }
 

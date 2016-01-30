@@ -5,11 +5,10 @@ package Model.Network;
  */
 import Model.Game.Exceptions.InsufficientTilesInPoolException;
 import Model.Game.Exceptions.InvalidMoveException;
-import Model.Game.Game;
+import Model.Game.ServerGame;
 import Model.Game.Location;
 import Model.Game.PutMove;
 import Model.Game.Tile;
-import View.ClientView;
 import View.ServerTUI;
 import View.ServerView;
 
@@ -53,7 +52,7 @@ public class Server extends Thread {
     private List<ClientHandler> inactiveThreads;
     private List<ClientHandler> lobby;
     private List<ClientHandler> matchedPlayers;
-    private List<Game> activeGames;
+    private List<ServerGame> activeGames;
     private List<ClientHandler> twoPlayerGame;
     private List<ClientHandler> threePlayerGame;
     private List<ClientHandler> fourPlayerGame;
@@ -130,18 +129,18 @@ public class Server extends Thread {
     public void challengeAccept(ClientHandler c, String challenger) {
         String[] playersList = new String[1];
         playersList[0] = challenger;
-        Game newGame = new Game(c.getClientName(), playersList, challenger);
+        ServerGame newServerGame = new ServerGame(c.getClientName(), playersList, challenger);
         c.sendMessage(GAMESTART + MSG_SEPARATOR + c.getClientName() + MSG_SEPARATOR + challenger);
         for (int i = 0; i < lobby.size(); i++) {
             if(lobby.get(i).getClientName().equals(challenger)) {
-                c.setGame(newGame);
-                serverView.showBoard(newGame.getBoard());
-                lobby.get(i).setGame(newGame);
+                c.setGame(newServerGame);
+                serverView.showBoard(newServerGame.getBoard());
+                lobby.get(i).setGame(newServerGame);
                 lobby.get(i).sendMessage(GAMESTART + MSG_SEPARATOR + c.getClientName() + MSG_SEPARATOR + challenger);
                 lobby.remove(i);
             }
         }
-        this.activeGames.add(newGame);
+        this.activeGames.add(newServerGame);
         lobby.remove(c);
     }
 
@@ -154,13 +153,13 @@ public class Server extends Thread {
                 if (twoPlayerGame.size() == 2) {
                     String [] playersList = new String[1];
                     playersList[0] = twoPlayerGame.get(0).getClientName();
-                    Game newGame = new Game(c.getClientName(), playersList, twoPlayerGame.get(0).getClientName());
-                    serverView.showBoard(newGame.getBoard());
-                    c.setGame(newGame);
-                    twoPlayerGame.get(0).setGame(newGame);
+                    ServerGame newServerGame = new ServerGame(c.getClientName(), playersList, twoPlayerGame.get(0).getClientName());
+                    serverView.showBoard(newServerGame.getBoard());
+                    c.setGame(newServerGame);
+                    twoPlayerGame.get(0).setGame(newServerGame);
                     c.sendMessage(GAMESTART + MSG_SEPARATOR + c.getClientName() + MSG_SEPARATOR + twoPlayerGame.get(0).getClientName());
                     twoPlayerGame.get(0).sendMessage(GAMESTART + MSG_SEPARATOR + c.getClientName() + MSG_SEPARATOR + twoPlayerGame.get(0).getClientName());
-                    this.activeGames.add(newGame);
+                    this.activeGames.add(newServerGame);
                     lobby.remove(c);
                     lobby.remove(twoPlayerGame.get(0));
                 }
@@ -172,14 +171,14 @@ public class Server extends Thread {
                         String[] playerList = new String[2];
                         playerList[0] = threePlayerGame.get(0).getClientName();
                         playerList[1] = threePlayerGame.get(1).getClientName();
-                        Game newGame = new Game(c.getClientName(), playerList, threePlayerGame.get(0).getClientName());
+                        ServerGame newServerGame = new ServerGame(c.getClientName(), playerList, threePlayerGame.get(0).getClientName());
                         for (ClientHandler aThreePlayerGame : threePlayerGame) {
-                            c.setGame(newGame);
-                            aThreePlayerGame.setGame(newGame);
+                            c.setGame(newServerGame);
+                            aThreePlayerGame.setGame(newServerGame);
                             aThreePlayerGame.sendMessage(GAMESTART + MSG_SEPARATOR + c.getClientName() + MSG_SEPARATOR + threePlayerGame.get(0) + threePlayerGame.get(2));
                             lobby.remove(threePlayerGame.get(i));
                         }
-                        this.activeGames.add(newGame);
+                        this.activeGames.add(newServerGame);
                     }
                 } else {
                     if (nr == 4) {
@@ -189,14 +188,14 @@ public class Server extends Thread {
                             playerList[0] = fourPlayerGame.get(0).getClientName();
                             playerList[1] = fourPlayerGame.get(1).getClientName();
                             playerList[2] = fourPlayerGame.get(2).getClientName();
-                            Game newGame = new Game(c.getClientName(), playerList, fourPlayerGame.get(0).getClientName());
+                            ServerGame newServerGame = new ServerGame(c.getClientName(), playerList, fourPlayerGame.get(0).getClientName());
                             for (ClientHandler aFourPlayerGame : fourPlayerGame) {
-                                c.setGame(newGame);
-                                aFourPlayerGame.setGame(newGame);
+                                c.setGame(newServerGame);
+                                aFourPlayerGame.setGame(newServerGame);
                                 aFourPlayerGame.sendMessage(GAMESTART + MSG_SEPARATOR + c.getClientName() + MSG_SEPARATOR + fourPlayerGame.get(0) + fourPlayerGame.get(2));
                                 lobby.remove(threePlayerGame.get(i));
                             }
-                            this.activeGames.add(newGame);
+                            this.activeGames.add(newServerGame);
                         }
                     }
                     else {
