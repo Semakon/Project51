@@ -5,7 +5,7 @@ package Model.Network;
  */
 import Model.Game.Exceptions.InsufficientTilesInPoolException;
 import Model.Game.Exceptions.InvalidMoveException;
-import Model.Game.Game;
+import Model.Game.ServerGame;
 import Model.Game.Location;
 import Model.Game.PutMove;
 import Model.Game.Tile;
@@ -58,7 +58,7 @@ public class Server extends Thread {
     private List<ClientHandler> inactiveThreads;
     private List<ClientHandler> lobby;
     private List<ClientHandler> matchedPlayers;
-    private List<Game> activeGames;
+    private List<ServerGame> activeGames;
     private List<ClientHandler> twoPlayerGame;
     private List<ClientHandler> threePlayerGame;
     private List<ClientHandler> fourPlayerGame;
@@ -146,18 +146,18 @@ public class Server extends Thread {
         if (challenger.equals(getCheckChallenger())) {
             String[] playersList = new String[1];
             playersList[0] = challenger;
-            Game newGame = new Game(c.getClientName(), null, playersList, challenger);
+            ServerGame newServerGame = new ServerGame(playersList, challenger);
             c.sendMessage(GAMESTART + MSG_SEPARATOR + c.getClientName() + MSG_SEPARATOR + challenger);
             for (int i = 0; i < lobby.size(); i++) {
                 if (lobby.get(i).getClientName().equals(challenger)) {
-                    c.setGame(newGame);
-                    serverView.showBoard(newGame.getBoard());
-                    lobby.get(i).setGame(newGame);
+                    c.setGame(newServerGame);
+                    serverView.showBoard(newServerGame.getBoard());
+                    lobby.get(i).setGame(newServerGame);
                     lobby.get(i).sendMessage(GAMESTART + MSG_SEPARATOR + c.getClientName() + MSG_SEPARATOR + challenger);
                     lobby.remove(i);
                 }
             }
-            this.activeGames.add(newGame);
+            this.activeGames.add(newServerGame);
             lobby.remove(c);
         } else {
             c.sendMessage("This player hasn't challenged you");
@@ -173,7 +173,7 @@ public class Server extends Thread {
                 if (twoPlayerGame.size() == 2) {
                     String [] playersList = new String[1];
                     playersList[0] = twoPlayerGame.get(0).getClientName();
-                    Game newGame = new Game(c.getClientName(), null, playersList, twoPlayerGame.get(0).getClientName());
+                    ServerGame newGame = new ServerGame(playersList, twoPlayerGame.get(0).getClientName());
                     serverView.showBoard(newGame.getBoard());
                     c.setGame(newGame);
                     twoPlayerGame.get(0).setGame(newGame);
@@ -191,7 +191,7 @@ public class Server extends Thread {
                         String[] playerList = new String[2];
                         playerList[0] = threePlayerGame.get(0).getClientName();
                         playerList[1] = threePlayerGame.get(1).getClientName();
-                        Game newGame = new Game(c.getClientName(), null, playerList, threePlayerGame.get(0).getClientName());
+                        ServerGame newGame = new ServerGame(playerList, threePlayerGame.get(0).getClientName());
                         for (ClientHandler aThreePlayerGame : threePlayerGame) {
                             c.setGame(newGame);
                             aThreePlayerGame.setGame(newGame);
@@ -208,7 +208,7 @@ public class Server extends Thread {
                             playerList[0] = fourPlayerGame.get(0).getClientName();
                             playerList[1] = fourPlayerGame.get(1).getClientName();
                             playerList[2] = fourPlayerGame.get(2).getClientName();
-                            Game newGame = new Game(c.getClientName(), null, playerList, fourPlayerGame.get(0).getClientName());
+                            ServerGame newGame = new ServerGame(playerList, fourPlayerGame.get(0).getClientName());
                             for (ClientHandler aFourPlayerGame : fourPlayerGame) {
                                 c.setGame(newGame);
                                 aFourPlayerGame.setGame(newGame);
@@ -292,7 +292,7 @@ public class Server extends Thread {
                                 //}
 
                             } else {
-                            c.sendMessage("You don't own this tile");
+                            c.sendMessage("You don't own this tile"); // deze staat nog niet goed, stuurt nu bijv 3x dit bericht als de 1e 3 tiles fout zijn en dan doet hij alsnog de move
                         }
                     }
                 }
