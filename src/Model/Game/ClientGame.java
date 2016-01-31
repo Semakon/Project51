@@ -1,10 +1,8 @@
 package Model.Game;
 
-import Model.Player.ComputerPlayer;
-import Model.Player.HumanPlayer;
 import Model.Player.Player;
+import Model.Player.Strategy;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
