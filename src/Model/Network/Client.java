@@ -57,7 +57,7 @@ public class Client extends Thread {
         try {
             port = Integer.parseInt(clientPort);
         } catch (NumberFormatException e) {
-            clientView.showMessage("ERROR: no valid portnumber!");
+            clientView.showMessage("ERROR: no valid port number!");
             System.exit(0);
         }
 

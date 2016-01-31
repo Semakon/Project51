@@ -5,7 +5,9 @@ import Model.Player.Player;
 import Model.Player.SocketPlayer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Martijn on 11-1-16.
@@ -40,14 +42,14 @@ public class ServerGame {
         }
     }
 
-    public String update() {
-        return board.toString();
+    public Pool getPool() {
+        return pool;
     }
 
     public void play() {
         boolean done = false;
         while (!done) {
-            getCurrentPlayer().makeMove(board);
+            currentPlayer.makeMove(board);
             if (gameOver()) {
 
                 done = true;
@@ -55,10 +57,19 @@ public class ServerGame {
         }
     }
 
-    public void madeMove(String player, Move move) {
+    public void madeTradeMove(String player, int[] move) {
+
+    }
+
+    public void madePutMove(String player, List<int[]> move) { //move[i]: {x, y, id}
+        Map<Location, Tile> moveSet = new HashMap<>();
+        for (int[] m : move) {
+            moveSet.put(new Location(m[0], m[1]), new Tile(m[2]));
+        }
+        PutMove putMove = new PutMove(moveSet);
         for (Player p : players) {
             if (player.equals(p.getName())) {
-
+                // have p make putMove move.
             }
         }
     }

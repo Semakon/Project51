@@ -3,6 +3,7 @@ package Model.Network;
 /**
  * Created by Herjan on 20-1-2016.
  */
+import Model.Game.Exceptions.InsufficientTilesInPoolException;
 import Model.Game.Exceptions.InvalidMoveException;
 import Model.Game.ServerGame;
 import Model.Game.Location;
@@ -32,10 +33,10 @@ public class Server extends Thread {
         }
         serverView = new ServerTUI();
         Scanner in = new Scanner(System.in);
-        serverView.showMessage("Enter portnumber: ");
+        serverView.showMessage("Enter port number: ");
         String portInput = in.nextLine();
         port = Integer.parseInt(portInput);
-        serverView.showMessage("De server luistert nu naar poort: " + port);
+        serverView.showMessage("Server now listening on port: " + port);
         Server server = new Server(port);
         serverView.showMessage("Server starting.");
         server.run();
@@ -84,7 +85,7 @@ public class Server extends Thread {
             while (true) {
                 Socket socket = sSocket.accept();
                 ClientHandler handler = new ClientHandler(this, socket);
-                serverView.showMessage("[Client no. " + (++i) + "]" + "connected.");
+                serverView.showMessage("Client no. " + (++i) + " connected.");
                 handler.start();
                 addInactiveHandler(handler);
             }
@@ -228,77 +229,26 @@ public class Server extends Thread {
     }
 
     public void movePut(ClientHandler c, String[] blocks) {
-        System.out.println(c.getGame().getCurrentPlayer().getName());
-        if(c.getClientName().equals(c.getGame().getCurrentPlayer().getName())){
-            for(int i = 1; i < blocks.length; i++) {
+        if (c.getClientName().equals(c.getGame().getCurrentPlayer().getName())) {
+            List<int[]> putMove = new ArrayList<>();
+            for (int i = 1; i < blocks.length; i++) {
                 String move = blocks[i];
                 String[] tileLoc = move.split("@");
+
                 String locTile = tileLoc[1];
                 String[] coords = locTile.split(",");
+
                 int x = Integer.parseInt(coords[0]);
                 int y = Integer.parseInt(coords[1]);
-                System.out.println("int x: " + x);
-                System.out.println("int y: " + y);
+                int id = Integer.parseInt(tileLoc[0]);
+                int[] m = {x, y, id};
 
-                Location location = new Location(x,y);
+                System.out.println("move:\t" + Arrays.toString(m));
 
-                System.out.println("Client name: " + c.getClientName());
-                System.out.println("Current player: " + c.getGame().getCurrentPlayer().getName());
-                System.out.println("Open locations: " + c.getGame().getBoard().getOpenLocations());
-                System.out.println("Open locations size: " + c.getGame().getBoard().getOpenLocations().size());
-
-                System.out.println("Hand of player on turn: " + c.getGame().getCurrentPlayer().getHand());
-                for(int z = 0; z < c.getGame().getCurrentPlayer().getHand().size(); z++) {
-                    System.out.println("Hand of player on turn: " + c.getGame().getCurrentPlayer().getHand().get(z).getId());
-                }
-                for (int k = 0; k < c.getGame().getBoard().getOpenLocations().size(); k++) {
-                    System.out.println("Location: " + location);
-                    System.out.println("GetOpenLocation.get(k): " + c.getGame().getBoard().getOpenLocations().get(k));
-                    if(c.getGame().getBoard().getOpenLocations().get(k).isEqualTo(location)) {
-                        for(int j = 0; j < c.getGame().getCurrentPlayer().getHand().size(); j++) {
-                            Tile tile = c.getGame().getCurrentPlayer().getHand().get(j);
-                            if(tile.getId() == (Integer.parseInt(tileLoc[0]))) {
-                                System.out.println("Alleen de move nog leggen");
-
-                                finalMove.put(location, tile);
-                                realMove = new PutMove(finalMove);
-                                System.out.println("Realmove: " + realMove);
-                                System.out.println("finalMove: " + finalMove);
-                                try {
-                                    c.getGame().getBoard().makePutMove(realMove);
-                                } catch (InvalidMoveException e) {
-                                    e.printStackTrace();
-                                }
-                                c.getGame().getCurrentPlayer().getHand().remove(tile);
-                                System.out.println("einde van de methode, alles ging goed");
-
-                                String resultMove = "MOVEOK_PUT" + move;
-
-                                for (int h = 0; h < c.getGame().getPlayers().size(); h++) {
-                                    if (c.getGame().getPlayers().size() == 2) {
-                                        twoPlayerGame.get(h).sendMessage("Move: " + move + " was successful put on the board by: " + c.getClientName());
-                                    }
-                                }
-
-                            /*if (c.getGame().hasWinner()) {
-                                c.getGame().printResult();
-                                endGameWinner(c);
-                            }
-                        } *///else {
-                                //invalidUserTurn(c);
-                                //}
-
-                            } else {
-                            c.sendMessage("You don't own this tile"); // deze staat nog niet goed, stuurt nu bijv 3x dit bericht als de 1e 3 tiles fout zijn en dan doet hij alsnog de move
-                        }
-                    }
-                }
+                putMove.add(m);
             }
+            c.getGame().madePutMove(c.getClientName(), putMove);
         }
-        } else {
-            c.sendMessage("It's not your turn");
-        }
-        c.getGame().update();
         serverView.showBoard(c.getGame().getBoard());
     }
 
@@ -310,11 +260,10 @@ public class Server extends Thread {
         int amount = 0;
         for (int i = 1; i < tiles.length; i++) {
             String tile = tiles[i];
-            int tileId = Integer.parseInt(tile);
-            c.getGame().getCurrentPlayer().getHand().remove(tileId);
+            oldTiles.add(new Tile(Integer.parseInt(tile)));
             amount = tiles.length - 1;
             try {
-                newTiles = c.getGame().getBoard().getPool().takeTiles(amount);
+                newTiles = c.getGame().getPool().takeTiles(amount);
                 System.out.println("NewTiles: " + newTiles);
                 //oldTiles.add(tile); //oude tiles moeten omgezet worden van een String/int naar een Tile
                 //c.getGame().getBoard().getPool().tradeTiles(oldTiles);

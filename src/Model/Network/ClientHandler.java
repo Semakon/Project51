@@ -47,9 +47,9 @@ public class ClientHandler extends Thread {
      * be called immediately after the ClientHandler has been constructed.
      */
      public void announce() throws IOException {
-     clientName = in.readLine();
-     server.broadcast("[" + clientName + " has entered]", this);
-     System.out.println(getName());}
+         clientName = in.readLine();
+         server.broadcast("[" + clientName + " has entered]", this);
+     }
 
     public void setClientName(String name) {
         this.clientName=name;
@@ -69,7 +69,7 @@ public class ClientHandler extends Thread {
 
     /**
      * This method takes care of sending messages from the Client.
-     * Every message that is received, is preprended with the name
+     * Every message that is received, is prepended with the name
      * of the Client, and the new message is offered to the Server
      * for broadcasting. If an IOException is thrown while reading
      * the message, the method concludes that the socket connection is
