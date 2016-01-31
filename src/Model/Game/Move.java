@@ -5,8 +5,4 @@ package Model.Game;
  */
 public class Move {
 
-    public Move() {
-        //TODO: implement (?)
-    }
-
 }

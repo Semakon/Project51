@@ -11,8 +11,6 @@ public interface Strategy {
 
     String getName();
     Move determineMove(Board board, List<Tile> hand);
-    TradeMove determineTradeMove(Board board, List<Tile> hand);
-    PutMove determinePutMove(Board board, List<Tile> hand);
 
 
 }

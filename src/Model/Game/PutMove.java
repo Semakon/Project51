@@ -16,7 +16,7 @@ public class PutMove extends Move {
     private Map<Location, Tile> move;
 
     /**
-     * Creates a new instance of PutMove(). (to be continued)
+     * Creates a new instance of PutMove with a map of Locations and a Tiles.
      * @param move Move input by Player.
      */
     public PutMove(Map<Location, Tile> move) {

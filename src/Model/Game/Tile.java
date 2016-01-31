@@ -16,6 +16,7 @@ public class Tile {
     /**
      * Creates a new Tile with an id, color and shape.
      * @param id The Tile's id.
+     * @throws InvalidIdRuntimeException If one tries to create a Tile with an invalid id.
      */
     public Tile(int id) {
         if (id < 0 || id > 35) {
@@ -44,16 +45,7 @@ public class Tile {
      * @return True if this Tile and tile have the same shape and color.
      */
     public boolean isEqualTo(Tile tile) {
-        return tile.getColor() == color && tile.getShape() == shape;
-    }
-
-    /**
-     * Checks whether an ID is equal to this Tile's ID.
-     * @param id ID to be checked.
-     * @return True if this Tile has the same ID as id.
-     */
-    public boolean isEqualTo(int id) {
-        return this.id == id;
+        return tile.getId() == id;
     }
 
     /**

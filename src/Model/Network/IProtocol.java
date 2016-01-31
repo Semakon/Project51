@@ -1,4 +1,4 @@
-package Model;
+package Model.Network;
 
 /**
  * IProtocol is the interface for the Qwirkle Protocol implementation. This interface
@@ -34,13 +34,13 @@ public interface IProtocol {
 
     /**
      * <p>Sent by the client when connecting to a server to identify itself.</p>
-     * <p>The player name must match regex <code>^[a-zA-Z0-9-_]$</code> <code>{@link Model.IProtocol.Error#NAME_INVALID }</code></p>
-     * <p>The player name must be unique. <code>{@link Model.IProtocol.Error#NAME_USED }</code></p>
+     * <p>The player name must match regex <code>^[a-zA-Z0-9-_]$</code> <code>{@link IProtocol.Error#NAME_INVALID }</code></p>
+     * <p>The player name must be unique. <code>{@link IProtocol.Error#NAME_USED }</code></p>
      *
      * <dl>
      *     <dt>Parameters:</dt>
      *     <dd><code>name</code> - name of the player</dd>
-     *     <dd><code>features</code> - list of features supported by the client <em>(see {@link Model.IProtocol.Feature})</em></dd>
+     *     <dd><code>features</code> - list of features supported by the client <em>(see {@link IProtocol.Feature})</em></dd>
      * </dl>
      * <dl>
      *     <dt>Example:</dt>
@@ -64,7 +64,7 @@ public interface IProtocol {
 
     /**
      * <p>Sent by the client to enter a queue for a n-player game.</p>
-     * <p>The player can queue for 2, 3 or 4 player games. <code>{@link Model.IProtocol.Error#QUEUE_INVALID }</code></p>
+     * <p>The player can queue for 2, 3 or 4 player games. <code>{@link IProtocol.Error#QUEUE_INVALID }</code></p>
      *
      * <dl>
      *     <dt>Parameters:</dt>
@@ -79,8 +79,8 @@ public interface IProtocol {
 
     /**
      * <p>Sent by the client to put tiles on the board as a move.</p>
-     * <p>The player must own the tiles.<code>{@link Model.IProtocol.Error#MOVE_TILES_UNOWNED }</code></p>
-     * <p>The move must be valid. <code>{@link Model.IProtocol.Error#MOVE_INVALID }</code></p>
+     * <p>The player must own the tiles.<code>{@link IProtocol.Error#MOVE_TILES_UNOWNED }</code></p>
+     * <p>The move must be valid. <code>{@link IProtocol.Error#MOVE_INVALID }</code></p>
      *
      * <dl>
      *     <dt>Parameters:</dt>
@@ -95,9 +95,9 @@ public interface IProtocol {
 
     /**
      * <p>Sent by the client to trade tiles as a move.</p>
-     * <p>The player must own the tiles. <code>{@link Model.IProtocol.Error#MOVE_TILES_UNOWNED }</code></p>
-     * <p>The deck contain at least as many tiles as traded. <code>{@link Model.IProtocol.Error#DECK_EMPTY }</code></p>
-     * <p>The player cannot trade if the board is empty. <code>{@link Model.IProtocol.Error#TRADE_FIRST_TURN }</code></p>
+     * <p>The player must own the tiles. <code>{@link IProtocol.Error#MOVE_TILES_UNOWNED }</code></p>
+     * <p>The deck contain at least as many tiles as traded. <code>{@link IProtocol.Error#DECK_EMPTY }</code></p>
+     * <p>The player cannot trade if the board is empty. <code>{@link IProtocol.Error#TRADE_FIRST_TURN }</code></p>
      *
      * <dl>
      *     <dt>Parameters:</dt>
@@ -227,7 +227,7 @@ public interface IProtocol {
 
     /**
      * <p>Sent by the client when chatting.</p>
-     * <p>The channel must be <code>global</code> or <code>@playername</code>. <code>{@link Model.IProtocol.Error#INVALID_CHANNEL }</code></p>
+     * <p>The channel must be <code>global</code> or <code>@playername</code>. <code>{@link IProtocol.Error#INVALID_CHANNEL }</code></p>
      *
      * <dl>
      *     <dt>Parameters:</dt>
@@ -262,7 +262,7 @@ public interface IProtocol {
     /* Challenge */
     /**
      * <p>Sent by the client to challenge another player.</p>
-     * <p>The player cannot challenge itself. <code>{@link Model.IProtocol.Error#CHALLENGE_SELF }</code></p>
+     * <p>The player cannot challenge itself. <code>{@link IProtocol.Error#CHALLENGE_SELF }</code></p>
      *
      * <dl>
      *     <dt>Parameters:</dt>
@@ -277,7 +277,7 @@ public interface IProtocol {
 
     /**
      * <p>Sent by the client to accept a challenge.</p>
-     * <p>The player must be challenged by the other player beforehand. <code>{@link Model.IProtocol.Error#NOT_CHALLENGED }</code></p>
+     * <p>The player must be challenged by the other player beforehand. <code>{@link IProtocol.Error#NOT_CHALLENGED }</code></p>
      *
      * <dl>
      *     <dt>Parameters:</dt>
@@ -292,7 +292,7 @@ public interface IProtocol {
 
     /**
      * <p>Sent by the client to decline a challenge.</p>
-     * <p>The player must be challenged by the other player beforehand. <code>{@link Model.IProtocol.Error#NOT_CHALLENGED }</code></p>
+     * <p>The player must be challenged by the other player beforehand. <code>{@link IProtocol.Error#NOT_CHALLENGED }</code></p>
      *
      * <dl>
      *     <dt>Parameters:</dt>

@@ -27,6 +27,14 @@ public class Board {
     }
 
     /**
+     * Makes a put move on the board. This method does NOT check the validity of the move.
+     * @param move The move to be made.
+     */
+    public void makePutMove(PutMove move) {
+        field.putAll(move.getMove());
+    }
+
+    /**
      * Creates a Map with a Location and a List of Tiles. The Locations are open spaces in the field where a Tile could be placed.
      * For every Location in the Map a List of Tiles is created that contains all Tiles that could be placed there. If a Location
      * yields an empty List, the Location is not included in the Map.
@@ -181,17 +189,14 @@ public class Board {
      * @return A list of Tiles that lie on one line. The Location startPoint is not included.
      */
     public List<Tile> createLine(Axis axis, Location location, Location startPoint, int step) {
-//        System.out.println("\nBegin:\t\t step: " + step + ",\taxis: " + axis + ",\tloc: " + location);
         List<Tile> line = new ArrayList<>();
         if (location.isEqualTo(startPoint)) {
-//            System.out.println("start point");
             List<Tile> temp = axis == Axis.X ? createLine(axis, new Location(location.getX() + step, location.getY()), startPoint, step) :
                     createLine(axis, new Location(location.getX(), location.getY() + step), startPoint, step);
             line.addAll(temp);
         } else {
             for (Location loc : field.keySet()) {
                 if (loc.isEqualTo(location)) {
-//                    System.out.println("in Field:\t step: " + step + ",\taxis: " + axis + ",\tloc: " + loc);
                     line.add(field.get(loc));
                     List<Tile> temp = axis == Axis.X ? createLine(axis, new Location(location.getX() + step, location.getY()), startPoint, step) :
                             createLine(axis, new Location(location.getX(), location.getY() + step), startPoint, step);
@@ -200,7 +205,6 @@ public class Board {
                 }
             }
             if (step > 0) {
-//                System.out.println("step > 0:\t step: " + step + ",\taxis: " + axis + ",\tloc: " + location);
                 List<Tile> temp = axis == Axis.X ? createLine(axis, new Location(startPoint.getX() - step, startPoint.getY()), startPoint, -step) :
                         createLine(axis, new Location(startPoint.getX(), startPoint.getY() - step), startPoint, -step);
                 line.addAll(temp);
@@ -237,14 +241,6 @@ public class Board {
             }
         }
         return openLocations;
-    }
-
-    /**
-     * Makes a put move on the board. This method does NOT check the validity of the move.
-     * @param move The move to be made.
-     */
-    public void makePutMove(PutMove move) {
-        field.putAll(move.getMove());
     }
 
     /**
