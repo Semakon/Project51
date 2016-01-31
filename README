@@ -1,0 +1,21 @@
+Welcome to this short explanation consisting of a few important things you need to know about the game you're about to play.
+
+First of all, we have to tell you that this game isn't working correctly as it is supposed to be.
+That's due to two small problems that occur when trying to place a move on the board or whilst trading tiles, so that
+the move you want to make as a client can't be placed or the tiles can't be traded. Another issue that comes with these problems
+is that you can't see your hand as a player. We do realize that this obviously is a huge problem,
+since the game actually can't be played because of this. What we do want to say though is that for the
+rest the game is implemented and working fine. Players can connect to the server, can send and receive messages from and to the
+server all according to the protocol. We do have working implementations for checking whether a move is valid or
+not, we do actually have implementations for tradeMove, methods to be able to challenge another player, be able to sign
+up for a game with a certain amount of players (you can send the amount you want to play with) and furthermore everything
+you need in order to play the game. Multiple tests are made so you can still check whether or not those implementations are correct.
+Once again we understand the consequences of those problems, but hopefully you can see the amount of time and effort we have actually
+put into this project, despite the problem we encountered which is explained in the planning reflection (Herjan missed a complete week
+because of the death of his grandfather. We're not sure whether this project can be repaired or not, but if the work we handed in turnes out
+to be not sufficient enough for a 6, we can assure your we'll be able to repair the game in a very short amount of time, so that the game
+can actually be played correctly.
+
+Thanks for your time and understanding, and hopefully you can still enjoy our project.
+
+Martijn & Herjan

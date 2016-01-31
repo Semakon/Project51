@@ -10,10 +10,8 @@ import java.util.Scanner;
  */
 public class ServerTUI implements ServerView {
     @Override
-    public void start() {
-        Scanner in = new Scanner(System.in);
-        String portInput = in.nextLine();
-    }
+    public void start() {}
+
 
     @Override
     public void showBoard(Board board) {
