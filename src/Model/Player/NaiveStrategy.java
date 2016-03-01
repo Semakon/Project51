@@ -29,7 +29,7 @@ public class NaiveStrategy implements Strategy {
         for (Tile tile : hand) {
             for (Location loc : map.keySet()) {
                 for (Tile tile2 : map.get(loc)) {
-                    if (tile.isEqualTo(tile2)) {
+                    if (tile.equals(tile2)) {
                         Map<Location, Tile> tiles = new HashMap<>();
                         tiles.put(loc, tile);
                         return new PutMove(tiles);

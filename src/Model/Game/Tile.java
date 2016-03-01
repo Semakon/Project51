@@ -44,7 +44,7 @@ public class Tile {
      * @param tile Tile to be checked.
      * @return True if this Tile and tile have the same shape and color.
      */
-    public boolean isEqualTo(Tile tile) {
+    public boolean equals(Tile tile) {
         return tile.getId() == id;
     }
 

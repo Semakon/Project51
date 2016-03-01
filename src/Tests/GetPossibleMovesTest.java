@@ -92,7 +92,7 @@ public class GetPossibleMovesTest {
 //                    for (Tile tile : listX) {
 //                        boolean add = false;
 //                        for (Tile tile2 : listY) {
-//                            if (tile.isEqualTo(tile2)) add = true;
+//                            if (tile.equals(tile2)) add = true;
 //                        }
 //                        if (add && !possibleTiles.contains(tile)) possibleTiles.add(tile);
 //                    }

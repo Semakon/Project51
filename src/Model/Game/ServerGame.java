@@ -20,7 +20,7 @@ public class ServerGame {
     private Pool pool;
 
     /**
-     * Creates an instance of Game. This can be on a Server or on a Client and the behaviour changes accordingly.
+     * Creates an instance of ServerGame. Assigns initial values to the fields.
      * @param players Array of names of players.
      * @param firstMove Name of player with the first move.
      */
@@ -57,6 +57,12 @@ public class ServerGame {
         }
     }
 
+    /**
+     * This method is called when a TradeMove is made with the player that made the move and the move itself as an int
+     * array as parameters. It sets the corresponding SocketPlayer's currentMove to the move that was made.
+     * @param player The player that made the move.
+     * @param move The move that was made.
+     */
     public void madeTradeMove(String player, int[] move) {
         List<Tile> moveSet = new ArrayList<>();
         for (int m : move) {
@@ -71,6 +77,12 @@ public class ServerGame {
         }
     }
 
+    /**
+     * This method is called when a PutMove is made with the player that made the move and the move itself as a list of
+     * int arrays as parameters. It sets the corresponding SocketPlayer's currentMove to the move that was made.
+     * @param player The player that made the move.
+     * @param move The move that was made.
+     */
     public void madePutMove(String player, List<int[]> move) { //move[i]: {x, y, id}
         Map<Location, Tile> moveSet = new HashMap<>();
         for (int[] m : move) {
@@ -92,14 +104,12 @@ public class ServerGame {
      * @return True if the game is over according to the game's rules.
      */
     public boolean gameOver() {
-        boolean gameOver = false;
-        for (SocketPlayer p : players) {
-            if (p.getHand().isEmpty() && pool.isEmpty()) {
-                gameOver = true;
+        if (pool.isEmpty()) {
+            for (SocketPlayer p : players) {
+                if (p.getHand().isEmpty()) return true;
             }
         }
-        if (board.getPossibleMoves().isEmpty()) gameOver = true;
-        return gameOver;
+        return board.getPossibleMoves().isEmpty();
     }
 
     public Board getBoard() {

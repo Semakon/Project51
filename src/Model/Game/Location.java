@@ -26,7 +26,7 @@ public class Location {
      * @param loc the other Location
      * @return True if loc points to the same location as this Location
      */
-    public boolean isEqualTo(Location loc) {
+    public boolean equals(Location loc) {
         return this.x == loc.getX() && this.y == loc.getY();
     }
 
@@ -36,7 +36,7 @@ public class Location {
      * @param y y to be tested
      * @return True if x and y are equal to this.x and this.y respectively
      */
-    public boolean isEqualTo(int x, int y) {
+    public boolean equals(int x, int y) {
         return this.x == x && this.y == y;
     }
 

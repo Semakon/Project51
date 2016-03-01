@@ -207,6 +207,7 @@ public class Client extends Thread {
                     System.in));
             answer = in.readLine();
         } catch (IOException e) {
+            e.printStackTrace();
         }
 
         return (answer == null) ? "" : answer;

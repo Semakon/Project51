@@ -2,11 +2,17 @@ package Model.Game.Enumerations;
 
 /**
  * Created by Martijn on 13-1-2016.
+ *
+ * This enumeration represents the shape of a Tile.
  */
 public enum Shape {
 
     Cross, Plus, Square, Star, Circle, Diamond;
 
+    /**
+     * Returns the shape's corresponding id. The default id is -1.
+     * @return this shape's corresponding id.
+     */
     public int getId() {
         int id = -1;
         switch (this) {
@@ -26,6 +32,11 @@ public enum Shape {
         return id;
     }
 
+    /**
+     * Translates the enumeration into a String that can be used in the toString() of the Board class.
+     * "XX" is the default.
+     * @return A String representation of this shape.
+     */
     public String toString() {
         String shape = "XX";
         switch (this) {

@@ -2,11 +2,17 @@ package Model.Game.Enumerations;
 
 /**
  * Created by Martijn on 13-1-2016.
+ *
+ * This enumeration represents the colors the tiles can have.
  */
 public enum Color {
 
     Green, Yellow, Red, Purple, Orange, Blue;
 
+    /**
+     * Returns the color's corresponding id. The default id is -1.
+     * @return this color's corresponding id.
+     */
     public int getId() {
         int id = -1;
         switch (this) {
@@ -26,6 +32,11 @@ public enum Color {
         return id;
     }
 
+    /**
+     * Translates the enumeration into a String that can be used in the toString() of the Board class.
+     * "XX" is the default.
+     * @return A String representation of this color.
+     */
     public String toString() {
         String color = "XX";
         switch (this) {

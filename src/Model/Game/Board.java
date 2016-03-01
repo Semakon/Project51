@@ -10,9 +10,15 @@ import java.util.Map;
 
 /**
  * Created by Martijn on 11-1-2016.
+ *
+ * This class represents the board that the game is played on. The actual field with tiles is a Map with Locations and Tiles.
+ * There are methods to alter that field, like making a move, and to get information from it, like getting possible moves.
  */
 public class Board {
 
+    /**
+     * The actual field with all the tiles and their location.
+     */
     private Map<Location, Tile> field;
 
     /**
@@ -22,6 +28,10 @@ public class Board {
         field = new HashMap<>();
     }
 
+    /**
+     * Returns the field.
+     * @return This board's field.
+     */
     public Map<Location, Tile> getField() {
         return field;
     }
@@ -36,13 +46,17 @@ public class Board {
 
     /**
      * Creates a Map with a Location and a List of Tiles. The Locations are open spaces in the field where a Tile could be placed.
-     * For every Location in the Map a List of Tiles is created that contains all Tiles that could be placed there. If a Location
-     * yields an empty List, the Location is not included in the Map.
+     * For every Location in the Map a List of Tiles is created that contains all Tiles that could be placed there.
+     * If a Location yields an empty List, the Location is not included in the Map.
      * @return A Map with a Location and a List of Tiles that can be placed on that Location.
      */
     public Map<Location, List<Tile>> getPossibleMoves() {
         Map<Location, List<Tile>> possibleMoves = new HashMap<>();
+
+        // Create a list of all the valid locations where a tile could be placed in the field.
         List<Location> openLocations = getOpenLocations();
+
+        // Check for every location in the openLocations
         for (Location loc : openLocations) {
 
             List<Tile> tilesX = createLine(Axis.X, loc, loc, 1);
@@ -92,7 +106,7 @@ public class Board {
                     for (Tile tile : listX) {
                         boolean add = false;
                         for (Tile tile2 : listY) {
-                            if (tile.isEqualTo(tile2)) add = true;
+                            if (tile.equals(tile2)) add = true;
                         }
                         if (add && !possibleTiles.contains(tile)) possibleTiles.add(tile);
                     }
@@ -106,10 +120,11 @@ public class Board {
     }
 
     /**
-     * Checks all ID's of Tiles with a certain identity if they are in <code>tiles</code>. If not, they will be added to <code>list</code>.
+     * Checks all ID's of Tiles with a certain identity if they are in <code>tiles</code>. If not,
+     * they will be added to <code>list</code>.
      * @param list List of possible Tiles for a certain Location on the board.
      * @param tiles List of Tiles that are in a line on the board.
-     * @param id ID of concerned Tile.
+     * @param id ID of the Tile concerned.
      * @param step Step taken by for loop that is determined by the identity.
      * @return A list with usable Tiles.
      */
@@ -125,7 +140,7 @@ public class Board {
             Tile temp = new Tile(i);
             boolean add = true;
             for (Tile tile : tiles) {
-                if (tile.isEqualTo(temp)) add = false;
+                if (tile.equals(temp)) add = false;
             }
             if (add) list.add(temp);
         }
@@ -138,41 +153,51 @@ public class Board {
      * @return Identity of List of Tiles.
      */
     public Identity getIdentity(List<Tile> line) {
+        // initialize values
         Identity identity;
         boolean sameColor = true;
         boolean sameShape = true;
 
+        // if the line is empty, return invalid. If the line is only 1 tile long, return unspecified.
+        if (line.size() < 2) return line.isEmpty() ? Identity.invalid : Identity.unspecified;
+
+        // check if all tiles have the same color or the same shape
         for (Tile tile : line) {
             for (Tile tile2 : line) {
                 if (tile != tile2 && tile.getColor() != tile2.getColor()) sameColor = false;
                 if (tile != tile2 && tile.getShape() != tile2.getShape()) sameShape = false;
             }
         }
+
+        // if all tiles have the same color and not the same shape, then the identity is color
         if (sameColor && !sameShape) {
             identity = Identity.color;
             outerLoop:
             for (Tile tile : line) {
                 for (Tile tile2 : line) {
                     if (tile != tile2 && tile.getShape() == tile2.getShape()) {
+                        // tiles are the same (same color and shape), so identity is invalid
                         identity = Identity.invalid;
                         break outerLoop;
                     }
                 }
             }
+
+        // if all tiles have the same shape and not the same color, then the identity is shape
         } else if (!sameColor && sameShape) {
             identity = Identity.shape;
             outerLoop:
             for (Tile tile : line) {
                 for (Tile tile2 : line) {
                     if (tile != tile2 && tile.getColor() == tile2.getColor()) {
+                        // tiles are the same (same color and shape), so identity is invalid
                         identity = Identity.invalid;
                         break outerLoop;
                     }
                 }
             }
-        } else if (sameColor /** && sameShape */){
-            //This means that line only contains one tile.
-            identity = Identity.unspecified;
+
+        // all other combinations just mean the identity is invalid
         } else {
             identity = Identity.invalid;
         }
@@ -181,166 +206,247 @@ public class Board {
 
     /**
      * Creates a List of Tiles that are on one line on a certain axis. The Location startPoint is not included.
-     * This method uses recursion to create the List.
+     * This method uses recursion to create the List. On the first call to this method, the step should be positive (1).
      * @param axis The axis on which the line lies.
      * @param location The location checked in this iteration of the method.
      * @param startPoint The start location of the method. This location is the reference point.
      * @param step The step taken on the line to the next location. Must be either 1 or -1.
      * @return A list of Tiles that lie on one line. The Location startPoint is not included.
      */
+    //@ requires step == 1 or step == -1;
     public List<Tile> createLine(Axis axis, Location location, Location startPoint, int step) {
+
+        // initialize a list of Tiles as the line
         List<Tile> line = new ArrayList<>();
-        if (location.isEqualTo(startPoint)) {
+
+        // if the location is the starting point
+        if (location.equals(startPoint)) {
+
+            // create a new list of Tiles with this method (recursively) with either the X- or the Y-axis incremented by step
             List<Tile> temp = axis == Axis.X ? createLine(axis, new Location(location.getX() + step, location.getY()), startPoint, step) :
                     createLine(axis, new Location(location.getX(), location.getY() + step), startPoint, step);
+
+            // add the resulting list to line
             line.addAll(temp);
+
+        // if the location is not the starting point
         } else {
+
+            // for every tile on the field, check if the location is that tile's location
             for (Location loc : field.keySet()) {
-                if (loc.isEqualTo(location)) {
+                if (loc.equals(location)) {
+
+                    // add the location to the field
                     line.add(field.get(loc));
+
+                    // create a new list of Tiles with this method (recursively) with either the X- or the Y-axis incremented by step
                     List<Tile> temp = axis == Axis.X ? createLine(axis, new Location(location.getX() + step, location.getY()), startPoint, step) :
                             createLine(axis, new Location(location.getX(), location.getY() + step), startPoint, step);
+
+                    // add the resulting list to the line
                     line.addAll(temp);
-                    break; //right location is found, further looping is unnecessary
+
+                    //right location is found, further looping is unnecessary
+                    break;
                 }
             }
+
+            // if the step is positive
             if (step > 0) {
+
+                // create a new list of Tiles with this method (recursively) with either the X- or the Y-axis decremented by step
                 List<Tile> temp = axis == Axis.X ? createLine(axis, new Location(startPoint.getX() - step, startPoint.getY()), startPoint, -step) :
                         createLine(axis, new Location(startPoint.getX(), startPoint.getY() - step), startPoint, -step);
+
+                // add the resulting list to the line
                 line.addAll(temp);
             }
         }
+
+        // if the step is negative and no further locations are found, return the line
         return line;
     }
 
     /**
-     * Creates a List of all empty Locations next to used Locations. This List is used to determine possible moves.
-     * @return A List of all empty Locations next to used Locations.
+     * Creates a List of all empty Locations adjacent to used Locations. This List is used to determine possible moves.
+     * @return A List of all empty Locations adjacent to used Locations.
      */
     public List<Location> getOpenLocations() {
+
+        // initialize list of open Locations
         List<Location> openLocations = new ArrayList<>();
-        if (field.isEmpty()) {
-            openLocations.add(new Location(0, 0));
-        } else {
+
+        // check if field has tiles
+        if (!field.isEmpty()) {
+
+            // for every tile on the field
             for (Location loc : field.keySet()) {
+
+                // initialize a list of locations with all adjacent locations
                 List<Location> temp = new ArrayList<>();
                 temp.add(new Location(loc.getX() + 1, loc.getY()));
                 temp.add(new Location(loc.getX() - 1, loc.getY()));
                 temp.add(new Location(loc.getX(), loc.getY() + 1));
                 temp.add(new Location(loc.getX(), loc.getY() - 1));
+
+                // for every location adjacent to the tile
                 for (Location loc2 : temp) {
+
+                    // initialize boolean that determines whether to add the loc2 to openLocations
                     boolean add = true;
+
+                    // if the location is already in use by another tile, don't add it to openLocations
                     for (Location loc3 : field.keySet()) {
-                        if (loc2.isEqualTo(loc3)) add = false;
+                        if (loc2.equals(loc3)) {
+                            add = false;
+                            break;
+                        }
                     }
-                    for (Location loc4 : openLocations) {
-                        if (loc2.isEqualTo(loc4)) add = false;
-                    }
-                    if (add) openLocations.add(loc2);
+
+                    // if the location is not in openLocations yet and it add is true, add the location to openLocations
+                    if (!openLocations.contains(loc2) && add) openLocations.add(loc2);
                 }
             }
-        }
+
+        // if field is empty, give (0, 0) as open location
+        } else openLocations.add(new Location(0, 0));
+
         return openLocations;
     }
 
     /**
-     * Gives the Location of the with the lowest X or Y depending on axis.
+     * Gives the Location with the lowest X or Y depending on the parameter, axis, from a Location to Tile Map.
+     * This is done using bubblesort, since N <= 108, making bubblesort sufficiently efficient.
      * @param axis Determines whether the Location with the lowest X or Y is returned.
+     * @param map The Map where the Location is returned from.
      * @return Location with lowest X/Y
      */
     public Location lowerBound(Axis axis, Map<Location, Tile> map) {
+
+        // Put all locations from the map into a list.
         List<Location> list = new ArrayList<>();
-        for (Location loc : map.keySet()) {
-            list.add(loc);
+        list.addAll(map.keySet());
+
+        // if the list is empty or consists of only one Location, return null or that Location respectively
+        if (list.size() < 2) {
+            return list.isEmpty() ? null : list.get(0);
         }
-        if (list.size() > 1) {
-            for (int i = 0; i < list.size() - 1; i++) {
-                if (axis == Axis.X) {
-                    if (list.get(i).getX() < list.get(i + 1).getX()) {
-                        Location temp = list.get(i);
-                        list.set(i, list.get(i + 1));
-                        list.set(i + 1, temp);
-                    }
-                } else if (axis == Axis.Y) {
-                    if (list.get(i).getY() < list.get(i + 1).getY()) {
-                        Location temp = list.get(i);
-                        list.set(i, list.get(i + 1));
-                        list.set(i + 1, temp);
-                    }
+
+        // apply bubblesort...
+        for (int i = 0; i < list.size() - 1; i++) {
+
+            // ... on the X-axis.
+            if (axis == Axis.X) {
+                if (list.get(i).getX() < list.get(i + 1).getX()) {
+                    Location temp = list.get(i);
+                    list.set(i, list.get(i + 1));
+                    list.set(i + 1, temp);
+                }
+
+            // ... on the Y-axis.
+            } else if (axis == Axis.Y) {
+                if (list.get(i).getY() < list.get(i + 1).getY()) {
+                    Location temp = list.get(i);
+                    list.set(i, list.get(i + 1));
+                    list.set(i + 1, temp);
                 }
             }
         }
+        // return the last in the list (lower bound)
         return list.get(list.size() - 1);
     }
 
     /**
-     * Gives the Location of the with the highest X or Y depending on axis.
+     * Gives the Location with the highest X or Y depending on the parameter, axis, from a Location to Tile Map.
+     * This is done using bubblesort, since N <= 108, making bubblesort sufficiently efficient.
      * @param axis Determines whether the Location with the highest X or Y is returned.
+     * @param map The Map where the Location is returned from.
      * @return Location with highest X/Y
      */
     public Location higherBound(Axis axis, Map<Location, Tile> map) {
+
+        // Put all locations from the map into a list.
         List<Location> list = new ArrayList<>();
-        for (Location loc : map.keySet()) {
-            list.add(loc);
+        list.addAll(map.keySet());
+
+        // if the list is empty or consists of only one Location, return null or that Location respectively
+        if (list.size() < 2) {
+            return list.isEmpty() ? null : list.get(0);
         }
-        if (list.size() > 1) {
-            for (int i = 0; i < list.size() - 1; i++) {
-                if (axis == Axis.X) {
-                    if (list.get(i).getX() > list.get(i + 1).getX()) {
-                        Location temp = list.get(i);
-                        list.set(i, list.get(i + 1));
-                        list.set(i + 1, temp);
-                    }
-                } else if (axis == Axis.Y) {
-                    if (list.get(i).getY() > list.get(i + 1).getY()) {
-                        Location temp = list.get(i);
-                        list.set(i, list.get(i + 1));
-                        list.set(i + 1, temp);
-                    }
+
+        // apply bubblesort...
+        for (int i = 0; i < list.size() - 1; i++) {
+
+            // ... on the X-axis.
+            if (axis == Axis.X) {
+                if (list.get(i).getX() > list.get(i + 1).getX()) {
+                    Location temp = list.get(i);
+                    list.set(i, list.get(i + 1));
+                    list.set(i + 1, temp);
+                }
+
+            // ... on the Y-axis.
+            } else if (axis == Axis.Y) {
+                if (list.get(i).getY() > list.get(i + 1).getY()) {
+                    Location temp = list.get(i);
+                    list.set(i, list.get(i + 1));
+                    list.set(i + 1, temp);
                 }
             }
         }
+        // return the last in the list (upper bound)
         return list.get(list.size() - 1);
     }
 
     /**
-     * Creates a string representation of field that can be used for a TUI.
-     * @return String representation of field.
+     * Creates a string representation of the field that can be used in a TUI. This format will work as long as the
+     * coordinates do not enter triple digits. Considering there are only 108 tiles, this should not be a problem.
+     * @return String representation of the field.
      */
     public String toString() {
-        if (field.isEmpty()) {
-            return Configuration.EMPTY_FIELD;
-        }
 
+        // If the field is empty return a predetermined String.
+        if (field.isEmpty()) return Configuration.EMPTY_FIELD;
+
+        // define the lower and upper bounds of the X- and Y-axis.
         int lowX = lowerBound(Axis.X, field).getX();
         int highX = higherBound(Axis.X, field).getX();
         int lowY = lowerBound(Axis.Y, field).getY();
         int highY = higherBound(Axis.Y, field).getY();
+
+        // define the length of the rows
         int length = highX - lowX + 2;
 
-
+        // initialize static- and empty row
         String emptyRow = "";
         String staticRow = "---|";
 
+        // fill the static- and empty row
         for (int i = 0; i < length; i++) {
             staticRow += Configuration.MID_ROW;
             emptyRow += Configuration.EMPTY_SPACE;
         }
 
+        // finish static- and empty row (start of empty row is added later, it's not the same)
         staticRow += Configuration.END_ROW + "\n";
         emptyRow += Configuration.EMPTY_SPACE + "\n";
 
+        // initialize the fieldString
         String fieldString = staticRow + startRow(highY + 1) + emptyRow + staticRow;
 
+        // build the string starting from the top row
         for (int j = highY; j > lowY - 1; j--) {
+
+            // initialize row
             String row = startRow(j) + Configuration.EMPTY_SPACE;
 
+            // create a map with all Location - Tile combinations that are on this row.
             Map<Location, Tile> temp = new HashMap<>();
             for (Location loc : field.keySet()) {
-                if (loc.getY() == j) {
-                    temp.put(loc, field.get(loc));
-                }
+                if (loc.getY() == j) temp.put(loc, field.get(loc));
             }
+
+            // fill in the row with the correct Tile
             for (int i = lowX; i <= highX; i++) {
                 boolean placed = false;
                 for (Location loc : temp.keySet()) {
@@ -349,19 +455,27 @@ public class Board {
                         placed = true;
                     }
                 }
-                if (!placed) {
-                    row += Configuration.EMPTY_SPACE;
-                }
+                // if the location doesn't have a Tile, add empty space.
+                if (!placed) row += Configuration.EMPTY_SPACE;
             }
+
+            // finalize row
             row += Configuration.EMPTY_SPACE + "\n";
+
+            // add row to fieldString and a staticRow underneath
             fieldString += row + staticRow;
         }
 
+        // add empty bottom row.
         fieldString += startRow(lowY - 1) + emptyRow + staticRow;
+
+        // finalize fieldString with a proper String presentation of the X-axis
         fieldString += "y/x|";
         for (int i = lowX - 1; i <= highX + 1; i++) {
             fieldString += bottomRow(i);
         }
+
+        // add new line and return the result
         fieldString += "\n";
         return fieldString;
     }
@@ -372,10 +486,16 @@ public class Board {
      * @return The coordinate on the Y axis in a proper format.
      */
     private String startRow(int i) {
+
+        // add a minus if the coordinate is negative.
         String startRow = i < 0 ? "-" : " ";
+
+        // add a 0 if the coordinate is single digit.
         if (i >= - 9 && i <= 9) {
             startRow += "0";
         }
+
+        // add absolute value of coordinate and finalize String
         startRow += Math.abs(i) + "|";
         return startRow;
     }
@@ -386,10 +506,16 @@ public class Board {
      * @return The bottom row of the toString() method with the coordinates of the X axis in the proper format.
      */
     private String bottomRow(int i) {
+
+        // add a minus if the coordinate is negative.
         String topRow = i < 0 ? "  -" : "   ";
+
+        // add a 0 if the coordinate is single digit.
         if (i >= - 9 && i <= 9) {
             topRow += "0";
         }
+
+        // add absolute value of coordinate and finalize String
         topRow += Math.abs(i) + "   |";
         return topRow;
     }

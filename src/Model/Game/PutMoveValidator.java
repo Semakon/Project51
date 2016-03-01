@@ -35,7 +35,7 @@ public class PutMoveValidator {
         if (firstMove) {
             boolean validFirstMove = false;
             for (Location loc : move.getMove().keySet()) {
-                if (loc.isEqualTo(0, 0)) {
+                if (loc.equals(0, 0)) {
                     validFirstMove = true;
                 }
             }
@@ -69,12 +69,12 @@ public class PutMoveValidator {
         if (!firstMove) {
             for (Location loc : move.getMove().keySet()) {
                 for (Location loc2 : board.getField().keySet()) {
-                    if (loc.isEqualTo(loc2)) {
+                    if (loc.equals(loc2)) {
                         throw new InvalidMoveException("Location already in use.");
                     }
                     if (!touchesField) {
-                        if (loc.isEqualTo(loc2.getX(), loc2.getY() + 1) || loc.isEqualTo(loc2.getX(), loc2.getY() - 1) || loc.isEqualTo(loc2.getX() + 1, loc2.getY()) ||
-                                loc.isEqualTo(loc2.getX() - 1, loc2.getY())) {
+                        if (loc.equals(loc2.getX(), loc2.getY() + 1) || loc.equals(loc2.getX(), loc2.getY() - 1) || loc.equals(loc2.getX() + 1, loc2.getY()) ||
+                                loc.equals(loc2.getX() - 1, loc2.getY())) {
                             touchesField = true;
                         }
                     }
@@ -156,7 +156,7 @@ public class PutMoveValidator {
         }
         for (Location loc : move.getMove().keySet()) {
             for (Location loc2 : move.getMove().keySet()) {
-                if (loc != loc2 && loc.isEqualTo(loc2)) {
+                if (loc != loc2 && loc.equals(loc2)) {
                     throw new InvalidMoveException("Move contains the same tile twice or more.");
                 }
             }
@@ -235,7 +235,7 @@ public class PutMoveValidator {
      */
     private List<Tile> orthogonalLine(Axis axis, Location location, Location startPoint, int step) { //TODO: merge with createLine()
         List<Tile> line = new ArrayList<>();
-        if (location.isEqualTo(startPoint)) {
+        if (location.equals(startPoint)) {
             if (step > 0) {
                 line.add(move.getMove().get(startPoint));
             }
@@ -244,7 +244,7 @@ public class PutMoveValidator {
             line.addAll(temp);
         } else {
             for (Location loc : board.getField().keySet()) {
-                if (loc.isEqualTo(location)) {
+                if (loc.equals(location)) {
                     line.add(board.getField().get(loc));
                     List<Tile> temp = axis == Axis.Y ? orthogonalLine(axis, new Location(location.getX() + step, location.getY()), startPoint, step) :
                             orthogonalLine(axis, new Location(location.getX(), location.getY() + step), startPoint, step);
@@ -308,7 +308,7 @@ public class PutMoveValidator {
      */
     private boolean validLine(Axis axis, Location location, int step) throws InvalidMoveException { // step is either +1 or -1
         for (Location loc : move.getMove().keySet()) {
-            if (loc.isEqualTo(location)) {
+            if (loc.equals(location)) {
                 if (axis == Axis.X) {
                     return validLine(axis, new Location(loc.getX() + step, loc.getY()), step);          // recursive
                 } else {
@@ -318,7 +318,7 @@ public class PutMoveValidator {
         }
 
         for (Location loc : board.getField().keySet()) {
-            if (loc.isEqualTo(location)) {
+            if (loc.equals(location)) {
 
                 //same color, different shapes
                 if (move.getIdentity() == Identity.color) {
