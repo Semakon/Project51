@@ -10,6 +10,9 @@ import java.util.List;
  */
 public class SocketPlayer extends Player {
 
+    private Move currentMove;
+    private Move previousMove;
+
     /**
      * Creates a new instance of Player with a name and a hand, that contains exactly Configuration.HAND Tiles.
      *
@@ -20,9 +23,24 @@ public class SocketPlayer extends Player {
         super(name, hand);
     }
 
+    public void setCurrentMove(Move currentMove) {
+        this.currentMove = currentMove;
+    }
+
+    public Move getPreviousMove() {
+        return previousMove;
+    }
+
     @Override
     public Move determineMove(Board board) throws InvalidMoveException {
-        //Get choice from server.
-        return null;
+        // If there was no move made, throw exception
+        if (currentMove == null) throw new InvalidMoveException("No move was made.");
+
+        // Set the previous move as the current move and set the current move to null
+        previousMove = currentMove;
+        currentMove = null;
+
+        // return the move that was made.
+        return previousMove;
     }
 }

@@ -15,7 +15,7 @@ import java.util.Map;
 public class ServerGame {
 
     private Board board;
-    private List<Player> players;
+    private List<SocketPlayer> players;
     private Player currentPlayer;
     private Pool pool;
 
@@ -32,7 +32,7 @@ public class ServerGame {
             for (String player : players) {
                 this.players.add(new SocketPlayer(player, pool.takeTiles(Configuration.HAND)));
             }
-            for (Player p : this.players) {
+            for (SocketPlayer p : this.players) {
                 if (firstMove.equals(p.getName())) currentPlayer = p;
             }
         } catch (InsufficientTilesInPoolException e) {
@@ -51,14 +51,24 @@ public class ServerGame {
         while (!done) {
             currentPlayer.makeMove(board);
             if (gameOver()) {
-
+                //TODO: implement further
                 done = true;
             }
         }
     }
 
     public void madeTradeMove(String player, int[] move) {
-
+        List<Tile> moveSet = new ArrayList<>();
+        for (int m : move) {
+            moveSet.add(new Tile(m));
+        }
+        TradeMove tradeMove = new TradeMove(moveSet);
+        for (SocketPlayer p : players) {
+            if (player.equals(p.getName())) {
+                p.setCurrentMove(tradeMove);
+                break;
+            }
+        }
     }
 
     public void madePutMove(String player, List<int[]> move) { //move[i]: {x, y, id}
@@ -67,9 +77,10 @@ public class ServerGame {
             moveSet.put(new Location(m[0], m[1]), new Tile(m[2]));
         }
         PutMove putMove = new PutMove(moveSet);
-        for (Player p : players) {
+        for (SocketPlayer p : players) {
             if (player.equals(p.getName())) {
-                // have p make putMove move.
+                p.setCurrentMove(putMove);
+                break;
             }
         }
     }
@@ -82,7 +93,7 @@ public class ServerGame {
      */
     public boolean gameOver() {
         boolean gameOver = false;
-        for (Player p : players) {
+        for (SocketPlayer p : players) {
             if (p.getHand().isEmpty() && pool.isEmpty()) {
                 gameOver = true;
             }
@@ -102,7 +113,7 @@ public class ServerGame {
      */
     public List<Tile> getHand(String player) {
         List<Tile> hand = null;
-        for (Player p : players) {
+        for (SocketPlayer p : players) {
             if (player.equals(p.getName())) hand = p.getHand();
         }
         return hand;
@@ -112,6 +123,6 @@ public class ServerGame {
         return currentPlayer;
     }
 
-    public List<Player> getPlayers() { return players;}
+    public List<SocketPlayer> getPlayers() { return players;}
 
 }
