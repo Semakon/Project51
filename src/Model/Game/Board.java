@@ -59,12 +59,15 @@ public class Board {
         // Check for every location in the openLocations
         for (Location loc : openLocations) {
 
+            // Make a list of all Tiles in a line horizontally and vertically
             List<Tile> tilesX = createLine(Axis.X, loc, loc, 1);
-            Identity identityX = getIdentity(tilesX);
-
             List<Tile> tilesY = createLine(Axis.Y, loc, loc, 1);
+
+            // Get the identity of those lines
+            Identity identityX = getIdentity(tilesX);
             Identity identityY = getIdentity(tilesY);
 
+            // if the lines remain valid with a Tile in this location
             if (tilesX.size() < 6 && identityX != Identity.invalid && tilesY.size() < 6 && identityY != Identity.invalid) {
                 List<Tile> possibleTiles = new ArrayList<>();
                 List<Tile> listX = new ArrayList<>();
@@ -124,24 +127,42 @@ public class Board {
      * they will be added to <code>list</code>.
      * @param list List of possible Tiles for a certain Location on the board.
      * @param tiles List of Tiles that are in a line on the board.
-     * @param id ID of the Tile concerned.
+     * @param id ID of the identity of the Tile concerned.
      * @param step Step taken by for loop that is determined by the identity.
      * @return A list with usable Tiles.
      */
     public List<Tile> checkId(List<Tile> list, List<Tile> tiles, Identity identity, int id, int step) {
+
+        // initialize maximum range of for-loop
         int max = 0;
+
         if (identity == Identity.color) {
+            // set id to color id to match Tile
             id = id * Configuration.RANGE;
+
+            // set maximum range of for-loop
             max = id + Configuration.RANGE;
+
         } else if (identity == Identity.shape) {
+            // set maximum range of for-loop
             max = Configuration.RANGE * Configuration.RANGE;
         }
+
+        // loop through all tiles with an id matching either the color or shape of initial Tile
         for (int i = id; i < max; i += step) {
+            // initialize loop values
             Tile temp = new Tile(i);
             boolean add = true;
+
+            // check if tile is in List<Tile> tiles, if so, don't add it to List<Tile> list
             for (Tile tile : tiles) {
-                if (tile.equals(temp)) add = false;
+                if (tile.equals(temp)) {
+                    add = false;
+                    break;
+                }
             }
+
+            // if tempTile is not in List<Tiles> tiles, add it to List<Tile> list
             if (add) list.add(temp);
         }
         return list;
