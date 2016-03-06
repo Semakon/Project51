@@ -67,56 +67,76 @@ public class Board {
             Identity identityX = getIdentity(tilesX);
             Identity identityY = getIdentity(tilesY);
 
-            // if the lines remain valid with a Tile in this location
+            // if there exists a Tile that could be placed on the location without invalidating the lines (rough estimate))
             if (tilesX.size() < 6 && identityX != Identity.invalid && tilesY.size() < 6 && identityY != Identity.invalid) {
+
+                // initialize list variables
                 List<Tile> possibleTiles = new ArrayList<>();
                 List<Tile> listX = new ArrayList<>();
                 List<Tile> listY = new ArrayList<>();
 
+                // if the list of Tiles on the X-axis is not empty
                 if (!tilesX.isEmpty()) {
+
+                    // if the Tiles on the X-axis are all of the same color, add all unused Tiles of that color to listX
                     if (identityX == Identity.color) {
                         listX = checkId(listX, tilesX, identityX, tilesX.get(0).getColor().getId(), 1);
+
+                    // if the Tiles on the X-axis are all of the same shape, add all unused Tiles of that shape to listX
                     } else if (identityX == Identity.shape) {
                         listX = checkId(listX, tilesX, identityX, tilesX.get(0).getShape().getId(), Configuration.RANGE);
+
+                    // if the the X-axis consists of only one Tile, add all unused Tiles of the right shape and color combinations to listX
                     } else if (identityX == Identity.unspecified) {
                         listX = checkId(listX, tilesX, Identity.color, tilesX.get(0).getColor().getId(), 1);
                         listX = checkId(listX, tilesX, Identity.shape, tilesX.get(0).getShape().getId(), Configuration.RANGE);
                     }
                 }
+
+                // if the list of Tiles on the Y-axis is not empty
                 if (!tilesY.isEmpty()) {
+
+                    // if the Tiles on the Y-axis are all of the same color, add all unused Tiles of that color to listY
                     if (identityY == Identity.color) {
                         listY = checkId(listY, tilesY, identityY, tilesY.get(0).getColor().getId(), 1);
+
+                    // if the Tiles on the Y-axis are all of the same shape, add all unused Tiles of that shape to listY
                     } else if (identityY == Identity.shape) {
                         listY = checkId(listY, tilesY, identityY, tilesY.get(0).getShape().getId(), Configuration.RANGE);
+
+                    // if the the Y-axis consists of only one Tile, add all unused Tiles of the right shape and color combinations to listY
                     } else if (identityY == Identity.unspecified) {
                         listY = checkId(listY, tilesY, Identity.color, tilesY.get(0).getColor().getId(), 1);
                         listY = checkId(listY, tilesY, Identity.shape, tilesY.get(0).getShape().getId(), Configuration.RANGE);
                     }
                 }
+
+                // if there are
                 if (listX.isEmpty() && !listY.isEmpty()) {
                     for (Tile tile : listY) {
-                        if (!possibleTiles.contains(tile)) {
-                            possibleTiles.add(tile);
-                        }
+                        if (!possibleTiles.contains(tile)) possibleTiles.add(tile);
                     }
+
                 } else if (!listX.isEmpty() && listY.isEmpty()) {
                     for (Tile tile : listX) {
-                        if (!possibleTiles.contains(tile)) {
-                            possibleTiles.add(tile);
-                        }
+                        if (!possibleTiles.contains(tile)) possibleTiles.add(tile);
                     }
+
                 } else {
                     for (Tile tile : listX) {
                         boolean add = false;
                         for (Tile tile2 : listY) {
-                            if (tile.equals(tile2)) add = true;
+                            if (tile.equals(tile2)) {
+                                add = true;
+                                break;
+                            }
                         }
                         if (add && !possibleTiles.contains(tile)) possibleTiles.add(tile);
                     }
                 }
-                if (!possibleTiles.isEmpty()) {
-                    possibleMoves.put(loc, possibleTiles);
-                }
+
+                // if a location has possible moves, add them to the possibleMoves map
+                if (!possibleTiles.isEmpty()) possibleMoves.put(loc, possibleTiles);
             }
         }
         return possibleMoves;
