@@ -111,18 +111,24 @@ public class Board {
                     }
                 }
 
-                // if there are
+                // if there are no possible Tiles on the X-axis but there are possible Tiles on the Y-axis,
+                // add all those Tiles to possibleTiles (unless they're already in possibleTiles)
                 if (listX.isEmpty() && !listY.isEmpty()) {
                     for (Tile tile : listY) {
                         if (!possibleTiles.contains(tile)) possibleTiles.add(tile);
                     }
 
+                // if there are no possible Tiles on the Y-axis but there are possible Tiles on the X-axis,
+                // add all those Tiles to possibleTiles (unless they're already in possibleTiles)
                 } else if (!listX.isEmpty() && listY.isEmpty()) {
                     for (Tile tile : listX) {
                         if (!possibleTiles.contains(tile)) possibleTiles.add(tile);
                     }
 
                 } else {
+
+                    // Add every Tile that's both possible on the X- as well as the Y-axis to possibleTiles
+                    // (unless they're already in possibleTiles)
                     for (Tile tile : listX) {
                         boolean add = false;
                         for (Tile tile2 : listY) {
