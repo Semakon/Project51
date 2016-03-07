@@ -12,12 +12,25 @@ import java.util.List;
 
 /**
  * Created by Martijn on 30-1-2016.
+ *
+ * This class has several methods that are used to validate whether a PutMove is valid on a provided Board.
  */
 public class PutMoveValidator {
 
+    /**
+     * The Board where the PutMove is tested for validity.
+     */
     private Board board;
+
+    /**
+     * The PutMove that is tested for validity.
+     */
     private PutMove move;
-    private boolean firstMove = false;
+
+    /**
+     * Boolean that holds information on whether this PutMove is the first PutMove on the Board.
+     */
+    private boolean firstMove;
 
     /**
      * Creates a new instance of PutMoveValidator. This class is used to validate a PutMove.
@@ -27,37 +40,36 @@ public class PutMoveValidator {
     public PutMoveValidator(Board board, PutMove move) {
         this.board = board;
         this.move = move;
-        if (board.getField().isEmpty()) firstMove = true;
+        firstMove = board.getField().isEmpty();
     }
 
+    /**
+     * This method is called by other classes to check this move's validity on the board. If the move is invalid in
+     * any way, an InvalidMoveException is thrown.
+     * @return True if the move is valid on the board.
+     * @throws InvalidMoveException When the move is invalid in any way.
+     */
     public boolean validMove() throws InvalidMoveException {
         boolean valid;
         if (firstMove) {
             boolean validFirstMove = false;
             for (Location loc : move.getMove().keySet()) {
-                if (loc.equals(0, 0)) {
-                    validFirstMove = true;
-                }
+                if (loc.equals(0, 0)) validFirstMove = true;
             }
-            if (!validFirstMove) {
-                throw new InvalidMoveException("First move does not have a Tile on Location (0, 0).");
-            }
+            if (!validFirstMove) throw new InvalidMoveException("First move does not have a Tile on Location (0, 0).");
         }
-        if (validPositioning() && validIdentity()) {
-            valid = true;
-        } else {
-            throw new InvalidMoveException("Move is invalid regardless of field.");
-        }
-        if (!validPut()) {
-            valid = false;
-        }
+        if (validPositioning() && validIdentity()) valid = true;
+        else throw new InvalidMoveException("Move is invalid regardless of the fields's state.");
+
+        if (!validPut()) valid = false;
+
         return valid;
     }
 
     /**
-     * Checks whether a PutMove is valid. A PutMove is invalid if all Tiles in a line have the same color and a different shape
-     * or all the same shape and different shape. The same Tile in a line is not allowed and the move must be connected to the field,
-     * but may not override it.
+     * Checks whether a PutMove is valid. A PutMove is invalid if all Tiles in a line have the same color and a
+     * different shape or all the same shape and different shape. The same Tile in a line is not allowed and the move
+     * must be connected to the field, but may not override it.
      * @return True if the move is valid on this board.
      * @throws InvalidMoveException If the move is invalid.
      */
@@ -128,8 +140,8 @@ public class PutMoveValidator {
     }
 
     /**
-     * Checks whether a move is either all on one horizontal line or all on one vertical line and within Configuration.RANGE
-     * distance from one another. Also checks whether the move set has duplicates.
+     * Checks whether a move is either all on one horizontal line or all on one vertical line and within
+     * Configuration.RANGE distance from one another. Also checks whether the move set has duplicates.
      * @return True if the Location of the move is valid
      */
     private boolean validPositioning() throws InvalidMoveException {
@@ -226,7 +238,8 @@ public class PutMoveValidator {
     }
 
     /**
-     * Creates a List of Tiles from the field that form a line with the Tile that lies on startPoint. This method is recursive.
+     * Creates a List of Tiles from the field that form a line with the Tile that lies on startPoint.
+     * This method is recursive.
      * @param axis Axis on which the line lies.
      * @param location Location of Tile that is checked.
      * @param startPoint Location of the original Tile from the move that is checked.
@@ -298,9 +311,10 @@ public class PutMoveValidator {
     }
 
     /**
-     * Checks whether a move with a certain axis is valid on the field. This method only checks the horizontal or vertical line,
-     * depending on the axis given. It's a recursive method that uses a given location and increases either the X or Y variable
-     * (again, depending on the given axis) by the given step. The step variable is either 1 or -1.
+     * Checks whether a move with a certain axis is valid on the field. This method only checks the horizontal or
+     * vertical line, depending on the axis given. It's a recursive method that uses a given location and increases
+     * either the X or Y variable (again, depending on the given axis) by the given step. The step variable
+     * is either 1 or -1.
      * @param axis Axis on which the line lies.
      * @param location Location of Tile that is checked.
      * @param step Step the X or Y takes (1 or -1).

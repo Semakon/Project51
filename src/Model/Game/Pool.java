@@ -9,9 +9,15 @@ import java.util.Random;
 
 /**
  * Created by Martijn on 12-1-2016.
+ *
+ * This class represents the pool where all Tiles are drawn from. Every Tile used in the game originally came from
+ * this class.
  */
 public class Pool {
 
+    /**
+     * The actual list of Tiles that are still contained in the pool.
+     */
     private List<Tile> pool;
 
     /**
@@ -19,7 +25,10 @@ public class Pool {
      * Configuration.TILE_DUPLICATES times in the pool.
      */
     public Pool() {
+        // initialize pool
         pool = new ArrayList<>();
+
+        // fill the pool with Tiles
         for (int i = 0; i < Configuration.TILE_DUPLICATES; i++) {
             for (int j = 0; j < Configuration.RANGE * Configuration.RANGE; j++) {
                 pool.add(new Tile(j));
@@ -27,6 +36,10 @@ public class Pool {
         }
     }
 
+    /**
+     * Returns the actual list of Tiles contained in this pool.
+     * @return The pool.
+     */
     public List<Tile> getPool() {
         return pool;
     }
@@ -46,15 +59,22 @@ public class Pool {
      * @throws InsufficientTilesInPoolException If the pool doesn't have enough tiles to take
      */
     public List<Tile> takeTiles(int amount) throws InsufficientTilesInPoolException {
+
+        // check whether amount is valid
         if (amount <= 0 || amount > Configuration.HAND) {
             throw new InvalidAmountRuntimeException("Amount must be between 0 (exclusive) and " + Configuration.HAND + " (inclusive).");
         }
+
+        // check whether pool contains enough tiles to take
         if (pool.size() < amount) {
             throw new InsufficientTilesInPoolException();
         }
 
+        // initialize return list and random generator
         List<Tile> tiles = new ArrayList<>();
         Random randomGen = new Random();
+
+        // take <amount> tiles out of the pool randomly and put them in the return list
         for (int i = 0; i < amount; i++) {
             int index = randomGen.nextInt(pool.size());
             tiles.add(pool.get(index));
@@ -70,24 +90,13 @@ public class Pool {
      * @throws InsufficientTilesInPoolException If the pool doesn't have enough tiles to trade
      */
     public List<Tile> tradeTiles(List<Tile> oldTiles) throws InsufficientTilesInPoolException {
-        if (oldTiles.size() <= 0 || oldTiles.size() > Configuration.HAND) {
-            throw new InvalidAmountRuntimeException("Amount must be between 0 (exclusive) and " + Configuration.HAND + " (inclusive).");
-        }
-        if (pool.size() < oldTiles.size()) {
-            throw new InsufficientTilesInPoolException();
-        }
 
-        List<Tile> newTiles = new ArrayList<>();
-        Random randomGen = new Random();
-        for (int i = 0; i < oldTiles.size(); i++) {
-            int index = randomGen.nextInt(pool.size());
-            newTiles.add(pool.get(index));
-            pool.remove(index);
-        }
+        // get correct amount of tiles from the pool
+        List<Tile> newTiles = takeTiles(oldTiles.size());
 
-        for (Tile oldTile : oldTiles) {
-            pool.add(oldTile);
-        }
+        // add all old tiles to the pool
+        for (Tile oldTile : oldTiles) pool.add(oldTile);
+
         return newTiles;
     }
 
