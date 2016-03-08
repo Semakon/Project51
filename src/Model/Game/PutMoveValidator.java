@@ -130,7 +130,7 @@ public class PutMoveValidator {
                 orthogonalLine.addAll(orthogonalLine(Axis.Y, loc, loc, -1));
 
                 // validate the line
-                if (orthogonalLine.size() > 1 && !validLine(orthogonalLine)) {
+                if (orthogonalLine.size() > 1 && !validIdentityInLine(orthogonalLine)) {
                     validOrthogonalLines = false;
                     break;
                 }
@@ -151,7 +151,7 @@ public class PutMoveValidator {
                 orthogonalLine.addAll(orthogonalLine(Axis.X, loc, loc, -1));
 
                 // validate the line
-                if (orthogonalLine.size() > 1 && !validLine(orthogonalLine)) {
+                if (orthogonalLine.size() > 1 && !validIdentityInLine(orthogonalLine)) {
                     validOrthogonalLines = false;
                     break;
                 }
@@ -346,7 +346,7 @@ public class PutMoveValidator {
      * @param line Line to be checked.
      * @return True if the line is valid.
      */
-    private boolean validLine(List<Tile> line) throws InvalidMoveException {
+    private boolean validIdentityInLine(List<Tile> line) throws InvalidMoveException {
         boolean valid = true;
         boolean sameColor = true;
         boolean sameShape = true;
@@ -396,7 +396,9 @@ public class PutMoveValidator {
      * @param step Step the X or Y takes (1 or -1).
      * @return True if the move does not violate any game rules on the line.
      */
-    private boolean validLine(Axis axis, Location location, int step) throws InvalidMoveException { // step is either +1 or -1
+    private boolean validLine(Axis axis, Location location, int step) throws InvalidMoveException {
+
+        // If the parameter 'location' is in the move, increase the appropriate axis by 'step' and try again recursively
         for (Location loc : move.getMove().keySet()) {
             if (loc.equals(location)) {
                 if (axis == Axis.X) {
@@ -407,68 +409,94 @@ public class PutMoveValidator {
             }
         }
 
+        // Check whether the parameter 'location' is on the board
         for (Location loc : board.getField().keySet()) {
             if (loc.equals(location)) {
 
-                //same color, different shapes
+                // Check whether the Tile on 'location' fits in the line of the move in case of:
+                // - The same color and different shapes:
                 if (move.getIdentity() == Identity.color) {
                     for (Tile tile : move.getMove().values()) {
+
+                        // Tile on 'location' has different color
                         if (board.getField().get(loc).getColor() != tile.getColor()) {
                             throw new InvalidMoveException("Color doesn't fit in row/column.");
                         }
+
+                        // Tile on 'location' has the same shape as one of the Tiles in the move
                         if (board.getField().get(loc).getShape() == tile.getShape()) {
                             throw new InvalidMoveException("Shape is already in row/column.");
                         }
                     }
-                    if (axis == Axis.X) {
-                        return validLine(axis, new Location(loc.getX() + step, loc.getY()), step);          // recursive
-                    } else {
-                        return validLine(axis, new Location(loc.getX(), loc.getY() + step), step);          // recursive
-                    }
 
-                    //same shape, different colors
+                    // try next location by increasing appropriate axis by 'step'
+                    return axis == Axis.X ? validLine(axis, new Location(loc.getX() + step, loc.getY()), step) :
+                            validLine(axis, new Location(loc.getX(), loc.getY() + step), step);
+
+                // - The same shape and different colors:
                 } else if (move.getIdentity() == Identity.shape) {
                     for (Tile tile : move.getMove().values()) {
+
+                        // Tile on 'location' has different shape
                         if (board.getField().get(loc).getShape() != tile.getShape()) {
                             throw new InvalidMoveException("Shape doesn't fit in row/column.");
                         }
+
+                        // Tile on 'location' has the same color as one of the Tiles in the move
                         if (board.getField().get(loc).getColor() == tile.getColor()) {
                             throw new InvalidMoveException("Color is already in row/column.");
                         }
                     }
-                    if (axis == Axis.X) {
-                        return validLine(axis, new Location(loc.getX() + step, loc.getY()), step);          // recursive
-                    } else {
-                        return validLine(axis, new Location(loc.getX(), loc.getY() + step), step);          // recursive
-                    }
 
-                    //one block in move set
+                    // try next location by increasing appropriate axis by 'step'
+                    return axis == Axis.X ? validLine(axis, new Location(loc.getX() + step, loc.getY()), step) :
+                            validLine(axis, new Location(loc.getX(), loc.getY() + step), step);
+
+                // if there's only one block in move
                 } else if (move.getIdentity() == Identity.unspecified) {
                     for (Tile tile : move.getMove().values()) {
+
+                        // Check if there's an equivalent tile in the line already
                         if (board.getField().get(loc).getColor() == tile.getColor() &&
                                 board.getField().get(loc).getShape() == tile.getShape()) {
                             throw new InvalidMoveException("Same tile in row/column.");
                         }
+
+                        // Check if tile fits with other tiles in the line
                         if (board.getField().get(loc).getColor() != tile.getColor() &&
                                 board.getField().get(loc).getShape() != tile.getShape()) {
                             throw new InvalidMoveException("Tile shares no identity with surrounding tiles.");
                         }
                     }
-                } else {
-                    //should not occur
-                    throw new InvalidIdentityRuntimeException();
-                }
 
-                break; // right location is found on the field, no need to continue loop
+                // if the identity is invalid, this should not occur
+                } else throw new InvalidIdentityRuntimeException();
+
+                // right location is found on the field, no need to continue loop
+                break;
             }
         }
+        // this part is reached when there is no Tile on the parameter 'location'
+        // or when all previous recursive iterations have ended
+
+        // if the axis is the X-axis
         if (axis == Axis.X) {
-            if (location.getX() < board.higherBound(axis, move.getMove()).getX() && location.getX() > board.lowerBound(axis, move.getMove()).getX()) {
-                return validLine(axis, new Location(location.getX() + step, location.getY()), step);                // recursive
+
+            // if the X of parameter 'location' is between the higher and lower bound of the move,
+            // execute another iteration of this method with the location's X increased by step.
+            if (location.getX() < board.higherBound(axis, move.getMove()).getX() &&
+                    location.getX() > board.lowerBound(axis, move.getMove()).getX()) {
+                return validLine(axis, new Location(location.getX() + step, location.getY()), step);
             }
+
+        // if the axis is the Y-axis
         } else {
-            if (location.getY() < board.higherBound(axis, move.getMove()).getY() && location.getY() > board.lowerBound(axis, move.getMove()).getY()) {
-                return validLine(axis, new Location(location.getX(), location.getY() + step), step);                // recursive
+
+            // if the Y of parameter 'location' is between the higher and lower bound of the move,
+            // execute another iteration of this method with the location's Y increased by step.
+            if (location.getY() < board.higherBound(axis, move.getMove()).getY() &&
+                    location.getY() > board.lowerBound(axis, move.getMove()).getY()) {
+                return validLine(axis, new Location(location.getX(), location.getY() + step), step);
             }
         }
 
