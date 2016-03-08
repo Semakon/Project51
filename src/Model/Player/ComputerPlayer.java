@@ -7,6 +7,8 @@ import java.util.List;
 
 /**
  * Created by Martijn on 27-1-2016.
+ *
+ *
  */
 public class ComputerPlayer extends Player {
 

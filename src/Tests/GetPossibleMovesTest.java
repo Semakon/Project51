@@ -85,9 +85,13 @@ public class GetPossibleMovesTest {
 //                    System.out.println("listY:\t\t" + listY);
 //                }
 //                if (listX.isEmpty() && !listY.isEmpty()) {
-//                    listY.stream().filter(tile -> !possibleTiles.contains(tile)).forEach(possibleTiles::add);
+//                    for (Tile tile : listY) {
+//                        if (!possibleTiles.contains(tile)) possibleTiles.add(tile);
+//                    }
 //                } else if (!listX.isEmpty() && listY.isEmpty()) {
-//                    listX.stream().filter(tile -> !possibleTiles.contains(tile)).forEach(possibleTiles::add);
+//                    for (Tile tile : listX) {
+//                        if (!possibleTiles.contains(tile)) possibleTiles.add(tile);
+//                    }
 //                } else {
 //                    for (Tile tile : listX) {
 //                        boolean add = false;
