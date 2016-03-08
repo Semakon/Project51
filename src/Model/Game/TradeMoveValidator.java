@@ -5,9 +5,9 @@ import Model.Game.Exceptions.InvalidMoveException;
 import java.util.List;
 
 /**
- * Created by Martijn on 30-1-2016.
- *
  * This class has a method to check whether a TradeMove is valid according to the game's rules.
+ *
+ * Created by Martijn on 30-1-2016.
  */
 public class TradeMoveValidator {
 

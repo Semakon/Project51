@@ -7,10 +7,10 @@ import Model.Game.Exceptions.InvalidMoveException;
 import java.util.Map;
 
 /**
- * Created by Martijn on 13-1-2016.
- *
  * This class is created when a move is made on the field (a PutMove). A PutMove is a map of Locations to Tiles with
  * fields that hold information about the PutMove and methods to get or modify that information.
+ *
+ * Created by Martijn on 13-1-2016.
  */
 public class PutMove extends Move {
 

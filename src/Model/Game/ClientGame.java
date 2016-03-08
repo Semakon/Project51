@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Martijn on 30-1-2016.
- *
  * This class is the game that runs on the client. The client's player has his/her own field and the other players
  * are contained in a list of SocketPlayers.
+ *
+ * Created by Martijn on 30-1-2016.
  */
 public class ClientGame {
 

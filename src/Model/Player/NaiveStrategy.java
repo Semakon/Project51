@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Martijn on 27-1-2016.
- *
  * This Strategy is the simplest strategy.
+ *
+ * Created by Martijn on 27-1-2016.
  */
 public class NaiveStrategy implements Strategy {
 

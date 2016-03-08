@@ -5,10 +5,10 @@ import Model.Game.Enumerations.Shape;
 import Model.Game.Exceptions.InvalidIdRuntimeException;
 
 /**
- * Created by martijn on 11-1-16.
- *
  * This class represents a tile that is used to play the game. A Tile has a few characteristics and utilities to
  * compare tiles and represent them on the board.
+ *
+ * Created by martijn on 11-1-16.
  */
 public class Tile {
 

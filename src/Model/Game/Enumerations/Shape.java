@@ -1,9 +1,9 @@
 package Model.Game.Enumerations;
 
 /**
- * Created by Martijn on 13-1-2016.
- *
  * This enumeration represents the shape of a Tile.
+ *
+ * Created by Martijn on 13-1-2016.
  */
 public enum Shape {
 

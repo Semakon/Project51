@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Created by Martijn on 12-1-2016.
- *
  * This class represents the pool where all Tiles are drawn from. Every Tile used in the game originally came from
  * this class.
+ *
+ * Created by Martijn on 12-1-2016.
  */
 public class Pool {
 

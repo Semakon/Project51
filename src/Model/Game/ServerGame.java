@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Martijn on 11-1-16.
- *
  * This class is the game that runs on the server. It contains a list of SocketPlayers that act as substitutes for real
  * players. This class keeps track of everything that happens in the game:
  * The board, the pool, the players and the score.
+ *
+ * Created by Martijn on 11-1-16.
  */
 public class ServerGame {
 

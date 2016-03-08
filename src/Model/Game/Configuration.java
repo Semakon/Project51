@@ -1,10 +1,10 @@
 package Model.Game;
 
 /**
- * Created by Martijn on 11-1-2016.
- *
  * This class contains a number of constant values that are used throughout the project. Containing them in a single
  * class makes for easy adjustments and, in my opinion, cleaner code.
+ *
+ * Created by Martijn on 11-1-2016.
  */
 public class Configuration {
 

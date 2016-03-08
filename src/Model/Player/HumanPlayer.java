@@ -7,9 +7,9 @@ import Model.Game.Exceptions.InvalidMoveException;
 import java.util.List;
 
 /**
- * Created by Martijn on 20-1-2016.
- *
  * This class represents a player controlled by an actual person.
+ *
+ * Created by Martijn on 20-1-2016.
  */
 public class HumanPlayer extends Player {
 

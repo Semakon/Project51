@@ -6,10 +6,10 @@ import Model.Game.Exceptions.InvalidMoveException;
 import java.util.List;
 
 /**
- * Created by Martijn on 22-1-2016.
- *
  * This extension of Player only makes moves that are given to it. It's used to simulate actual players on the
  * ServerGame and ClientGame (otherPlayers).
+ *
+ * Created by Martijn on 22-1-2016.
  */
 public class SocketPlayer extends Player {
 

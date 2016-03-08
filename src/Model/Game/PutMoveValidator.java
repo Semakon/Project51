@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Martijn on 30-1-2016.
- *
  * This class has several methods that are used to validate whether a PutMove is valid on a provided Board.
+ *
+ * Created by Martijn on 30-1-2016.
  */
 public class PutMoveValidator {
 

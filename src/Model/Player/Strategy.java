@@ -5,9 +5,9 @@ import Model.Game.*;
 import java.util.List;
 
 /**
- * Created by Martijn on 27-1-2016.
- *
  * This interface is the basis for all Strategies that ComputerPlayers use.
+ *
+ * Created by Martijn on 27-1-2016.
  */
 public interface Strategy {
 

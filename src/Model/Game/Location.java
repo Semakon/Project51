@@ -1,9 +1,9 @@
 package Model.Game;
 
 /**
- * Created by Martijn on 11-1-2016.
- *
  * This class represents the location of a Tile on the board. It has a unique X and Y coordinate combination.
+ *
+ * Created by Martijn on 11-1-2016.
  */
 public class Location {
 

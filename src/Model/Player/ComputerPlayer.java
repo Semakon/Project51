@@ -6,10 +6,10 @@ import Model.Game.Exceptions.InvalidMoveException;
 import java.util.List;
 
 /**
- * Created by Martijn on 27-1-2016.
- *
  * This class represents a Player controlled by the computer.
  * The computer uses a Strategy to actually make the decisions.
+ *
+ * Created by Martijn on 27-1-2016.
  */
 public class ComputerPlayer extends Player {
 

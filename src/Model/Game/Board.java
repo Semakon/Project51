@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Martijn on 11-1-2016.
- *
  * This class represents the board that the game is played on. The actual field with tiles is a Map with Locations and Tiles.
  * There are methods to alter that field, like making a move, and to get information from it, like getting possible moves.
+ *
+ * Created by Martijn on 11-1-2016.
  */
 public class Board {
 

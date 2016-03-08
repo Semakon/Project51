@@ -3,10 +3,10 @@ package Model.Game;
 import java.util.List;
 
 /**
- * Created by Martijn on 13-1-2016.
- *
  * This class represents a trade move. It contains a list of Tiles that forms the actual move. This class extends
  * the class Move so it can be used to generalize PutMoves and TradeMoves.
+ *
+ * Created by Martijn on 13-1-2016.
  */
 public class TradeMove extends Move {
 

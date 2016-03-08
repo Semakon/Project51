@@ -7,9 +7,9 @@ import Model.Game.Exceptions.InvalidMoveException;
 import java.util.List;
 
 /**
- * Created by Martijn on 11-1-2016.
- *
  * This abstract class generalizes all other Player classes.
+ *
+ * Created by Martijn on 11-1-2016.
  */
 public abstract class Player {
 
