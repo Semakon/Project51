@@ -8,10 +8,19 @@ import java.util.List;
 
 /**
  * Created by Martijn on 11-1-2016.
+ *
+ * This abstract class generalizes all other Player classes.
  */
 public abstract class Player {
 
+    /**
+     * This player's name.
+     */
     private String name;
+
+    /**
+     * This player's hand.
+     */
     private List<Tile> hand;
 
     /**
@@ -28,12 +37,17 @@ public abstract class Player {
     }
 
     /**
-     * returns the player's name.
+     * Returns the player's name.
+     * @return The player's name.
      */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns the player's hand.
+     * @return The player's hand.
+     */
     public List<Tile> getHand() {
         return hand;
     }
@@ -52,21 +66,42 @@ public abstract class Player {
     public Move makeMove(Board board) {
         Move move;
         try {
+
+            // Determine the move
             move = determineMove(board);
-            if (move instanceof PutMove) {
-                if (new PutMoveValidator(board, (PutMove)move).validMove()) {
-                    //Send move to server.
-                }
-            } else if (move instanceof TradeMove) {
-                if (new TradeMoveValidator((TradeMove)move).correctHand(hand)) {
-                    //Send move to server.
-                }
-            }
+
+            // validate the move and send it to the server
+            validateMove(move, board);
+
         } catch (InvalidMoveException e) {
+
+            // if the move is invalid
             move = null;
             e.getMessage(); //TODO: display message to View and try again.
         }
         return move;
+    }
+
+    /**
+     * Checks whether a move is valid. If a move is invalid, throws an InvalidMoveException.
+     * @param move The Move that is to be validated.
+     * @param board The Board that the Move is to be validated on.
+     * @throws InvalidMoveException When the move is invalid.
+     */
+    private void validateMove(Move move, Board board) throws InvalidMoveException {
+        // check if the move is a PutMove or TradeMove
+        if (move instanceof PutMove) {
+            if (new PutMoveValidator(board, (PutMove)move).validMove()) {
+                //TODO: Send move to server.
+
+            } else throw new InvalidMoveException();
+
+        } else if (move instanceof TradeMove) {
+            if (new TradeMoveValidator((TradeMove)move).correctHand(hand)) {
+                //TODO: Send move to server.
+
+            } else throw new InvalidMoveException();
+        }
     }
 
 }
