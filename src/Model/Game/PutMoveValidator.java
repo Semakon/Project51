@@ -51,16 +51,26 @@ public class PutMoveValidator {
      */
     public boolean validMove() throws InvalidMoveException {
         boolean valid;
+
+        // if this move is the first move on the board
         if (firstMove) {
             boolean validFirstMove = false;
+
+            // check if the move contains a Location pointing to (0, 0)
             for (Location loc : move.getMove().keySet()) {
-                if (loc.equals(0, 0)) validFirstMove = true;
+                if (loc.equals(0, 0)) {
+                    validFirstMove = true;
+                    break;
+                }
             }
+            // if there is no Location in the first move pointing to (0, 0), throw invalid move exception
             if (!validFirstMove) throw new InvalidMoveException("First move does not have a Tile on Location (0, 0).");
         }
+        // check whether the move is invalid regardless of the field's state, if not, throw an invalid move exception
         if (validPositioning() && validIdentity()) valid = true;
         else throw new InvalidMoveException("Move is invalid regardless of the fields's state.");
 
+        // check whether the move is valid on the board
         if (!validPut()) valid = false;
 
         return valid;
@@ -78,12 +88,17 @@ public class PutMoveValidator {
         boolean validOrthogonalLines = true;
         boolean touchesField = false;
 
+        // if this is not the first move on the board
         if (!firstMove) {
+
+            // check for every location in the move and on the board
             for (Location loc : move.getMove().keySet()) {
                 for (Location loc2 : board.getField().keySet()) {
-                    if (loc.equals(loc2)) {
-                        throw new InvalidMoveException("Location already in use.");
-                    }
+
+                    // check if location is not already in use
+                    if (loc.equals(loc2)) throw new InvalidMoveException("Location already in use.");
+
+                    // check whether at least one tile in the move makes contact with at least one tile on the field
                     if (!touchesField) {
                         if (loc.equals(loc2.getX(), loc2.getY() + 1) || loc.equals(loc2.getX(), loc2.getY() - 1) || loc.equals(loc2.getX() + 1, loc2.getY()) ||
                                 loc.equals(loc2.getX() - 1, loc2.getY())) {
@@ -92,46 +107,67 @@ public class PutMoveValidator {
                     }
                 }
             }
+            // if no tiles in the move touch the tiles in the field, the move is invalid.
             if (!touchesField) {
                 throw new InvalidMoveException("Tiles are not connected to any other Tiles in the field.");
             }
         }
-
-
+        // pick a random Location as starting point from the move
         Location startPoint = new ArrayList<>(move.getMove().keySet()).get(0);
 
+        // if the move line is vertical
         if (move.getPositioning() == Positioning.vertical) {
-            validLine = validLine(Axis.Y, startPoint, 1) &&
-                    validLine(Axis.Y, startPoint, -1);
 
+            // Check whether the line itself is valid
+            validLine = validLine(Axis.Y, startPoint, 1) && validLine(Axis.Y, startPoint, -1);
+
+            // Check whether the orthogonal lines are valid
             for (Location loc : move.getMove().keySet()) {
+
+                // initialize orthogonal line
                 List<Tile> orthogonalLine = new ArrayList<>();
                 orthogonalLine.addAll(orthogonalLine(Axis.Y, loc, loc, 1));
                 orthogonalLine.addAll(orthogonalLine(Axis.Y, loc, loc, -1));
+
+                // validate the line
                 if (orthogonalLine.size() > 1 && !validLine(orthogonalLine)) {
                     validOrthogonalLines = false;
                     break;
                 }
             }
-        } else if (move.getPositioning() == Positioning.horizontal) {
-            validLine = validLine(Axis.X, startPoint, 1) &&
-                    validLine(Axis.X, startPoint, -1);
 
+        // if the move line is horizontal
+        } else if (move.getPositioning() == Positioning.horizontal) {
+
+            // check whether the line itself is valid
+            validLine = validLine(Axis.X, startPoint, 1) && validLine(Axis.X, startPoint, -1);
+
+            // check whether the orthogonal lines are valid
             for (Location loc : move.getMove().keySet()) {
+
+                // initialize orthogonal line
                 List<Tile> orthogonalLine = new ArrayList<>();
                 orthogonalLine.addAll(orthogonalLine(Axis.X, loc, loc, 1));
                 orthogonalLine.addAll(orthogonalLine(Axis.X, loc, loc, -1));
+
+                // validate the line
                 if (orthogonalLine.size() > 1 && !validLine(orthogonalLine)) {
                     validOrthogonalLines = false;
                     break;
                 }
             }
-        } else if (move.getPositioning() == Positioning.unspecified) {  //TODO: figure out if this is the best solution
-            validLine = validLine(Axis.X, startPoint, 1) &&
-                    validLine(Axis.X, startPoint, -1);
+
+        // if the move consists of only one block
+        } else if (move.getPositioning() == Positioning.unspecified) {
+
+            // check whether the line is valid on the X axis
+            validLine = validLine(Axis.X, startPoint, 1) && validLine(Axis.X, startPoint, -1);
+
+            // check whether the line is valid on the Y axis
             validOrthogonalLines = validLine(Axis.Y, startPoint, 1) &&
                     validLine(Axis.Y, startPoint, -1);
 
+        // if the positioning of the move is invalid
         } else {
             //should not occur
             throw new InvalidPositioningRuntimeException();
@@ -148,6 +184,7 @@ public class PutMoveValidator {
         boolean verticalLine = true;
         boolean horizontalLine = true;
 
+        // checks whether the tiles are all on one horizontal line and whether they are close enough to each other
         outerLoop:
         for (Location loc : move.getMove().keySet()) {
             for (Location loc2 : move.getMove().keySet()) {
@@ -157,6 +194,8 @@ public class PutMoveValidator {
                 }
             }
         }
+
+        // check whether the tiles are all on the one vertical line and whether they are close enough to each other
         outerLoop:
         for (Location loc : move.getMove().keySet()) {
             for (Location loc2 : move.getMove().keySet()) {
@@ -166,6 +205,8 @@ public class PutMoveValidator {
                 }
             }
         }
+
+        // checks whether the move contains a single location twice
         for (Location loc : move.getMove().keySet()) {
             for (Location loc2 : move.getMove().keySet()) {
                 if (loc != loc2 && loc.equals(loc2)) {
@@ -173,6 +214,8 @@ public class PutMoveValidator {
                 }
             }
         }
+
+        // sets the positioning of the move to the appropriate value
         if (move.getMove().size() == 1) {
             move.setPositioning(Positioning.unspecified);
         } else if (horizontalLine && !verticalLine) {
@@ -180,9 +223,11 @@ public class PutMoveValidator {
         } else if (!horizontalLine && verticalLine) {
             move.setPositioning(Positioning.vertical);
         } else {
+            // the move is invalid
             move.setPositioning(Positioning.invalid);
             throw new InvalidMoveException("Invalid Positioning");
         }
+
         return true;
     }
 
@@ -194,17 +239,19 @@ public class PutMoveValidator {
         boolean sameColor = true;
         boolean sameShape = true;
 
+        // compare all tiles in the move
         for (Tile tile : move.getMove().values()) {
             for (Tile tile2 : move.getMove().values()) {
-                if (tile != tile2 && tile.getColor() != tile2.getColor()) {
-                    sameColor = false;
-                }
-                if (tile != tile2 && tile.getShape() != tile2.getShape()) {
-                    sameShape = false;
-                }
+
+                // check if the tiles have the same color
+                if (tile != tile2 && tile.getColor() != tile2.getColor()) sameColor = false;
+
+                // check if the tiles have the same shape
+                if (tile != tile2 && tile.getShape() != tile2.getShape()) sameShape = false;
             }
         }
 
+        // sets the identity of the move to the appropriate value
         if (move.getMove().size() == 1) {
             move.setIdentity(Identity.unspecified);
         } else if (sameColor && !sameShape) {
@@ -215,6 +262,8 @@ public class PutMoveValidator {
             move.setIdentity(Identity.invalid);
         }
 
+        // check if there's a tile that appears twice in the move for a color- and shape identity.
+        // Note: the unspecified identity does not have to be checked, since there's only one Tile in such a move.
         if (move.getIdentity() == Identity.color) {
             for (Tile tile : move.getMove().values()) {
                 for (Tile tile2 : move.getMove().values()) {
@@ -231,9 +280,12 @@ public class PutMoveValidator {
                     }
                 }
             }
+
+        // throw an exception if the identity is invalid
         } else if (move.getIdentity() == Identity.invalid){
             throw new InvalidMoveException("Identity is invalid.");
         }
+
         return true;
     }
 
@@ -246,23 +298,43 @@ public class PutMoveValidator {
      * @param step Step the X or Y takes (1 or -1).
      * @return A List of Tiles that form a line with the Tile that lies on startPoint.
      */
-    private List<Tile> orthogonalLine(Axis axis, Location location, Location startPoint, int step) { //TODO: merge with createLine()
+    private List<Tile> orthogonalLine(Axis axis, Location location, Location startPoint, int step) {
         List<Tile> line = new ArrayList<>();
+
+        // first iteration of this recursive method
         if (location.equals(startPoint)) {
-            if (step > 0) {
-                line.add(move.getMove().get(startPoint));
-            }
+
+            // if the method is going over the positive side of the axis, add the tile on the starting point to the list
+            if (step > 0) line.add(move.getMove().get(startPoint));
+
+            // create a new list of Tiles with a new location, a Location with the appropriate axis increased by step (X + step, Y) or (X, Y + step)
             List<Tile> temp = axis == Axis.Y ? orthogonalLine(axis, new Location(location.getX() + step, location.getY()), startPoint, step) :
                     orthogonalLine(axis, new Location(location.getX(), location.getY() + step), startPoint, step);
+
+            // add the new list to the existing list
             line.addAll(temp);
+
+        // if the location is not equal to the starting point
         } else {
+
+            // check every filled location on the board
             for (Location loc : board.getField().keySet()) {
+
+                // if this method's parameter 'location' is on the board:
                 if (loc.equals(location)) {
+
+                    // add the tile on this location to the list
                     line.add(board.getField().get(loc));
+
+                    // create a new list of Tiles with a new location, a Location with the appropriate axis increased by step (X + step, Y) or (X, Y + step)
                     List<Tile> temp = axis == Axis.Y ? orthogonalLine(axis, new Location(location.getX() + step, location.getY()), startPoint, step) :
                             orthogonalLine(axis, new Location(location.getX(), location.getY() + step), startPoint, step);
+
+                    // add the new list to the existing list
                     line.addAll(temp);
-                    break; //right location is found, further looping is unnecessary
+
+                    //right location is found, further looping is unnecessary
+                    break;
                 }
             }
         }
@@ -279,15 +351,18 @@ public class PutMoveValidator {
         boolean sameColor = true;
         boolean sameShape = true;
 
+        // compare all Tiles in 'line'
         for (Tile tile : line) {
             for (Tile tile2 : line) {
-                if (tile != tile2 && tile.getColor() != tile2.getColor()) {
-                    sameColor = false;
-                } else if (tile != tile2 && tile.getShape() != tile2.getShape()) {
-                    sameShape = false;
-                }
+
+                // check whether the tiles have the same color or the same shape
+                if (tile != tile2 && tile.getColor() != tile2.getColor()) sameColor = false;
+                else if (tile != tile2 && tile.getShape() != tile2.getShape()) sameShape = false;
             }
         }
+
+        // check if there's a tile that appears twice in the line for a color- and shape identity.
+        // note: there's no need for checking for a single tile, since that is checked before calling this method.
         if (sameColor && !sameShape) {
             for (Tile tile : line) {
                 for (Tile tile2 : line) {
@@ -304,9 +379,10 @@ public class PutMoveValidator {
                     }
                 }
             }
-        } else {
-            valid = false;
-        }
+
+        // if the tiles all have the same color or there are tiles with both different colors and different shapes
+        } else valid = false;
+
         return valid;
     }
 
