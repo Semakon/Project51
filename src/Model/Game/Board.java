@@ -32,7 +32,7 @@ public class Board {
      * Returns the field.
      * @return This board's field.
      */
-    public Map<Location, Tile> getField() {
+    public /*@ pure non_null @*/ Map<Location, Tile> getField() {
         return field;
     }
 
@@ -40,6 +40,7 @@ public class Board {
      * Makes a put move on the board. This method does NOT check the validity of the move.
      * @param move The move to be made.
      */
+    //@ requires move != null;
     public void makePutMove(PutMove move) {
         field.putAll(move.getMove());
     }
@@ -50,6 +51,7 @@ public class Board {
      * If a Location yields an empty List, the Location is not included in the Map.
      * @return A Map with a Location and a List of Tiles that can be placed on that Location.
      */
+    //@ ensures \result != null;
     public Map<Location, List<Tile>> getPossibleMoves() {
         Map<Location, List<Tile>> possibleMoves = new HashMap<>();
 
@@ -157,6 +159,11 @@ public class Board {
      * @param step Step taken by for loop that is determined by the identity.
      * @return A list with usable Tiles.
      */
+    /*@
+        requires (step == 1 || step == 6) && list != null && tiles != null &&
+            identity != null && id >= 0 && id <= 5;
+        invariant id == \old(id) || id == \old(id) * 6;
+     @*/
     public List<Tile> checkId(List<Tile> list, List<Tile> tiles, Identity identity, int id, int step) {
 
         // initialize maximum range of for-loop
@@ -199,6 +206,11 @@ public class Board {
      * @param line List of Tiles to be checked.
      * @return Identity of List of Tiles.
      */
+    /*@
+        requires line != null;
+        ensures \result == Identity.color || \result == Identity.shape ||
+             \result == Identity.unspecified || \result == Identity.invalid;
+     @*/
     public Identity getIdentity(List<Tile> line) {
         // initialize values
         Identity identity;
@@ -260,7 +272,7 @@ public class Board {
      * @param step The step taken on the line to the next location. Must be either 1 or -1.
      * @return A list of Tiles that lie on one line. The Location startPoint is not included.
      */
-    //@ requires step == 1 or step == -1;
+    //@ requires (step == 1 || step == -1) && axis != null && location != null && startPoint != null;
     public List<Tile> createLine(Axis axis, Location location, Location startPoint, int step) {
 
         // initialize a list of Tiles as the line
@@ -318,6 +330,7 @@ public class Board {
      * Creates a List of all empty Locations adjacent to used Locations. This List is used to determine possible moves.
      * @return A List of all empty Locations adjacent to used Locations.
      */
+    //@ requires getField() != null;
     public List<Location> getOpenLocations() {
 
         // initialize list of open Locations
@@ -368,6 +381,7 @@ public class Board {
      * @param map The Map where the Location is returned from.
      * @return Location with lowest X/Y
      */
+    //@ requires map != null && axis != null;
     public Location lowerBound(Axis axis, Map<Location, Tile> map) {
 
         // Put all locations from the map into a list.
@@ -410,6 +424,7 @@ public class Board {
      * @param map The Map where the Location is returned from.
      * @return Location with highest X/Y
      */
+    //@ requires map != null && axis != null;
     public Location higherBound(Axis axis, Map<Location, Tile> map) {
 
         // Put all locations from the map into a list.
@@ -532,6 +547,7 @@ public class Board {
      * @param i Coordinate on the Y axis.
      * @return The coordinate on the Y axis in a proper format.
      */
+    //@ requires 99 >= i && i >= -99;
     private String startRow(int i) {
 
         // add a minus if the coordinate is negative.
@@ -550,8 +566,9 @@ public class Board {
     /**
      * Creates a String that is used as the bottom row that represents the X axis.
      * @param i Coordinate on the X axis.
-     * @return The bottom row of the toString() method with the coordinates of the X axis in the proper format.
+     * @return The coordinates of the X axis in the proper format.
      */
+    //@ requires 99 >= i && i >= -99;
     private String bottomRow(int i) {
 
         // add a minus if the coordinate is negative.
