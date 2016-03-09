@@ -40,7 +40,7 @@ public class Pool {
      * Returns the actual list of Tiles contained in this pool.
      * @return The pool.
      */
-    public List<Tile> getPool() {
+    public /*@ pure @*/ List<Tile> getPool() {
         return pool;
     }
 
@@ -48,7 +48,7 @@ public class Pool {
      * Checks whether pool is empty.
      * @return True if pool has no Tiles left.
      */
-    public boolean isEmpty() {
+    public /*@ pure @*/ boolean isEmpty() {
         return pool.isEmpty();
     }
 
@@ -57,6 +57,10 @@ public class Pool {
      * @param amount tiles taken from the pool
      * @return a List of Tiles
      * @throws InsufficientTilesInPoolException If the pool doesn't have enough tiles to take
+     */
+    /*@
+        requires 0 <= amount && amount <= 6 && getPool() >= amount && getPool() != null;
+        ensures \result != null;
      */
     public List<Tile> takeTiles(int amount) throws InsufficientTilesInPoolException {
 
@@ -88,6 +92,10 @@ public class Pool {
      * @param oldTiles Tiles to be traded
      * @return a List of new Tiles from the pool
      * @throws InsufficientTilesInPoolException If the pool doesn't have enough tiles to trade
+     */
+    /*@
+        requires oldTiles != null && 0 <= oldTiles.size() && oldTiles.size() <= 6;
+        ensures \result != null;
      */
     public List<Tile> tradeTiles(List<Tile> oldTiles) throws InsufficientTilesInPoolException {
 
