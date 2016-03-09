@@ -30,7 +30,7 @@ public class Client extends Thread {
     private static ClientView clientView;
     public ServerGame newGame;
 
-    /** Start een Client-applicatie op. */
+    /** Start een Client-applicatie op.*/
     public static void main(String[] args) {
         clientView = new ClientTUI();
         clientView.showMessage(USAGE);
@@ -87,7 +87,10 @@ public class Client extends Thread {
     private List<String> serverFeatures = new ArrayList<>();
 
     /**
-     * Constructs a Client-object and tries to make a socket connection
+     * Constructs a Client-object and tries to make a socket connection.
+     * @param host the ip-adres the client is using (can also be localhost).
+     * @param name the username the client using.
+     * @param port the portnumber the client wants to connect to.
      */
     public Client(String name, InetAddress host, int port) throws IOException {
         clientName = name;
@@ -135,29 +138,41 @@ public class Client extends Thread {
         shutdown();
     }
 
-    /** returns the client name */
+    /** returns the client name.
+     * @return This client's name .
+     */
+
     public String getClientName() {
         return clientName;
     }
 
-
+    /** @param blocks an array of the command that was send by the server split by a msgSeparator.
+     */
     public void identify(String [] blocks){
         serverFeatures.addAll(Arrays.asList(blocks).subList(1, blocks.length));
         clientView.showMessage("IDENTIFYOK" + msgSeparator + serverFeatures);
     }
 
+    /** @param blocks an array of the command that was send by the server split by a msgSeparator.
+     */
     public void challenge(String [] blocks){
         clientView.showMessage("You're challenged by " + blocks[1]);
     }
 
+    /** @param blocks an array of the command that was send by the server split by a msgSeparator.
+     */
     public void challengeDecline(String [] blocks) {
         clientView.showMessage("Your challenge is declined by " + blocks[1]);
     }
 
+    /** @param blocks an array of the command that was send by the server split by a msgSeparator.
+     */
     public void wrongNumber(String [] blocks) {
         clientView.showMessage("Choose a valid number: 2, 3 or 4");
     }
 
+    /** @param blocks an array of the command that was send by the server split by a msgSeparator.
+     */
     public void startGame(String [] blocks) {
         String [] playersList = new String[blocks.length - 2];
         for(int i = 0; i < blocks.length - 2; i++) {
@@ -176,7 +191,9 @@ public class Client extends Thread {
         clientView.showMessage("Couldn't challenge player");
     }
 
-    /** send a message to a ClientHandler. */
+    /** send a message to a ClientHandler.
+     * @param msg the message that needs to be sent to a clientHandler.
+     */
     public void sendMessage(String msg) {
         try {
             out.write(msg);
@@ -199,6 +216,9 @@ public class Client extends Thread {
         }
     }
 
+    /** @param text the incoming message/command that needs to be shown by the clientView.
+     *  @return an empty line if answer = null, else it returns the answer
+    */
     public static String readString(String text) {
         clientView.showMessage(text);
         String answer = null;
