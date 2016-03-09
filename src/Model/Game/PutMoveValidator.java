@@ -44,11 +44,28 @@ public class PutMoveValidator {
     }
 
     /**
+     * Returns the Board the PutMove is validated on.
+     * @return The Board the PutMove is validated on.
+     */
+    public /*@ pure @*/ Board getBoard() {
+        return board;
+    }
+
+    /**
+     * Returns the PutMove that is validated.
+     * @return The PutMove that is validated.
+     */
+    public /*@ pure @*/ PutMove getMove() {
+        return move;
+    }
+
+    /**
      * This method is called by other classes to check this move's validity on the board. If the move is invalid in
      * any way, an InvalidMoveException is thrown.
      * @return True if the move is valid on the board.
      * @throws InvalidMoveException When the move is invalid in any way.
      */
+    //@ requires getMove() != null;
     public boolean validMove() throws InvalidMoveException {
         boolean valid;
 
@@ -83,6 +100,7 @@ public class PutMoveValidator {
      * @return True if the move is valid on this board.
      * @throws InvalidMoveException If the move is invalid.
      */
+    //@ requires getBoard() != null && getMove() != null;
     private boolean validPut() throws InvalidMoveException {
         boolean validLine;
         boolean validOrthogonalLines = true;
@@ -180,6 +198,10 @@ public class PutMoveValidator {
      * Configuration.RANGE distance from one another. Also checks whether the move set has duplicates.
      * @return True if the Location of the move is valid
      */
+    /*@
+        requires getBoard() != null && getMove() != null;
+        ensures \result == true;
+     @*/
     private boolean validPositioning() throws InvalidMoveException {
         boolean verticalLine = true;
         boolean horizontalLine = true;
@@ -235,6 +257,7 @@ public class PutMoveValidator {
      * Checks whether a move has all Tiles with the same color and different shape or same shape and different color.
      * @return True if the Tiles have valid shapes/colors
      */
+    //@ requires getMove() != null;
     private boolean validIdentity() throws InvalidMoveException {
         boolean sameColor = true;
         boolean sameShape = true;
@@ -298,6 +321,11 @@ public class PutMoveValidator {
      * @param step Step the X or Y takes (1 or -1).
      * @return A List of Tiles that form a line with the Tile that lies on startPoint.
      */
+    /*@
+        requires (step == 1 || step == -1) && axis != null && location != null && startPoint != null &&
+            getBoard() != null && getMove() != null;
+        ensures \result != null;
+     @*/
     private List<Tile> orthogonalLine(Axis axis, Location location, Location startPoint, int step) {
         List<Tile> line = new ArrayList<>();
 
@@ -346,6 +374,7 @@ public class PutMoveValidator {
      * @param line Line to be checked.
      * @return True if the line is valid.
      */
+    //@ requires line != null;
     private boolean validIdentityInLine(List<Tile> line) throws InvalidMoveException {
         boolean valid = true;
         boolean sameColor = true;
@@ -396,15 +425,19 @@ public class PutMoveValidator {
      * @param step Step the X or Y takes (1 or -1).
      * @return True if the move does not violate any game rules on the line.
      */
+    /*@ requires (step == 1 || step == -1) && axis != null && location != null &&
+            getBoard() != null && getMove() != null;
+        ensures \result == true;
+     @*/
     private boolean validLine(Axis axis, Location location, int step) throws InvalidMoveException {
 
         // If the parameter 'location' is in the move, increase the appropriate axis by 'step' and try again recursively
         for (Location loc : move.getMove().keySet()) {
             if (loc.equals(location)) {
                 if (axis == Axis.X) {
-                    return validLine(axis, new Location(loc.getX() + step, loc.getY()), step);          // recursive
+                    return validLine(axis, new Location(loc.getX() + step, loc.getY()), step);
                 } else {
-                    return validLine(axis, new Location(loc.getX(), loc.getY() + step), step);          // recursive
+                    return validLine(axis, new Location(loc.getX(), loc.getY() + step), step);
                 }
             }
         }
