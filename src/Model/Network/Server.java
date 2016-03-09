@@ -4,18 +4,17 @@ package Model.Network;
  * Created by Herjan on 20-1-2016.
  */
 import Model.Game.Exceptions.InsufficientTilesInPoolException;
-import Model.Game.Exceptions.InvalidMoveException;
-import Model.Game.ServerGame;
 import Model.Game.Location;
 import Model.Game.PutMove;
+import Model.Game.ServerGame;
 import Model.Game.Tile;
 import View.ServerTUI;
 import View.ServerView;
 
-import java.util.*;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.*;
 
 /**
  * Created by Herjan on 20-1-2016.
@@ -25,7 +24,7 @@ public class Server extends Thread {
     private static final String USAGE = "usage: " + Server.class.getName()
             + " <port>";
 
-    /** Start een Server-applicatie op. */
+    /** Starts a Server-application. */
     public static void main(String[] args) {
         if (args.length != 1) {
             System.out.println(USAGE);
@@ -93,7 +92,7 @@ public class Server extends Thread {
         }
     }
 
-    List<String> serverFeatures = new ArrayList<String>(); //TODO: serverFeatures in lijst stoppen
+    List<String> serverFeatures = new ArrayList<>(); //TODO: put serverFeatures in list
 
     public void identify(ClientHandler c) {
         inactiveThreads.remove(c);
@@ -105,7 +104,7 @@ public class Server extends Thread {
         c.sendMessage("Welcome to the lobby!");
     }
 
-    //werkt nog niet helemaal correct, names pakt nog de lege string ipv die uit de for-loop
+    // does not work properly yet. names takes the empty String instead of the one from the for-loop
     public void lobby(ClientHandler c) {
         String names = "";
         for (ClientHandler aLobby : lobby) {
@@ -225,7 +224,7 @@ public class Server extends Thread {
     }
 
     public void quit(ClientHandler c) {
-        //TODO: remove clienthandler from the game
+        //TODO: remove clientHandler from the game
     }
 
     public void movePut(ClientHandler c, String[] blocks) {
@@ -243,6 +242,7 @@ public class Server extends Thread {
                 int id = Integer.parseInt(tileLoc[0]);
                 int[] m = {x, y, id};
 
+                // debug
                 System.out.println("move:\t" + Arrays.toString(m));
 
                 putMove.add(m);
@@ -252,30 +252,23 @@ public class Server extends Thread {
         serverView.showBoard(c.getGame().getBoard());
     }
 
-
-
     public void moveTrade(ClientHandler c, String[] tiles) {
-        List<Tile> oldTiles = new ArrayList<>();
-        List<Tile> newTiles = new ArrayList<>();
-        int amount = 0;
-        for (int i = 1; i < tiles.length; i++) {
-            String tile = tiles[i];
-            oldTiles.add(new Tile(Integer.parseInt(tile)));
-            amount = tiles.length - 1;
-            try {
-                newTiles = c.getGame().getPool().takeTiles(amount);
-                System.out.println("NewTiles: " + newTiles);
-                //oldTiles.add(tile); //oude tiles moeten omgezet worden van een String/int naar een Tile
-                //c.getGame().getBoard().getPool().tradeTiles(oldTiles);
-            } catch (InsufficientTilesInPoolException e) {
-                e.printStackTrace();
+        if (c.getClientName().equals((c.getGame().getCurrentPlayer().getName()))) {
+            int[] tradeMove = new int[tiles.length - 1];
+            for (int i = 1; i < tiles.length; i++) {
+                int oldTile = Integer.parseInt(tiles[i]);
+
+                // debug
+                System.out.println("move:\t" + oldTile);
+
+                tradeMove[i - 1] = oldTile;
             }
-            for (Tile newTile : newTiles) {
-                c.getGame().getCurrentPlayer().getHand().add(newTile);
-            }
+            c.getGame().madeTradeMove(c.getClientName(), tradeMove);
         }
-        c.sendMessage("MOVEOK_TRADE" + MSG_SEPARATOR + amount);
-        c.sendMessage("DRAWTILE" + MSG_SEPARATOR + newTiles);
+        serverView.showBoard(c.getGame().getBoard());
+
+//        c.sendMessage("MOVEOK_TRADE" + MSG_SEPARATOR + amount);
+//        c.sendMessage("DRAWTILE" + MSG_SEPARATOR + newTiles);
     }
 
     public void broadcast(String msg, ClientHandler c) {
@@ -321,8 +314,7 @@ public class Server extends Thread {
     /**
      * Add a ClientHandler to the collection of ClientHandlers.
      *
-     * @param handler
-     *            ClientHandler that will be added
+     * @param handler ClientHandler that will be added.
      */
     public void addInactiveHandler(ClientHandler handler) {
         inactiveThreads.add(handler);
