@@ -51,18 +51,22 @@ public class ClientHandler extends Thread {
          server.broadcast("[" + clientName + " has entered]", this);
      }
 
+    /** @param name the name that should be linked with this client.*/
     public void setClientName(String name) {
         this.clientName=name;
     }
 
+    /**@return the client's name.*/
     public String getClientName(){
         return clientName;
     }
 
+    /**@return the game this clientHandler participates in.*/
     public ServerGame getGame(){
         return newGame;
     }
 
+    /** @param newGame the game that should be linked with this client.*/
     public void setGame(ServerGame newGame){
         this.newGame = newGame;
     }
@@ -106,6 +110,7 @@ public class ClientHandler extends Thread {
      * connection to the Client. If the writing of a message fails,
      * the method concludes that the socket connection has been lost
      * and shutdown() is called.
+     * @param msg the message that should be sent to the client.
      */
     public void sendMessage(String msg) {
         try {
