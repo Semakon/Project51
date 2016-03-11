@@ -30,7 +30,7 @@ public class Client extends Thread {
     private static ClientView clientView;
     public ServerGame newGame;
 
-    /** Start een Client-applicatie op.*/
+    /** Starts a Client-application.*/
     public static void main(String[] args) {
         clientView = new ClientTUI();
         clientView.showMessage(USAGE);

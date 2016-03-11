@@ -23,7 +23,7 @@ public class Server extends Thread {
     private static final String USAGE = "usage: " + Server.class.getName()
             + " <port>";
 
-    /** Start een Server-applicatie op. */
+    /** Starts a Server-application. */
     public static void main(String[] args) {
         if (args.length != 1) {
             System.out.println(USAGE);
