@@ -51,7 +51,10 @@ public class Board {
      * If a Location yields an empty List, the Location is not included in the Map.
      * @return A Map with a Location and a List of Tiles that can be placed on that Location.
      */
-    //@ ensures \result != null;
+    /*@
+        ensures \result != null && (\forall int i; 0 <= i && i < \result;
+            getOpenLocations().keySet().contains((\result).get(i));
+     @*/
     public Map<Location, List<Tile>> getPossibleMoves() {
         Map<Location, List<Tile>> possibleMoves = new HashMap<>();
 
@@ -160,9 +163,10 @@ public class Board {
      * @return A list with usable Tiles.
      */
     /*@
-        requires (step == 1 || step == 6) && list != null && tiles != null &&
-            identity != null && id >= 0 && id <= 5;
-        invariant id == \old(id) || id == \old(id) * 6;
+        requires (step == 1 || step == Configuration.RANGE) && list != null && tiles != null &&
+            identity != null && id >= 0 && id <= Configuration.RANGE - 1;
+        ensures \old(list) <= \result;
+        invariant id == \old(id) || id == \old(id) * Configuration.RANGE;
      @*/
     public List<Tile> checkId(List<Tile> list, List<Tile> tiles, Identity identity, int id, int step) {
 
@@ -327,10 +331,14 @@ public class Board {
     }
 
     /**
-     * Creates a List of all empty Locations adjacent to used Locations. This List is used to determine possible moves.
+     * Creates a List of all empty Locations adjacent to used Locations. If the field is empty, it will return a list
+     * with only one Location with coordinates (0, 0). This List is used to determine possible moves.
      * @return A List of all empty Locations adjacent to used Locations.
      */
-    //@ requires getField() != null;
+    /*@
+        requires getField() != null;
+        ensures \result != null && !(\result).isEmpty();
+     @*/
     public List<Location> getOpenLocations() {
 
         // initialize list of open Locations
@@ -381,7 +389,10 @@ public class Board {
      * @param map The Map where the Location is returned from.
      * @return Location with lowest X/Y
      */
-    //@ requires map != null && axis != null;
+    /*@
+        requires map != null && axis != null;
+        ensures (\forall Location l : map.keySet(); (\result).getX() <= l.getX() || (\result).getY() <= l.getY());
+     */
     public Location lowerBound(Axis axis, Map<Location, Tile> map) {
 
         // Put all locations from the map into a list.
@@ -424,7 +435,10 @@ public class Board {
      * @param map The Map where the Location is returned from.
      * @return Location with highest X/Y
      */
-    //@ requires map != null && axis != null;
+    /*@
+        requires map != null && axis != null;
+        ensures (\forall Location l : map.keySet(); (\result).getX() >= l.getX() || (\result).getY() >= l.getY());
+     @*/
     public Location higherBound(Axis axis, Map<Location, Tile> map) {
 
         // Put all locations from the map into a list.
