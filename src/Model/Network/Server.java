@@ -3,7 +3,6 @@ package Model.Network;
 /**
  * Created by Herjan on 20-1-2016.
  */
-import Model.Game.Exceptions.InsufficientTilesInPoolException;
 import Model.Game.Location;
 import Model.Game.PutMove;
 import Model.Game.ServerGame;
@@ -24,7 +23,7 @@ public class Server extends Thread {
     private static final String USAGE = "usage: " + Server.class.getName()
             + " <port>";
 
-    /** Starts a Server-application. */
+    /** Start een Server-applicatie op. */
     public static void main(String[] args) {
         if (args.length != 1) {
             System.out.println(USAGE);
@@ -60,6 +59,7 @@ public class Server extends Thread {
     private List<ClientHandler> threePlayerGame;
     private List<ClientHandler> fourPlayerGame;
 
+    /**@param port the port that the server listens to.*/
     public Server(int port) {
 
         this.inactiveThreads = new ArrayList<>();
@@ -94,6 +94,7 @@ public class Server extends Thread {
 
     List<String> serverFeatures = new ArrayList<>(); //TODO: put serverFeatures in list
 
+    /**@param c the clientHandler which has to be used in the method since it has sent the command.*/
     public void identify(ClientHandler c) {
         inactiveThreads.remove(c);
         lobby.add(c);
@@ -105,6 +106,7 @@ public class Server extends Thread {
     }
 
     // does not work properly yet. names takes the empty String instead of the one from the for-loop
+    /**@param c the clientHandler which has to be used in the method since it has sent the command.*/
     public void lobby(ClientHandler c) {
         String names = "";
         for (ClientHandler aLobby : lobby) {
@@ -113,14 +115,19 @@ public class Server extends Thread {
         c.sendMessage("LOBBYOK" + names);
     }
 
+    /**@return the name of the client that has sent the challenge request.*/
     public String getCheckChallenger() {
         return checkChallenger;
     }
 
+    /**@param challenger the name of the client that has sent the challenge request.*/
     public void setCheckChallenger(String challenger) {
         checkChallenger = challenger;
     }
 
+    /**@param c the clientHandler which has to be used in the method since it has sent the command.
+     * @param challenged the name of the client that has been challenged by another client.
+     */
     public void challenge(ClientHandler c, String challenged) {
         for (ClientHandler aLobby : lobby) {
             if (aLobby.getClientName().equals(challenged)) {
@@ -130,6 +137,9 @@ public class Server extends Thread {
         }
     }
 
+    /**@param c the clientHandler which has to be used in the method since it has sent the command.
+     * @param challenger the name of the client that has sent the challenge request.
+     */
     public void challengeDecline(ClientHandler c, String challenger) {
         for (ClientHandler aLobby : lobby) {
             if (aLobby.getClientName().equals(challenger)) {
@@ -138,6 +148,9 @@ public class Server extends Thread {
         }
     }
 
+    /**@param c the clientHandler which has to be used in the method since it has sent the command.
+     * @param challenger the name of the client that has sent the challenge request and to whom the challengeAccept command should be sent.
+     */
     public void challengeAccept(ClientHandler c, String challenger) {
         System.out.println(getCheckChallenger());
         if (challenger.equals(getCheckChallenger())) {
@@ -161,6 +174,9 @@ public class Server extends Thread {
         }
     }
 
+    /**@param c the clientHandler which has to be used in the method since it has sent the command.
+     * @param message the command that is sent by the clientHandler c.
+     */
     public void queue(ClientHandler c, String message) {
         String[] numbers = message.split(",");
         for (int i = 0; i < numbers.length; i++) {
@@ -223,10 +239,14 @@ public class Server extends Thread {
         }
     }
 
+    /**@param c the clientHandler which has to be used in the method since it has sent the command.*/
     public void quit(ClientHandler c) {
         //TODO: remove clientHandler from the game
     }
 
+    /**@param c the clientHandler which has to be used in the method since it has sent the command.
+     * @param blocks an array of the command that was sent by the clientHandler c split by a msgSeparator.
+     */
     public void movePut(ClientHandler c, String[] blocks) {
         if (c.getClientName().equals(c.getGame().getCurrentPlayer().getName())) {
             List<int[]> putMove = new ArrayList<>();
@@ -252,6 +272,9 @@ public class Server extends Thread {
         serverView.showBoard(c.getGame().getBoard());
     }
 
+    /**@param c the clientHandler which has to be used in the method since it has sent the command.
+     * @param tiles an array of the command that was sent by the clientHandler c split by a msgSeparator.
+     */
     public void moveTrade(ClientHandler c, String[] tiles) {
         if (c.getClientName().equals((c.getGame().getCurrentPlayer().getName()))) {
             int[] tradeMove = new int[tiles.length - 1];
@@ -271,6 +294,8 @@ public class Server extends Thread {
 //        c.sendMessage("DRAWTILE" + MSG_SEPARATOR + newTiles);
     }
 
+    /**@param msg the message that was sent by the clientHandler c.
+     * @param c the clientHandler which has to be used in the method since it has sent the command.*/
     public void broadcast(String msg, ClientHandler c) {
         String[] splitArray = msg.split(MSG_SEPARATOR);
         serverView.showMessage("New message from " + c.getClientName() + ": " + msg);
